@@ -18,7 +18,9 @@ app.message('viikko', async({ message, say }) => {
   ]
 
   const d = new Date()
-  d.setDate(d.getDate()+(8-d.getDay()))
+  const weekday = d.getDay()
+  const daysToBeAdded = weekday===0 ? 1 : 8-weekday
+  d.setDate(d.getDate()+daysToBeAdded)
 
   for (const day of weekdays) {
     await say(`${day} ${d.getDate()}.${d.getMonth()+1}.`)
