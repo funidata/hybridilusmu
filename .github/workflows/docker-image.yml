@@ -22,7 +22,7 @@ jobs:
       run: |
         docker login -u "${DOCKER_USER}" -p "${DOCKER_PASSWORD}"
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag hytuslain/hytuslain:$(date +%s)
+      run: docker build . --file Dockerfile --tag hytuslain/hytuslain:"${GITHUB_SHA}"
 
     - name: Docker Push
-      run: docker push hytuslain/hytuslain
+      run: docker push hytuslain/hytuslain:"${GITHUB_SHA}"
