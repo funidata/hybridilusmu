@@ -25,4 +25,5 @@ jobs:
       run: docker build . --file Dockerfile --tag hytuslain/hytuslain:"${GITHUB_SHA}"
 
     - name: Docker Push
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       run: docker push hytuslain/hytuslain:"${GITHUB_SHA}"
