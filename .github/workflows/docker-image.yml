@@ -26,4 +26,4 @@ jobs:
 
     - name: Docker Push
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-      run: docker tag hytuslain/hytuslain:"${GITHUB_SHA}" hytuslain/hytuslain:latest && docker push --all-tags hytuslain/hytuslain:"${GITHUB_SHA}"
+      run: docker tag hytuslain/hytuslain:"${GITHUB_SHA}" hytuslain/hytuslain:latest && docker push --all-tags
