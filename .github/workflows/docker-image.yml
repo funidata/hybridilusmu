@@ -1,10 +1,11 @@
 name: Docker Image CI
 
 on:
-  push:
+  workflow_run:
+    workflows: [ "Node.js CI" ]
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    types:
+      - completed
 
 jobs:
 
@@ -16,14 +17,20 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: docker login
+      if: ${{ github.event.workflow_run.conclusion == 'success' }}
       env:
         DOCKER_USER: ${{secrets.DOCKER_USER}}
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: |
         docker login -u "${DOCKER_USER}" -p "${DOCKER_PASSWORD}"
+
     - name: Build the Docker image
+      if: ${{ github.event.workflow_run.conclusion == 'success' }}
       run: docker build . --file Dockerfile --tag hytuslain/hytuslain:"${GITHUB_SHA}"
 
     - name: Docker Push
-      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      if: ${{ github.event.workflow_run.conclusion == 'success' }}
+      # yritetään olla tekemättä puskua, kun kyseessä on pullari
+      if: ${{ github.event.workflow_run.pull_requests == null }}
+      if: ${{ github.ref == 'refs/heads/master' }}
       run: docker tag hytuslain/hytuslain:"${GITHUB_SHA}" hytuslain/hytuslain:latest && docker push --all-tags hytuslain/hytuslain
