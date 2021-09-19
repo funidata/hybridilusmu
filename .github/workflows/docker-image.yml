@@ -24,15 +24,15 @@ jobs:
       run: |
         docker login -u "${DOCKER_USER}" -p "${DOCKER_PASSWORD}"
 
+    - name: wtfrly
+      env:
+        GITHUB_CTX: ${{ toJSON(github) }}
+      run:
+        echo "${GITHUB_CTX}"
+
     - name: Build the Docker image
       if: ${{ github.event.workflow_run.conclusion == 'success' }}
       run: docker build . --file Dockerfile --tag hytuslain/hytuslain:"${GITHUB_SHA}"
-
-    - name: wtfrly
-      env:
-        GITHUB_CTX= ${{ toJSON(github) }}
-      run:
-        echo "${GITHUB_CTX}"
 
     - name: Docker Push
       if: |
