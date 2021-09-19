@@ -1,5 +1,6 @@
 require('dotenv').config()
 const { App } = require('@slack/bolt');
+const logic = require('./logic');
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -9,22 +10,8 @@ const app = new App({
 });
 
 app.message('viikko', async({ message, say }) => {
-  const weekdays = [
-    'Maanantai',
-    'Tiistai',
-    'Keskiviikko',
-    'Torstai',
-    'Perjantai'
-  ]
-
-  const d = new Date()
-  const weekday = d.getDay()
-  const daysToBeAdded = weekday===0 ? 1 : 8-weekday
-  d.setDate(d.getDate()+daysToBeAdded)
-
-  for (const day of weekdays) {
-    await say(`${day} ${d.getDate()}.${d.getMonth()+1}.`)
-    d.setDate(d.getDate()+1)
+  for (const lineToPrint of logic.generateNextWeek(new Date())) {
+      await say(lineToPrint)
   }
 });
 
@@ -34,6 +21,5 @@ app.event('reaction_added', async ({ event, client }) => {
 
 (async () => {
   await app.start(process.env.PORT || 3000);
-
   console.log('⚡️ Bolt app is running!');
 })();
