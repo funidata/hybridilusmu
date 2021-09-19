@@ -28,6 +28,12 @@ jobs:
       if: ${{ github.event.workflow_run.conclusion == 'success' }}
       run: docker build . --file Dockerfile --tag hytuslain/hytuslain:"${GITHUB_SHA}"
 
+    - name: wtfrly
+      env:
+        GITHUB_CTX= ${{ toJSON(github) }}
+      run:
+        echo "${GITHUB_CTX}"
+
     - name: Docker Push
       if: |
         github.event.workflow_run.conclusion == 'success' &&
