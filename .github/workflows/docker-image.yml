@@ -31,7 +31,6 @@ jobs:
     - name: Docker Push
       if: |
         github.event.workflow_run.conclusion == 'success' &&
-        # Yritetään olla tekemättä puskua, kun kyseessä on pullari
         github.event.workflow_run.pull_requests == null &&
         github.ref == 'refs/heads/master'
       run: docker tag hytuslain/hytuslain:"${GITHUB_SHA}" hytuslain/hytuslain:latest && docker push --all-tags hytuslain/hytuslain
