@@ -24,12 +24,6 @@ jobs:
       run: |
         docker login -u "${DOCKER_USER}" -p "${DOCKER_PASSWORD}"
 
-    - name: wtfrly
-      env:
-        GITHUB_CTX: ${{ toJSON(github) }}
-      run:
-        echo "${GITHUB_CTX}"
-
     - name: Build the Docker image
       if: ${{ github.event.workflow_run.conclusion == 'success' }}
       run: docker build . --file Dockerfile --tag hytuslain/hytuslain:"${GITHUB_SHA}"
@@ -37,6 +31,6 @@ jobs:
     - name: Docker Push
       if: |
         github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.pull_requests == null &&
+        github.event.workflow_run.event == 'push' &&
         github.ref == 'refs/heads/master'
       run: docker tag hytuslain/hytuslain:"${GITHUB_SHA}" hytuslain/hytuslain:latest && docker push --all-tags hytuslain/hytuslain
