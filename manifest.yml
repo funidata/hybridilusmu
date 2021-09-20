@@ -22,6 +22,7 @@ oauth_config:
       - mpim:history
       - channels:read
       - reactions:read
+      - usergroups:read
 settings:
   event_subscriptions:
     bot_events:
