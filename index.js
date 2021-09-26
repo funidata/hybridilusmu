@@ -27,21 +27,25 @@ app.event('reaction_added', async ({ event, client }) => {
 })();
 
 async function startScheduling() {
-  (await app.client.conversations.list()).channels
-  .filter(c => c.is_member)
-  .forEach(c => {
-    const everySunday = new schedule.RecurrenceRule();
-    everySunday.dayOfWeek = 0
-    console.log("scheduling posts to channel", c.name, "on dayOfWeek",everySunday.dayOfWeek)
+  const everySunday = new schedule.RecurrenceRule();
+  everySunday.dayOfWeek = 0
+  console.log("scheduling posts to every public channel the bot is a member of on dayOfWeek",everySunday.dayOfWeek)
+  const job = schedule.scheduleJob(everySunday, () => {
     weekdays = logic.generateNextWeek(new Date())
-    const job = schedule.scheduleJob(everySunday, () => {
-      postMessage(c.id, weekdays[0])
-        .then(() => postMessage(c.id, weekdays[1]))
-        .then(() => postMessage(c.id, weekdays[2]))
-        .then(() => postMessage(c.id, weekdays[3]))
-        .then(() => postMessage(c.id, weekdays[4]))
-    })
+    getMemberChannelIds().then((result) => result.forEach(id => {
+      postMessage(id, weekdays[0])
+        .then(() => postMessage(id, weekdays[1]))
+        .then(() => postMessage(id, weekdays[2]))
+        .then(() => postMessage(id, weekdays[3]))
+        .then(() => postMessage(id, weekdays[4]))
+    }))
   })
+}
+
+async function getMemberChannelIds() {
+  return (await app.client.conversations.list()).channels
+    .filter(c => c.is_member)
+    .map(c => c.id)
 }
 
 async function postMessage(channelId, text) {
