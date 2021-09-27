@@ -51,7 +51,7 @@ const updateHome = async (client, userId) => {
       "type": "section",
       "text": {
           "type": "plain_text",
-          "text": `Tiedot päivitetty ${date.getDay()}.${date.getMonth()} klo ${date.getHours()}:${date.getMinutes()}`
+          "text": `Tiedot päivitetty ${date.toLocaleString()}`
         }
     },
     {
