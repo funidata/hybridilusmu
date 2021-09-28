@@ -19,7 +19,8 @@
   "homepage": "https://github.com/hytuslain/hytuslain#readme",
   "dependencies": {
     "@slack/bolt": "^3.6.0",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "node-schedule": "^2.0.0"
   },
   "devDependencies": {
     "mocha": "^9.1.1"
