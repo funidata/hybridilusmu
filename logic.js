@@ -22,7 +22,7 @@ const generateNextWeek = day => {
 const generateWeek = (day) => {
   const res = []
   const currDate = new Date();
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 14; i++) {
     dayNumber = currDate.getDay();
     if (dayNumber === 6 || dayNumber === 0) {
       currDate.setDate(currDate.getDate() + 1)

@@ -1,4 +1,9 @@
 const logic = require('./logic');
+const { plain_text, mrkdwn } = require('./blocks/section')
+const { header } = require('./blocks/header')
+const { actions } = require('./blocks/actions')
+const { divider } = require('./blocks/divider')
+const { button } = require('./blocks/elements/button')
 
 const update = async (client, userId) => {
   const date = new Date()
@@ -6,42 +11,16 @@ const update = async (client, userId) => {
   let dayBlocks = []
 
   dayBlocks = dayBlocks.concat(
-    {
-      "type": "section",
-      "text": {
-          "type": "plain_text",
-          "text": `Tiedot päivitetty ${date.toLocaleString()}`
-        }
-    },
-    {
-      "type": "actions",
-      "elements": [
-          {
-            "type": "button",
-            "text": {
-              "type": "plain_text",
-              "emoji": true,
-              "text": "Päivitä"
-            },
-            "value": "updated",
-            "action_id": 'update_click'              
-          }
-      ]
-    },
-    {
-      "type": "divider"
-    }
+    plain_text(`Tiedot päivitetty ${date.toLocaleString()}`),
+    actions([
+      button('Päivitä', 'update_click', 'updated')
+    ]),
+    divider()
   )
 
   days.forEach(d => {
     dayBlocks = dayBlocks.concat(
-      {
-        "type": "header",
-        "text": {
-            "type": "plain_text",
-            "text": d
-          }
-      }
+      header(d)
     )
     
     const enrollments = logic.getEnrollmentsFor(d)
@@ -49,55 +28,15 @@ const update = async (client, userId) => {
     enrollments.forEach((user) => {
       usersString += `<@${user}>\n`
     })
-
-    dayBlocks = dayBlocks.concat(
-      {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": usersString
-          }
-      }
-    )
     
     dayBlocks = dayBlocks.concat(
-      {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": "Oma ilmoittautumiseni:"
-          }
-      },
-      {
-        "type": "actions",
-        "elements": [
-            {
-              "type": "button",
-              "text": {
-                "type": "plain_text",
-                "emoji": true,
-                "text": "Toimistolla"
-              },
-              "style": `${logic.userInOffice(userId, d) ? "danger" : "primary"}`,
-              "value": d,
-              "action_id": 'toimistolla_click'              
-            },
-            {
-              "type": "button",
-              "text": {
-                "type": "plain_text",
-                "emoji": true,
-                "text": "Etänä"
-              },
-              "style": `${logic.userIsRemote(userId, d) ? "danger" : "primary"}`,
-              "value": d,
-              "action_id": 'etana_click'
-          }
-        ]
-      },
-      {
-        "type": "divider"
-      }
+      mrkdwn(usersString),
+      plain_text("Oma ilmoittautumiseni:"),
+      actions([
+        button('Toimistolla', 'toimistolla_click', d, `${logic.userInOffice(userId, d) ? 'primary' : null}`),
+        button('Etänä', 'etana_click', d, `${logic.userIsRemote(userId, d) ? 'primary' : null}`) 
+      ]),
+      divider()
     )
   })
 
@@ -107,7 +46,7 @@ const update = async (client, userId) => {
     user_id: userId,
     view: {
        type:"home",
-       blocks: JSON.stringify(blocks)
+       blocks: blocks
     }
   })
 }
