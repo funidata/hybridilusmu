@@ -1,6 +1,7 @@
 const db = require("../database");
 const assert = require('assert');
-const { publicEncrypt } = require("crypto");
+const controller = require("../controllers/db.controllers");
+const { publicEncrypt, sign } = require("crypto");
 
 describe('signups test', function() {
 
@@ -12,11 +13,10 @@ describe('signups test', function() {
     it('create office date and assign to a user', async function() {
         const person = await db.Person.create({
             id: 1,
-            slack_user_id: 'XYZ',
+            slack_id: 'XYZ',
             real_name: 'Matti Meikalainen'
         });
         const su1 = await db.Signup.create({
-            id: 2,
             office_date: '2021-10-10',
             at_office: true,
             PersonId: 1
@@ -29,31 +29,50 @@ describe('signups test', function() {
     it('find all users for a date', async function() {
         const p2 = await db.Person.create({
             id: 2,
-            slack_user_id: 'ZZZ',
+            slack_id: 'ZZZ',
             real_name: 'Maija Mehilainen'
         });
         const su2 = await db.Signup.create({
-            id: 3,
             office_date: '2021-10-10',
             at_office: true,
             PersonId: 2
         });
 
-        const persons = await db.Signup.findAll({
-            attributes: ['PersonId'],
-            where: {
-                office_date: '2021-10-10',
-                at_office: true
-            }
-            
-        });
+        const persons = await controller.getAllOfficeSignupsForADate('2021-10-10');
         let txt = '';
+
         for (let i=0; i < persons.length; i++) {
-            const p = await db.Person.findByPk(persons[i].PersonId);
+            const p = await db.Person.findByPk(persons[i]);
             txt += p.real_name + ' ';
-        }
+        };
         assert.equal('Matti Meikalainen Maija Mehilainen ', txt);
+
     });
+    it('addSignUpForUser test', async function() {
+        const p2 = await db.Person.create({
+            id: 3,
+            slack_id: 'ABC',
+            real_name: 'Tyyppi Tyyppinen'
+        });
+        const user_id = await controller.findUserId('ABC');
+        await controller.addSignupForUser(user_id, '2021-10-11', true);
+        const person = await db.Person.findByPk(1, {
+            include: ["signups"]
+        });
+        assert.equal(1, person.signups.length); 
+    });
+    it('find signups for a person test', async function() {
+        const user_id = await controller.findUserId('ABC');
+        await controller.addSignupForUser(user_id, '2021-10-12', true);
+        const signups = await controller.getAllOfficeSignupsForAUser(user_id);
+        assert.equal(2, signups.length);
+        assert.equal('2021-10-11', signups[0]);
+    });
+    it('removeSignup test', async function() {
+        await controller.removeSignup(3, '2021-10-11');
+        const signups = await controller.getAllOfficeSignupsForAUser(3);
+        assert.equal(1, signups.length);
+    })
     
 
 });

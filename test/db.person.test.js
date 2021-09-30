@@ -12,7 +12,7 @@ describe('persons test', function() {
     it('create user', async function() {
         const person = await db.Person.create({
             id: 1,
-            slack_user_id: 'XYZ',
+            slack_id: 'XYZ',
             real_name: 'Matti Meikalainen'
         });
         assert.equal(person.id, 1);
@@ -24,6 +24,10 @@ describe('persons test', function() {
     it('findUserId test', async function() {
         const id = await controller.findUserId('XYZ');
         assert.equal(1, id);
+    });
+    it('find slack_id', async function() {
+        const slack_id = await controller.getSlackId(1);
+        assert.equal('XYZ', slack_id);
     });
 
     
