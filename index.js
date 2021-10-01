@@ -3,6 +3,8 @@ const schedule = require('node-schedule');
 const { App } = require('@slack/bolt');
 const logic = require('./logic');
 const home = require('./home')
+const db = require('./database');
+const controller = require('./controllers/db.controllers');
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
