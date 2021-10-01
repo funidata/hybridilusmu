@@ -26,7 +26,7 @@ exports.addSignupForUser = (user_id, date, atoffice) => {
         PersonId: user_id,
     })
     .then((signup) => {
-        console.log("added signup for ", slack_id);
+        console.log("added signup for ");
         return signup;
     })
     .catch((err) => {
@@ -87,7 +87,7 @@ exports.addUser = (user) => {
         real_name: user.real_name
     })
     .then((person) => {
-        console.log("person created ", person);
+        console.log("person created ");
         return person;
     })
     .catch((err) => {
@@ -98,7 +98,7 @@ exports.addUser = (user) => {
 exports.getSlackId = (id) => {
     return Person.findByPk(id)
     .then((user) => {
-        console.log("found user ", user);
+        console.log("found user ");
         return user.slack_id;
     })
     .catch((err) => {

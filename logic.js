@@ -1,4 +1,4 @@
-const db = require('./database');
+const db = require('./controllers/db.controllers');
 
 const daysUntilMonday = day => day.getDay() === 0 ? 1 : 8 - day.getDay()
 
@@ -30,7 +30,7 @@ const generateWeek = (day) => {
       currDate.setDate(currDate.getDate() + 1)
       continue
     }
-    res.push(`${weekdays[dayNumber-1]} ${currDate.getDate()}.${currDate.getMonth() + 1}.`)
+    res.push(`${currDate.getFullYear()}-${currDate.getMonth()}-${currDate.getDate() + 1}`)
     currDate.setDate(currDate.getDate() + 1)
   }
   return res;
@@ -39,21 +39,41 @@ const generateWeek = (day) => {
 const users = new Map();
 generateWeek(new Date()).forEach(d => users.set(d, []))
 
-const getEnrollmentsFor = (date) => {
-  return users.get(date)
+const getEnrollmentsFor = async (date) => {
+  const dbIds = await db.getAllOfficeSignupsForADate(date)
+  console.log("dbIds:", dbIds)
+
+  const slackIds = []
+
+  for (let i = 0; i < dbIds.length; i++) {
+    slackIds.push(await db.getSlackId(dbIds[i]))
+  }
+
+  console.log("slackIds for : ", date, slackIds)
+  return slackIds
 }
 
-const setInOffice = (userId, date) => {
-  db.addSignupForUser(userId, date)
-  users.set(date, users.get(date).concat(userId))
+const setInOffice = async (userId, date) => {
+  const user = {
+    id: userId,
+    real_name: "user1"
+  }
+  //await db.addUser(user)
+  const id = await db.findUserId(userId)
+  console.log(id)
+  await db.addSignupForUser(id, date, true)
+  //users.set(date, users.get(date).concat(userId))
 }
 
 const setAsRemote = (userId, date) => {
   users.set(date, users.get(date).filter(function(e){return e != userId}))
 }
 
-const userInOffice = (userId, date) => {
-  return users.get(date).includes(userId)
+const userInOffice = async (userId, date) => {
+  const enrollments = await db.getAllOfficeSignupsForAUser(await db.findUserId(userId))
+  const is = enrollments.includes(date)
+  console.log(is, date)
+  return is
 }
 
 const userIsRemote = (userId, date) => {

@@ -18,12 +18,14 @@ const update = async (client, userId) => {
     divider()
   )
 
-  days.forEach(d => {
+  for (let i = 0; i < days.length; i++) {
+    const d = days[i]
+
     dayBlocks = dayBlocks.concat(
       header(d)
     )
     
-    const enrollments = logic.getEnrollmentsFor(d)
+    const enrollments = await logic.getEnrollmentsFor(d)
     let usersString = enrollments.length === 0 ? "Kukaan ei ole ilmoittautunut toimistolle!" : "Toimistolla aikoo olla:\n"
     enrollments.forEach((user) => {
       usersString += `<@${user}>\n`
@@ -33,12 +35,12 @@ const update = async (client, userId) => {
       mrkdwn(usersString),
       plain_text("Oma ilmoittautumiseni:"),
       actions([
-        button('Toimistolla', 'toimistolla_click', d, `${logic.userInOffice(userId, d) ? 'primary' : null}`),
-        button('Etänä', 'etana_click', d, `${logic.userIsRemote(userId, d) ? 'primary' : null}`) 
+        button('Toimistolla', 'toimistolla_click', d, `${await logic.userInOffice(userId, d) ? 'primary' : null}`),
+        button('Etänä', 'etana_click', d, `${await logic.userIsRemote(userId, d) ? 'primary' : null}`) 
       ]),
       divider()
     )
-  })
+  }
 
   const blocks = dayBlocks
 
