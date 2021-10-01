@@ -1,5 +1,6 @@
 
 const { DateTime } = require("luxon");
+const daysUntilMonday = day => day.getDay() === 0 ? 1 : 8 - day.getDay()
 
 const generateNextWeek = day => {
   const weekdays = [
@@ -9,8 +10,7 @@ const generateNextWeek = day => {
     'Torstai',
     'Perjantai'
   ]
-  const daysUntilMonday = day.getDay() === 0 ? 1 : 8 - day.getDay()
-  day.setDate(day.getDate() + daysUntilMonday)
+  day.setDate(day.getDate() + daysUntilMonday(day))
   const result = []
   for (const weekday of weekdays) {
     result.push(`${weekday} ${day.getDate()}.${day.getMonth() + 1}.`)
@@ -34,4 +34,5 @@ const getPeopleInOffice = date => {
     return names
 }
 
-module.exports = { generateNextWeek, formateDate, getPeopleInOffice };
+module.exports = { generateNextWeek, formateDate, getPeopleInOffice, daysUntilMonday };
+
