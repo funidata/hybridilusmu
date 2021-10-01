@@ -1,3 +1,5 @@
+const db = require('./database');
+
 const daysUntilMonday = day => day.getDay() === 0 ? 1 : 8 - day.getDay()
 
 const weekdays = [
@@ -42,6 +44,7 @@ const getEnrollmentsFor = (date) => {
 }
 
 const setInOffice = (userId, date) => {
+  db.addSignupForUser(userId, date)
   users.set(date, users.get(date).concat(userId))
 }
 
