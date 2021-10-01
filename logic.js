@@ -1,4 +1,6 @@
 
+const { DateTime } = require("luxon");
+
 const generateNextWeek = day => {
   const weekdays = [
     'Maanantai',
@@ -17,26 +19,19 @@ const generateNextWeek = day => {
   return result
 }
 
-const formateDateString = input => {
-  const regex = /^([0-9]+\.[0-9]+(\.[0-9]+)?)$/
-  if (!regex.test(input)) return ""
+const formateDate = input => {
+  const regex = /^([0-9]+\.[0-9]+(\.)?)$/
+  if (!regex.test(input)) return DateTime.fromObject({ day: 0 })
   const pieces = input.split(".")
-  if (pieces[0].length == 1) pieces[0] = "0" + pieces[0]
-  if (pieces[1].length == 1) pieces[1] = "0" + pieces[1]
-  let dateStr = "-" + pieces[1] + "-" + pieces[0]
-  if (pieces.length >= 3) {
-    let zeros = 4 - pieces[2].length;
-    for (let i = 0; i < zeros; i++) {
-      pieces[2] = "0" + pieces[2]
-    }
-    dateStr = pieces[2] + dateStr
-  } else dateStr = (new Date).getFullYear() + dateStr
-  return dateStr
+  let date = DateTime.fromObject({ month: pieces[1],  day: pieces[0] })
+  let now = DateTime.now()
+  if (date < now) date = date.plus({ years: 1 })
+  return date
 }
 
-const getPeopleInOffice = dateStr => {
+const getPeopleInOffice = date => {
     const names = ["Jussikainen Pupu", "Missenen Misse", "Makkis"]
     return names
 }
 
-module.exports = { generateNextWeek, formateDateString, getPeopleInOffice };
+module.exports = { generateNextWeek, formateDate, getPeopleInOffice };

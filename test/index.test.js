@@ -20,13 +20,5 @@ describe('Weekdays Test', () => {
 });
 
 describe('Date Format Tests', () => {
- it('date format test', () => {
-    assert.equal(logic.formateDateString("31.1"), (new Date()).getFullYear() + "-01-31")
- });
- it('date format test 2', () => {
-    assert.equal(logic.formateDateString("6.5.2010"), "2010-05-06")
- });
- it('date format test 3', () => {
-    assert.equal(logic.formateDateString("6.5.2010 moi"), "")
- });
+
 });

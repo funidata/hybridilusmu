@@ -1,5 +1,5 @@
 require('dotenv').config()
-const moment = require('moment');
+const { DateTime } = require("luxon");
 const { App } = require('@slack/bolt');
 const logic = require('./logic');
 
@@ -21,12 +21,13 @@ app.event('reaction_added', async ({ event, client }) => {
 });
 
 app.event('message', async({ event, say }) => {
-  const dateStr = logic.formateDateString(event.text)
-  if (moment(dateStr, "YYYY-MM-DD", true).isValid() && event.channel_type == "im") {
-    const date = new Date(dateStr);
+  const date = logic.formateDate(event.text)
+  if (date.isValid && event.channel_type == "im") {
+    let response = ""
     for (const name of logic.getPeopleInOffice(date)) {
-      await say(name)
+      response += name + "\n"
     }
+    await say(response)
   }
 });
 
