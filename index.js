@@ -20,7 +20,7 @@ app.message('viikko', async({ message, say }) => {
 });
 
 app.event('reaction_added', async ({ event, client }) => {
-  console.log(`User <${event.user}> reacted`)
+  console.log(`User <${event.user}> reacted`);
 });
 
 app.event('app_home_opened', async ({ event, client }) => {
