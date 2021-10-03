@@ -21,7 +21,7 @@ exports.findUserId = (slack_id) => {
 };
 
 exports.addSignupForUser = (user_id, date, atoffice) => {
-    return Signup.create({
+    return Signup.upsert({
         office_date: date,
         at_office: atoffice,
         PersonId: user_id,
@@ -83,7 +83,7 @@ exports.getAllOfficeSignupsForAUser = (user_id) => {
 };
 
 exports.addUser = (user) => {
-    return Person.create({
+    return Person.upsert({
         slack_id: user.id,
         real_name: user.real_name
     })
