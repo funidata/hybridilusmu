@@ -94,18 +94,18 @@ const setAsRemote = (userId, date) => {
   //users.set(date, users.get(date).filter(function(e){return e != userId}))
 }
 
-const userInOffice = async (userId, date) => {
+const userInOffice = async (userId, date, atOffice = true) => {
   const id = await db.findUserId(userId)
   if (id != null) {
-    const enrollments = await db.getAllOfficeSignupsForAUser(id)
+    const enrollments = await db.getAllOfficeSignupsForAUser(id, atOffice)
     const is = enrollments.includes(date)
     return is
   }
   return false
 }
 
-const userIsRemote = (userId, date) => {
-  return !userInOffice(userId, date)
+const userIsRemote = async (userId, date) => {
+  return userInOffice(userId, date, false)
 }
 
 module.exports = {

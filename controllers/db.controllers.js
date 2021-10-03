@@ -64,7 +64,7 @@ exports.getAllOfficeSignupsForADate = (date) => {
 
 // hakee ilmoittautumiset tietylle päivälle
 // palauttaa arrayn päivämääristä
-exports.getAllOfficeSignupsForAUser = (user_id) => {
+exports.getAllOfficeSignupsForAUser = (user_id, atOffice = true) => {
     return Person.findByPk(user_id, {
         include: ['signups']
     })
@@ -73,7 +73,7 @@ exports.getAllOfficeSignupsForAUser = (user_id) => {
         const signups = person.signups;
         const arr = [];
         for (let i=0; i < signups.length; i++) {
-            if (signups[i].at_office) {
+            if (signups[i].at_office == atOffice) {
                 arr.push(signups[i].office_date);
             }
         };
