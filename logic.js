@@ -12,6 +12,7 @@ const weekdays = [
 
 
 const generateNextWeek = day => {
+  day = new Date(day)
   day.setDate(day.getDate() + daysUntilMonday(day))
   const result = []
   for (const weekday of weekdays) {
@@ -31,7 +32,7 @@ const generateDateTitle = (date) => {
 
 const generateWeek = (day) => {
   const res = []
-  const currDate = day;
+  const currDate = new Date(day)
   for (let i = 0; i < 14; i++) {
     dayNumber = currDate.getDay();
     if (dayNumber === 6 || dayNumber === 0) {
