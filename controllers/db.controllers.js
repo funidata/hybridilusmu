@@ -73,7 +73,9 @@ exports.getAllOfficeSignupsForAUser = (user_id) => {
         const signups = person.signups;
         const arr = [];
         for (let i=0; i < signups.length; i++) {
-            arr.push(signups[i].office_date);
+            if (signups[i].at_office) {
+                arr.push(signups[i].office_date);
+            }
         };
         return arr;
     })
