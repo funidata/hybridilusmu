@@ -21,16 +21,36 @@ const generateNextWeek = day => {
   return result
 }
 
+const generateDateTitle = (date) => {
+  const parts = date.split('-')
+  const newDate = new Date(parts[0], parts[1] -1, parts[2])
+  const weekday = weekdays[newDate.getDay() -1]
+  const res = `${weekday} ${newDate.getDate()}.${newDate.getMonth() +1}.`
+  return res
+}
+
 const generateWeek = (day) => {
   const res = []
-  const currDate = new Date();
+  const currDate = day;
   for (let i = 0; i < 14; i++) {
     dayNumber = currDate.getDay();
     if (dayNumber === 6 || dayNumber === 0) {
       currDate.setDate(currDate.getDate() + 1)
       continue
     }
-    res.push(`${currDate.getFullYear()}-${currDate.getMonth()}-${currDate.getDate() + 1}`)
+    var month = ''
+    if (currDate.getMonth() < 9) {
+      month = `0${currDate.getMonth() + 1}`
+    } else {
+       month = `${currDate.getMonth() + 1}`
+    }
+    var dayNum = ''
+    if (currDate.getDate() < 10 ) {
+      dayNum = `0${currDate.getDate()}`
+    } else {
+      dayNum = `${currDate.getDate()}`
+    }
+    res.push(`${currDate.getFullYear()}-${month}-${dayNum}`)
     currDate.setDate(currDate.getDate() + 1)
   }
   return res;
@@ -41,12 +61,12 @@ generateWeek(new Date()).forEach(d => users.set(d, []))
 
 const getEnrollmentsFor = async (date) => {
   const dbIds = await db.getAllOfficeSignupsForADate(date)
-  console.log("dbIds:", dbIds)
 
   const slackIds = []
-
-  for (let i = 0; i < dbIds.length; i++) {
-    slackIds.push(await db.getSlackId(dbIds[i]))
+  if (dbIds.length != 0) {
+    for (let i = 0; i < dbIds.length; i++) {
+      slackIds.push(await db.getSlackId(dbIds[i]))
+    }
   }
 
   console.log("slackIds for : ", date, slackIds)
@@ -58,8 +78,11 @@ const setInOffice = async (userId, date) => {
     id: userId,
     real_name: "user1"
   }
-  //await db.addUser(user)
-  const id = await db.findUserId(userId)
+  var id = await db.findUserId(userId)
+  if (id == null) {
+    await db.addUser(user)
+    id = await db.findUserId(userId)
+  }
   console.log(id)
   await db.addSignupForUser(id, date, true)
   //users.set(date, users.get(date).concat(userId))
@@ -70,14 +93,17 @@ const setAsRemote = (userId, date) => {
 }
 
 const userInOffice = async (userId, date) => {
-  const enrollments = await db.getAllOfficeSignupsForAUser(await db.findUserId(userId))
-  const is = enrollments.includes(date)
-  console.log(is, date)
-  return is
+  const id = await db.findUserId(userId)
+  if (id != null) {
+    const enrollments = await db.getAllOfficeSignupsForAUser(id)
+    const is = enrollments.includes(date)
+    return is
+  }
+  return false
 }
 
 const userIsRemote = (userId, date) => {
   return false
 }
 
-module.exports = { daysUntilMonday, generateNextWeek, generateWeek, getEnrollmentsFor, setInOffice, setAsRemote, userInOffice, userIsRemote};
+module.exports = { daysUntilMonday, generateNextWeek, generateDateTitle, generateWeek, getEnrollmentsFor, setInOffice, setAsRemote, userInOffice, userIsRemote};

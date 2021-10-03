@@ -16,6 +16,7 @@ exports.findUserId = (slack_id) => {
     })
     .catch((err) => {
         console.log('error while finding id ', err);
+        return null;
     });
 };
 

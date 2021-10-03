@@ -22,7 +22,7 @@ const update = async (client, userId) => {
     const d = days[i]
 
     dayBlocks = dayBlocks.concat(
-      header(d)
+      header(logic.generateDateTitle(d))
     )
     
     const enrollments = await logic.getEnrollmentsFor(d)
