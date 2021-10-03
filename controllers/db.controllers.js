@@ -62,7 +62,7 @@ exports.getAllOfficeSignupsForADate = (date) => {
 };
 
 
-// hakee ilmoittautumiset tietylle päivälle
+// hakee kaikki tietyn käyttäjän ilmoittautumiset, joiden at_office === atOffice
 // palauttaa arrayn päivämääristä
 exports.getAllOfficeSignupsForAUser = (user_id, atOffice = true) => {
     return Person.findByPk(user_id, {
@@ -73,7 +73,7 @@ exports.getAllOfficeSignupsForAUser = (user_id, atOffice = true) => {
         const signups = person.signups;
         const arr = [];
         for (let i=0; i < signups.length; i++) {
-            if (signups[i].at_office == atOffice) {
+            if (signups[i].at_office === atOffice) {
                 arr.push(signups[i].office_date);
             }
         };
@@ -81,6 +81,35 @@ exports.getAllOfficeSignupsForAUser = (user_id, atOffice = true) => {
     })
     .catch((err) => {
         console.log("Error while finding signups ", err);
+    });
+};
+
+// palauttaa Signupin käyttäjälle haluttuna päivänä
+// palauttaa undefined, jos Signupia ei löydy
+exports.getOfficeSignupForUserAndDate = (user_id, date) => {
+    return Person.findByPk(user_id, {
+        include: [
+            {
+                model: Signup,
+                as: "signups",
+                where: {office_date: date}
+            }
+        ]
+    })
+    .then((person) => {
+        if (!person) {
+            throw `no signup found for user ${user_id} on ${date}`
+        }
+        console.log("signup found for user ", user_id, " on ", date);
+        const signups = person.signups;
+        let ret = undefined;
+        for (let i=0; i < signups.length; i++) {
+            ret = signups[i];
+        };
+        return ret;
+    })
+    .catch((err) => {
+        console.log("Error while finding signup ", err);
     });
 };
 
