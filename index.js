@@ -22,13 +22,17 @@ app.event('reaction_added', async ({ event, client }) => {
 });
 
 app.event('message', async({ event, say }) => {
-  const date = logic.formateDate(event.text)
-  if (date.isValid && event.channel_type == "im") {
-    let response = ""
-    for (const name of logic.getPeopleInOffice(date)) {
+  if (event.channel_type == "im") {
+    const date = logic.parseDate(event.text)
+    if (date.isValid) {
+        console.log(date.toString())
+      let response = ""
+      for (const name of logic.getPeopleInOffice(date)) {
       response += name + "\n"
-    }
-    await say(response)
+      }
+      await say(response)  
+    } else await say("Anteeksi, en ymmärtänyt äskeistä.")
+    
   }
 });
 
