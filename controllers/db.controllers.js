@@ -108,7 +108,7 @@ exports.getSlackId = (id) => {
 };
 
 exports.removeSignup = (id, date) => {
-    return Signup.destroy({        
+    return Signup.destroy({
         where: {
             office_date: date,
             PersonId: id

@@ -74,7 +74,7 @@ const getEnrollmentsFor = async (date) => {
   return slackIds
 }
 
-const setInOffice = async (userId, date) => {
+const setInOffice = async (userId, date, atOffice = true) => {
   const user = {
     id: userId,
     real_name: "user1"
@@ -85,12 +85,13 @@ const setInOffice = async (userId, date) => {
     id = await db.findUserId(userId)
   }
   console.log(id)
-  await db.addSignupForUser(id, date, true)
+  await db.addSignupForUser(id, date, atOffice)
   //users.set(date, users.get(date).concat(userId))
 }
 
 const setAsRemote = (userId, date) => {
-  users.set(date, users.get(date).filter(function(e){return e != userId}))
+  setInOffice(userId, date, false)
+  //users.set(date, users.get(date).filter(function(e){return e != userId}))
 }
 
 const userInOffice = async (userId, date) => {
@@ -104,7 +105,17 @@ const userInOffice = async (userId, date) => {
 }
 
 const userIsRemote = (userId, date) => {
-  return false
+  return !userInOffice(userId, date)
 }
 
-module.exports = { daysUntilMonday, generateNextWeek, generateDateTitle, generateWeek, getEnrollmentsFor, setInOffice, setAsRemote, userInOffice, userIsRemote};
+module.exports = {
+  daysUntilMonday,
+  generateNextWeek,
+  generateDateTitle,
+  generateWeek,
+  getEnrollmentsFor,
+  setInOffice,
+  setAsRemote,
+  userInOffice,
+  userIsRemote
+};

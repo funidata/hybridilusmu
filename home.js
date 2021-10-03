@@ -11,7 +11,7 @@ const update = async (client, userId) => {
   let dayBlocks = []
 
   dayBlocks = dayBlocks.concat(
-    plain_text(`Tiedot päivitetty ${date.toLocaleString()}`),
+    plain_text(`Tiedot päivitetty ${date.toLocaleString("fi-FI")}`),
     actions([
       button('Päivitä', 'update_click', 'updated')
     ]),
@@ -24,19 +24,19 @@ const update = async (client, userId) => {
     dayBlocks = dayBlocks.concat(
       header(logic.generateDateTitle(d))
     )
-    
+
     const enrollments = await logic.getEnrollmentsFor(d)
     let usersString = enrollments.length === 0 ? "Kukaan ei ole ilmoittautunut toimistolle!" : "Toimistolla aikoo olla:\n"
     enrollments.forEach((user) => {
       usersString += `<@${user}>\n`
     })
-    
+
     dayBlocks = dayBlocks.concat(
       mrkdwn(usersString),
       plain_text("Oma ilmoittautumiseni:"),
       actions([
         button('Toimistolla', 'toimistolla_click', d, `${await logic.userInOffice(userId, d) ? 'primary' : null}`),
-        button('Etänä', 'etana_click', d, `${await logic.userIsRemote(userId, d) ? 'primary' : null}`) 
+        button('Etänä', 'etana_click', d, `${await logic.userIsRemote(userId, d) ? 'primary' : null}`)
       ]),
       divider()
     )

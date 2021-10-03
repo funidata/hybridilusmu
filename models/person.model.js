@@ -10,6 +10,14 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             allowNull: true
         }
+    }, {
+        indexes: [
+            {
+                // enforce slack id uniqueness
+                fields: ["slack_id"],
+                unique: true
+            }
+        ]
     });
     return Person
 };

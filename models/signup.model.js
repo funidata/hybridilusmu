@@ -10,6 +10,18 @@ module.exports = ( sequelize, Sequelize ) => {
             type: Sequelize.BOOLEAN,
             allowNull: false
         }
+    }, {
+        indexes: [
+            {
+                // just for speeding up date lookups
+                fields: ["office_date"]
+            },
+            {
+                // a two-field index to ensure uniqueness of signups
+                fields: ["office_date", "PersonId"],
+                unique: true
+            }
+        ]
     });
     return Signups;
 };
