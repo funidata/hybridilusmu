@@ -11,7 +11,7 @@ const update = async (client, userId) => {
   let dayBlocks = []
 
   dayBlocks = dayBlocks.concat(
-    plain_text(`Tiedot päivitetty ${date.toLocaleString("fi-FI")}`),
+    plain_text(`Tiedot päivitetty ${date.toLocaleString("fi-FI", { timeZone: 'Europe/Helsinki' })}`),
     actions([
       button('Päivitä', 'update_click', 'updated')
     ]),
