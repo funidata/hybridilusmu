@@ -89,8 +89,8 @@ const setInOffice = async (userId, date, atOffice = true) => {
   //users.set(date, users.get(date).concat(userId))
 }
 
-const setAsRemote = (userId, date) => {
-  setInOffice(userId, date, false)
+const setAsRemote = async (userId, date) => {
+  await setInOffice(userId, date, false)
   //users.set(date, users.get(date).filter(function(e){return e != userId}))
 }
 
