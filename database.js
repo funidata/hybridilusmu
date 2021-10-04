@@ -24,7 +24,7 @@ db.Signup = require("./models/signup.model.js")(sequelize, Sequelize);
 db.Person.hasMany(db.Signup, { as: "signups" });
 
 db.Signup.belongsTo(db.Person, {
-    foreignKey: "personId",
+    foreignKey: "PersonId",
     as: "person",
 });
 
