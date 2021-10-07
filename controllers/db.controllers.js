@@ -36,7 +36,6 @@ exports.addSignupForUser = async (userId, date, atOffice) => {
             })
             
             const user = userQuery[0].dataValues
-            console.log(user)
 
             const signup = await Signup.upsert({
                 office_date: date,
@@ -102,32 +101,46 @@ exports.getAllOfficeSignupsForAUser = (user_id, atOffice = true) => {
 
 // palauttaa Signupin käyttäjälle haluttuna päivänä
 // palauttaa undefined, jos Signupia ei löydy
-exports.getOfficeSignupForUserAndDate = (user_id, date) => {
-    return Person.findByPk(user_id, {
-        include: [
-            {
-                model: Signup,
-                as: "signups",
-                where: {office_date: date}
-            }
-        ]
-    })
-    .then((person) => {
-        if (!person) {
-            throw `no signup found for user ${user_id} on ${date}`
-        }
-        console.log("signup found for user ", user_id, " on ", date);
-        const signups = person.signups;
-        let ret = undefined;
-        for (let i=0; i < signups.length; i++) {
-            ret = signups[i];
-        };
-        return ret;
-    })
-    .catch((err) => {
-        console.log("Error while finding signup ", err);
-    });
-};
+
+exports.getOfficeSignupForUserAndDate = async (userId, date) => {
+    try {
+        const result = await sequelize.transaction(async (t) => {
+            const userQuery = await Person.findOrCreate({
+                where: {
+                    slack_id: userId,
+                },
+                defaults: {
+                    real_name: 'Nope'
+                },
+                transaction: t
+            })
+            
+            const user = userQuery[0].dataValues
+
+            const person = await Person.findByPk(user.id, {
+                include: [
+                    {
+                        model: Signup,
+                        as: "signups",
+                        where: {office_date: date}
+                    }
+                ],
+                transaction: t
+            })
+
+            console.log("signup found for user ", userId, " on ", date);
+            const signups = person.signups;
+            let ret = undefined;
+            for (let i=0; i < signups.length; i++) {
+                ret = signups[i].dataValues;
+            };
+            return ret;
+        })
+        return result
+    } catch (err) {
+        console.log("Error while finding signups ", err);
+    }
+}
 
 exports.addUser = (user) => {
     return Person.upsert({

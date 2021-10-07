@@ -85,13 +85,8 @@ const setAsRemote = async (userId, date) => {
 }
 
 const userInOffice = async (userId, date, atOffice = true) => {
-  const id = await db.findUserId(userId)
-  if (id != null) {
-    const enrollment = await db.getOfficeSignupForUserAndDate(id, date)
-    const is = enrollment && enrollment.at_office === atOffice
-    return is
-  }
-  return false
+  const enrollment = await db.getOfficeSignupForUserAndDate(userId, date)
+  return enrollment && enrollment.at_office === atOffice
 }
 
 const userIsRemote = async (userId, date) => {
