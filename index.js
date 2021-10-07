@@ -1,4 +1,5 @@
 require('dotenv').config()
+const { DateTime } = require("luxon");
 const schedule = require('node-schedule');
 const { App } = require('@slack/bolt');
 const logic = require('./logic');
@@ -18,6 +19,21 @@ app.message('viikko', async({ message, say }) => {
 
 app.event('reaction_added', async ({ event, client }) => {
   console.log(`User <${event.user}> reacted`)
+});
+
+app.event('message', async({ event, say }) => {
+  if (event.channel_type == "im") {
+    const date = logic.parseDate(event.text)
+    if (date.isValid) {
+        console.log(date.toString())
+      let response = ""
+      for (const name of logic.getPeopleInOffice(date)) {
+      response += name + "\n"
+      }
+      await say(response)  
+    } else await say("Anteeksi, en ymmärtänyt äskeistä.")
+    
+  }
 });
 
 (async () => {

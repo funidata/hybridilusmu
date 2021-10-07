@@ -1,7 +1,7 @@
 const assert = require('assert');
 const logic = require('../logic');
 
-describe('Simple Unit Test', () => {
+describe('Weekdays Test', () => {
  it('Basic test', () => {
         const wantedResult = [
             'Maanantai 20.9.',
@@ -17,4 +17,8 @@ describe('Simple Unit Test', () => {
             assert.equal(result[i], wantedResult[i]);
         }
     });
+});
+
+describe('Date Format Tests', () => {
+
 });
