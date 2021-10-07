@@ -25,12 +25,18 @@ exports.findUserId = (slack_id) => {
 exports.addSignupForUser = async (userId, date, atOffice) => {
     try {
         const result = await sequelize.transaction(async (t) => {
-            const userQuery = await Person.upsert({
-                slack_id: userId,
-                real_name: "Nope"
-            }, {transaction: t, returning: true})
-
+            const userQuery = await Person.findOrCreate({
+                where: {
+                    slack_id: userId,
+                },
+                defaults: {
+                    real_name: 'Nope'
+                },
+                transaction: t
+            })
+            
             const user = userQuery[0].dataValues
+            console.log(user)
 
             const signup = await Signup.upsert({
                 office_date: date,
@@ -40,8 +46,8 @@ exports.addSignupForUser = async (userId, date, atOffice) => {
 
             return signup
         })
-    } catch (error) {
-        console.log("Error while adding a sign up ", error);
+    } catch (err) {
+        console.log("Error while adding a sign up ", err);
     }
 }
 
@@ -66,7 +72,7 @@ exports.getAllOfficeSignupsForADate = (date) => {
         return arr;
     })
     .catch((err) => {
-        //console.log("Error while finding signups ", err);
+        console.log("Error while finding signups ", err);
     });
 
 };
