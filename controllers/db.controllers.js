@@ -1,4 +1,4 @@
-const { Sequelize } = require("../database");
+const { Sequelize, sequelize } = require("../database");
 const db = require("../database");
 const Person = db.Person;
 const Signup = db.Signup;
@@ -15,25 +15,35 @@ exports.findUserId = (slack_id) => {
         return p.id;
     })
     .catch((err) => {
-        console.log('error while finding id ', err);
+        //console.log('error while finding id ', err);
         return null;
     });
 };
 
-exports.addSignupForUser = (user_id, date, atoffice) => {
-    return Signup.upsert({
-        office_date: date,
-        at_office: atoffice,
-        PersonId: user_id,
-    })
-    .then((signup) => {
-        console.log("added signup for ");
-        return signup;
-    })
-    .catch((err) => {
-        console.log("Error while adding a sign up ", err);
-    });
-};
+
+
+exports.addSignupForUser = async (userId, date, atOffice) => {
+    try {
+        const result = await sequelize.transaction(async (t) => {
+            const userQuery = await Person.upsert({
+                slack_id: userId,
+                real_name: "Nope"
+            }, {transaction: t, returning: true})
+
+            const user = userQuery[0].dataValues
+
+            const signup = await Signup.upsert({
+                office_date: date,
+                at_office: atOffice,
+                PersonId: user.id,
+            }, {transaction: t})
+
+            return signup
+        })
+    } catch (error) {
+        console.log("Error while adding a sign up ", error);
+    }
+}
 
 
 // hakee tietylle päivämäärälle ilmoittautuneet käyttäjät
@@ -56,7 +66,7 @@ exports.getAllOfficeSignupsForADate = (date) => {
         return arr;
     })
     .catch((err) => {
-        console.log("Error while finding signups ", err);
+        //console.log("Error while finding signups ", err);
     });
 
 };
@@ -80,7 +90,7 @@ exports.getAllOfficeSignupsForAUser = (user_id, atOffice = true) => {
         return arr;
     })
     .catch((err) => {
-        console.log("Error while finding signups ", err);
+        //console.log("Error while finding signups ", err);
     });
 };
 

@@ -75,17 +75,7 @@ const getEnrollmentsFor = async (date) => {
 }
 
 const setInOffice = async (userId, date, atOffice = true) => {
-  const user = {
-    id: userId,
-    real_name: "user1"
-  }
-  var id = await db.findUserId(userId)
-  if (id == null) {
-    await db.addUser(user)
-    id = await db.findUserId(userId)
-  }
-  console.log(id)
-  await db.addSignupForUser(id, date, atOffice)
+  await db.addSignupForUser(userId, date, atOffice)
   //users.set(date, users.get(date).concat(userId))
 }
 
