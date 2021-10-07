@@ -3,6 +3,9 @@ const { DateTime } = require("luxon");
 const schedule = require('node-schedule');
 const { App } = require('@slack/bolt');
 const logic = require('./logic');
+const home = require('./home')
+const db = require('./database');
+const controller = require('./controllers/db.controllers');
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -20,7 +23,28 @@ app.message('viikko', async({ message, say }) => {
 */
 
 app.event('reaction_added', async ({ event, client }) => {
-  console.log(`User <${event.user}> reacted`)
+  console.log(`User <${event.user}> reacted`);
+});
+
+app.event('app_home_opened', async ({ event, client }) => {
+  home.update(client, event.user);
+});
+
+app.action(`toimistolla_click`, async ({ body, ack, client}) => {
+  await logic.setInOffice(body.user.id, body.actions[0].value)
+  home.update(client, body.user.id);
+  await ack();
+});
+
+app.action(`etana_click`, async ({ body, ack, client}) => {
+  await logic.setAsRemote(body.user.id, body.actions[0].value)
+  home.update(client, body.user.id);
+  await ack();
+});
+
+app.action(`update_click`, async ({ body, ack, client}) => {
+  home.update(client, body.user.id);
+  await ack();
 });
 
 app.event('message', async({ event, say }) => {
@@ -44,10 +68,13 @@ app.event('message', async({ event, say }) => {
 })();
 
 async function startScheduling() {
-  const everySunday = new schedule.RecurrenceRule();
-  everySunday.dayOfWeek = 0
-  console.log("scheduling posts to every public channel the bot is a member of on dayOfWeek",everySunday.dayOfWeek)
-  const job = schedule.scheduleJob(everySunday, () => {
+  const onceEverySunday = new schedule.RecurrenceRule();
+  onceEverySunday.tz = 'Etc/UTC';
+  onceEverySunday.dayOfWeek = 0
+  onceEverySunday.hour = 10
+  onceEverySunday.minute = 30
+  console.log("scheduling posts to every public channel the bot is a member of on dayOfWeek",onceEverySunday.dayOfWeek,"at hour",onceEverySunday.hour,onceEverySunday.tz)
+  const job = schedule.scheduleJob(onceEverySunday, () => {
     weekdays = logic.generateNextWeek(new Date())
     getMemberChannelIds().then((result) => result.forEach(id => {
       postMessage(id, weekdays[0])
