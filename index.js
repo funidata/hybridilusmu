@@ -11,11 +11,13 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN
 });
 
+/*
 app.message('viikko', async({ message, say }) => {
   for (const lineToPrint of logic.generateNextWeek(new Date())) {
       await say(lineToPrint)
   }
 });
+*/
 
 app.event('reaction_added', async ({ event, client }) => {
   console.log(`User <${event.user}> reacted`)
@@ -25,14 +27,13 @@ app.event('message', async({ event, say }) => {
   if (event.channel_type == "im") {
     const date = logic.parseDate(event.text)
     if (date.isValid) {
-        console.log(date.toString())
+      console.log(date.toString())
       let response = ""
       for (const name of logic.getPeopleInOffice(date)) {
-      response += name + "\n"
+        response += name + "\n"
       }
       await say(response)  
     } else await say("Anteeksi, en ymmärtänyt äskeistä.")
-    
   }
 });
 

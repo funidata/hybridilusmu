@@ -8,6 +8,8 @@ const weekdays = [
     'Torstai',
     'Perjantai'
   ]
+const MAX_INPUT_LENGTH = 20
+const RECORD_LIMIT = 180
 
 const generateNextWeek = day => {
   day.setDate(day.getDate() + daysUntilMonday(day))
@@ -20,35 +22,28 @@ const generateNextWeek = day => {
 }
 
 const parseDate = input => {
-  if (input.length < 20) {
-    weekday = matchesWeekday(input)
-    if (weekday != 0) {
-        let date = DateTime.now()
-        return date.plus({ days: (weekday + 7 - date.weekday)%7 })
-    }
+  weekday = matchWeekday(input)
+  if (weekday != 0) {
+    let date = DateTime.now()
+    return date.plus({ days: (weekday + 7 - date.weekday)%7 })
   }
   const regex = /^([0-9]+\.[0-9]+(\.)?)$/
   if (!regex.test(input)) return DateTime.fromObject({ day: 0 })
   const pieces = input.split(".")
   let date = DateTime.fromObject({ month: pieces[1],  day: pieces[0] })
   let now = DateTime.now()
-  if (date < now.minus({ days: 1 })) date = date.plus({ years: 1 })
+  if (date < now.minus({ days: RECORD_LIMIT })) date = date.plus({ years: 1 })
   return date
 }
 
-const getPeopleInOffice = date => {
-    const names = ["Jussikainen Pupu", "Missenen Misse", "Makkis"]
-    return names
-}
-
-
-//returns 0 if no match, 1 if matches monday, 2 for tuesday etc.
-const matchesWeekday = str => {
+//returns 0 if no match, 1 if str matches monday, 2 for tuesday etc.
+const matchWeekday = str => {
+    if (str.length > MAX_INPUT_LENGTH) return 0
     dist = new Array(weekdays.length)
     for (let i = 0; i < weekdays.length; i++) {
         dist[i] = [editDistance(str.toLowerCase(), weekdays[i].toLowerCase()) , i]
     }
-    dist.sort((a,b)=>a[0]-b[0])
+    dist.sort((a,b) => a[0]-b[0])
     if (dist[0][0] <= 3) return dist[0][1] + 1
     return 0
 }
@@ -57,15 +52,9 @@ const editDistance = (str1, str2) => {
    a = str1.length
    b = str2.length
    dp = new Array(a+1)
-   for (let i = 0; i < a+1; i++) {
-     dp[i] = new Array(b+1)
-   }
-   for (let i = 0; i <= a; i++) {
-     dp[i][0] = i
-   }
-   for (let i = 0; i <= b; i++) {
-     dp[0][i] = i
-   }
+   for (let i = 0; i <= a; i++) dp[i] = new Array(b+1)
+   for (let i = 0; i <= a; i++) dp[i][0] = i
+   for (let i = 0; i <= b; i++) dp[0][i] = i
    for (let i = 1; i <= a; i++) {
       for (let j = 1; j <= b; j++) {
         c = (str1[i-1] === str2[j-1] ? 0 : 1)
@@ -75,5 +64,9 @@ const editDistance = (str1, str2) => {
    return dp[a][b]
 }
 
-module.exports = { generateNextWeek, parseDate, getPeopleInOffice, daysUntilMonday ,editDistance, matchesWeekday};
+const getPeopleInOffice = date => {
+    const names = ["Jussikainen Pupu", "Missenen Misse", "Makkis"]
+    return names
+}
 
+module.exports = { generateNextWeek, parseDate, getPeopleInOffice, daysUntilMonday, editDistance, matchWeekday };
