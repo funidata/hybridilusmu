@@ -10,7 +10,6 @@ const weekdays = [
   'Perjantai'
 ]
 
-
 const generateNextWeek = day => {
   day = new Date(day)
   day.setDate(day.getDate() + daysUntilMonday(day))
@@ -33,7 +32,7 @@ const generateDateTitle = (date) => {
 const generateWeek = (day) => {
   const res = []
   const currDate = new Date(day)
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 1; i++) {
     dayNumber = currDate.getDay();
     if (dayNumber === 6 || dayNumber === 0) {
       currDate.setDate(currDate.getDate() + 1)
@@ -57,9 +56,6 @@ const generateWeek = (day) => {
   return res;
 }
 
-const users = new Map();
-generateWeek(new Date()).forEach(d => users.set(d, []))
-
 const getEnrollmentsFor = async (date) => {
   const dbIds = await db.getAllOfficeSignupsForADate(date)
 
@@ -74,14 +70,12 @@ const getEnrollmentsFor = async (date) => {
   return slackIds
 }
 
-const setInOffice = async (userId, date, atOffice = true) => {
-  await db.addSignupForUser(userId, date, atOffice)
-  //users.set(date, users.get(date).concat(userId))
-}
-
-const setAsRemote = async (userId, date) => {
-  await setInOffice(userId, date, false)
-  //users.set(date, users.get(date).filter(function(e){return e != userId}))
+const toggleSignup = async (userId, date, atOffice = true) => {
+  if (await userInOffice(userId, date, atOffice)) {
+    await db.removeSignup(userId, date)
+  } else {
+    await db.addSignupForUser(userId, date, atOffice)
+  }
 }
 
 const userInOffice = async (userId, date, atOffice = true) => {
@@ -99,8 +93,7 @@ module.exports = {
   generateDateTitle,
   generateWeek,
   getEnrollmentsFor,
-  setInOffice,
-  setAsRemote,
+  toggleSignup,
   userInOffice,
   userIsRemote
 };

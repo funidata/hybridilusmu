@@ -4,6 +4,20 @@ const Person = db.Person;
 const Signup = db.Signup;
 const Op = Sequelize.Op;
 
+const getUser = async (userId, transaction) => {
+    const userQuery = await Person.findOrCreate({
+        where: {
+            slack_id: userId,
+        },
+        defaults: {
+            real_name: 'Nope'
+        },
+        transaction: transaction
+    })
+
+    return userQuery[0].dataValues
+}
+
 exports.findUserId = (slack_id) => {
     return Person.findOne({
         attributes: ['id'],
@@ -25,17 +39,7 @@ exports.findUserId = (slack_id) => {
 exports.addSignupForUser = async (userId, date, atOffice) => {
     try {
         const result = await sequelize.transaction(async (t) => {
-            const userQuery = await Person.findOrCreate({
-                where: {
-                    slack_id: userId,
-                },
-                defaults: {
-                    real_name: 'Nope'
-                },
-                transaction: t
-            })
-            
-            const user = userQuery[0].dataValues
+            const user = await getUser(userId, t)
 
             const signup = await Signup.upsert({
                 office_date: date,
@@ -105,17 +109,7 @@ exports.getAllOfficeSignupsForAUser = (user_id, atOffice = true) => {
 exports.getOfficeSignupForUserAndDate = async (userId, date) => {
     try {
         const result = await sequelize.transaction(async (t) => {
-            const userQuery = await Person.findOrCreate({
-                where: {
-                    slack_id: userId,
-                },
-                defaults: {
-                    real_name: 'Nope'
-                },
-                transaction: t
-            })
-            
-            const user = userQuery[0].dataValues
+            const user = await getUser(userId, t)
 
             const person = await Person.findByPk(user.id, {
                 include: [
@@ -181,4 +175,21 @@ exports.removeSignup = (id, date) => {
         console.log("Error while removing signup ", err);
     });
 };
+
+exports.removeSignup = async (userId, date) => {
+    try {
+        const result = await sequelize.transaction(async t => {
+            const user = await getUser(userId, t)
+
+            await Signup.destroy({
+                where: {
+                    office_date: date,
+                    PersonId: user.id
+                }
+            })
+        })
+    } catch (err) {
+        console.log("Error while removing signup ", err);
+    }
+}
 
