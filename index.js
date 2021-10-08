@@ -53,9 +53,11 @@ app.event('message', async({ event, say }) => {
     if (date.isValid) {
       console.log(date.toString())
       let response = ""
-      for (const name of logic.getPeopleInOffice(date)) {
-        response += name + "\n"
-      }
+      const enrollments = await logic.getEnrollmentsFor(logic.generateDayStringFrom(new Date(date.toString())))
+      if (enrollments.length == 0) response = "Kukaan ei ole toimistolla tuona päivänä."
+      enrollments.forEach((user) => {
+        response += `<@${user}>\n`
+      })
       await say(response)  
     } else await say("Anteeksi, en ymmärtänyt äskeistä.")
   }

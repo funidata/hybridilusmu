@@ -47,7 +47,7 @@ const matchWeekday = str => {
         dist[i] = [editDistance(str.toLowerCase(), weekdays[i].toLowerCase()) , i]
     }
     dist.sort((a,b) => a[0]-b[0])
-    if (dist[0][0] <= 3) return dist[0][1] + 1
+    if (dist[0][0] <= 2) return dist[0][1] + 1
     return 0
 }
 
@@ -89,22 +89,26 @@ const generateDaysStartingFrom = (day, n) => {
       currDate.setDate(currDate.getDate() + 1)
       continue
     }
-    var month = ''
+    res.push(generateDayStringFrom(currDate))
+    currDate.setDate(currDate.getDate() + 1)
+  }
+  return res;
+}
+
+const generateDayStringFrom = currDate => {
+    let month = ''
     if (currDate.getMonth() < 9) {
       month = `0${currDate.getMonth() + 1}`
     } else {
        month = `${currDate.getMonth() + 1}`
     }
-    var dayNum = ''
+    let dayNum = ''
     if (currDate.getDate() < 10 ) {
       dayNum = `0${currDate.getDate()}`
     } else {
       dayNum = `${currDate.getDate()}`
     }
-    res.push(`${currDate.getFullYear()}-${month}-${dayNum}`)
-    currDate.setDate(currDate.getDate() + 1)
-  }
-  return res;
+    return `${currDate.getFullYear()}-${month}-${dayNum}`
 }
 
 const getEnrollmentsFor = async (date) => {
@@ -135,12 +139,11 @@ module.exports = {
   generateNextWeek,
   generateDateTitle,
   generateDaysStartingFrom,
+  generateDayStringFrom,
   getEnrollmentsFor,
   getPeopleInOffice,
   matchWeekday,
   parseDate,
-  setInOffice,
-  setAsRemote,
   toggleSignup,
   userInOffice,
   userIsRemote

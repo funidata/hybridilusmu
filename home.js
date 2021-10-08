@@ -24,7 +24,6 @@ const update = async (client, userId) => {
     blocks = blocks.concat(
       header(logic.generateDateTitle(d))
     )
-
     const enrollments = await logic.getEnrollmentsFor(d)
     let usersString = enrollments.length === 0 ? "Kukaan ei ole ilmoittautunut toimistolle!" : "Toimistolla aikoo olla:\n"
     enrollments.forEach((user) => {
