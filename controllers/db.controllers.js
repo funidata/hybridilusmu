@@ -93,7 +93,7 @@ exports.getAllOfficeSignupsForAUser = (user_id, atOffice = true) => {
         return arr;
     })
     .catch((err) => {
-        //console.log("Error while finding signups ", err);
+        console.log("Error while finding signups ", err);
     });
 };
 

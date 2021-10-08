@@ -8,9 +8,9 @@ const { button } = require('./blocks/elements/button')
 const update = async (client, userId) => {
   const date = new Date()
   const days = logic.generateDaysStartingFrom(date, 14)
-  let dayBlocks = []
+  let blocks = []
 
-  dayBlocks = dayBlocks.concat(
+  blocks = blocks.concat(
     plain_text(`Tiedot päivitetty ${date.toLocaleString("fi-FI", { timeZone: 'Europe/Helsinki' })}`),
     actions([
       button('Päivitä', 'update_click', 'updated')
@@ -21,7 +21,7 @@ const update = async (client, userId) => {
   for (let i = 0; i < days.length; i++) {
     const d = days[i]
 
-    dayBlocks = dayBlocks.concat(
+    blocks = blocks.concat(
       header(logic.generateDateTitle(d))
     )
 
@@ -31,7 +31,7 @@ const update = async (client, userId) => {
       usersString += `<@${user}>\n`
     })
 
-    dayBlocks = dayBlocks.concat(
+    blocks = blocks.concat(
       mrkdwn(usersString),
       plain_text("Oma ilmoittautumiseni:"),
       actions([
@@ -41,8 +41,6 @@ const update = async (client, userId) => {
       divider()
     )
   }
-
-  const blocks = dayBlocks
 
   client.views.publish({
     user_id: userId,
