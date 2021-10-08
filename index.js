@@ -31,13 +31,13 @@ app.event('app_home_opened', async ({ event, client }) => {
 });
 
 app.action(`toimistolla_click`, async ({ body, ack, client}) => {
-  await logic.setInOffice(body.user.id, body.actions[0].value)
+  await logic.toggleSignup(body.user.id, body.actions[0].value)
   home.update(client, body.user.id);
   await ack();
 });
 
 app.action(`etana_click`, async ({ body, ack, client}) => {
-  await logic.setAsRemote(body.user.id, body.actions[0].value)
+  await logic.toggleSignup(body.user.id, body.actions[0].value, false)
   home.update(client, body.user.id);
   await ack();
 });

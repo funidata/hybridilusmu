@@ -39,13 +39,8 @@ describe('signups test', function() {
         });
 
         const persons = await controller.getAllOfficeSignupsForADate('2021-10-10');
-        let txt = '';
-
-        for (let i=0; i < persons.length; i++) {
-            const p = await db.Person.findByPk(persons[i]);
-            txt += p.real_name + ' ';
-        };
-        assert.equal('Matti Meikalainen Maija Mehilainen ', txt);
+        
+        assert.equal(2, persons.length);
 
     });
     it('addSignUpForUser test', async function() {
@@ -54,8 +49,7 @@ describe('signups test', function() {
             slack_id: 'ABC',
             real_name: 'Tyyppi Tyyppinen'
         });
-        const user_id = await controller.findUserId('ABC');
-        await controller.addSignupForUser(user_id, '2021-10-11', true);
+        await controller.addSignupForUser('ABC', '2021-10-11', true);
         const person = await db.Person.findByPk(1, {
             include: ["signups"]
         });
@@ -63,13 +57,14 @@ describe('signups test', function() {
     });
     it('find signups for a person test', async function() {
         const user_id = await controller.findUserId('ABC');
-        await controller.addSignupForUser(user_id, '2021-10-12', true);
+        await controller.addSignupForUser('ABC', '2021-10-12', true);
         const signups = await controller.getAllOfficeSignupsForAUser(user_id);
+        console.log(signups)
         assert.equal(2, signups.length);
         assert.equal('2021-10-11', signups[0]);
     });
     it('removeSignup test', async function() {
-        await controller.removeSignup(3, '2021-10-11');
+        await controller.removeSignup('ABC', '2021-10-11');
         const signups = await controller.getAllOfficeSignupsForAUser(3);
         assert.equal(1, signups.length);
     })

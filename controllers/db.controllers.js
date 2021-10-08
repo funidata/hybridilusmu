@@ -4,6 +4,20 @@ const Person = db.Person;
 const Signup = db.Signup;
 const Op = Sequelize.Op;
 
+const getUser = async (userId, transaction) => {
+    const userQuery = await Person.findOrCreate({
+        where: {
+            slack_id: userId,
+        },
+        defaults: {
+            real_name: 'Nope'
+        },
+        transaction: transaction
+    })
+
+    return userQuery[0].dataValues
+}
+
 exports.findUserId = (slack_id) => {
     return Person.findOne({
         attributes: ['id'],
@@ -25,17 +39,7 @@ exports.findUserId = (slack_id) => {
 exports.addSignupForUser = async (userId, date, atOffice) => {
     try {
         const result = await sequelize.transaction(async (t) => {
-            const userQuery = await Person.findOrCreate({
-                where: {
-                    slack_id: userId,
-                },
-                defaults: {
-                    real_name: 'Nope'
-                },
-                transaction: t
-            })
-            
-            const user = userQuery[0].dataValues
+            const user = await getUser(userId, t)
 
             const signup = await Signup.upsert({
                 office_date: date,
@@ -59,16 +63,11 @@ exports.getAllOfficeSignupsForADate = (date) => {
         where: {
             office_date: date,
             at_office: true,
-        }
+        },
+        include: {model: Person, as: 'person'}
     })
-    .then((signups) => {
-        console.log("signups found for date ", date);
-        const arr = [];
-        for (let i=0; i < signups.length; i++) {
-            const p = signups[i].PersonId;
-            arr.push(p);
-        };
-        return arr;
+    .then((signups) => {const ids = signups.map(s => s.dataValues.person.dataValues.slack_id)
+        return ids;
     })
     .catch((err) => {
         console.log("Error while finding signups ", err);
@@ -84,7 +83,6 @@ exports.getAllOfficeSignupsForAUser = (user_id, atOffice = true) => {
         include: ['signups']
     })
     .then((person) => {
-        console.log("signups found for a user ", user_id);
         const signups = person.signups;
         const arr = [];
         for (let i=0; i < signups.length; i++) {
@@ -95,7 +93,7 @@ exports.getAllOfficeSignupsForAUser = (user_id, atOffice = true) => {
         return arr;
     })
     .catch((err) => {
-        //console.log("Error while finding signups ", err);
+        console.log("Error while finding signups ", err);
     });
 };
 
@@ -105,17 +103,7 @@ exports.getAllOfficeSignupsForAUser = (user_id, atOffice = true) => {
 exports.getOfficeSignupForUserAndDate = async (userId, date) => {
     try {
         const result = await sequelize.transaction(async (t) => {
-            const userQuery = await Person.findOrCreate({
-                where: {
-                    slack_id: userId,
-                },
-                defaults: {
-                    real_name: 'Nope'
-                },
-                transaction: t
-            })
-            
-            const user = userQuery[0].dataValues
+            const user = await getUser(userId, t)
 
             const person = await Person.findByPk(user.id, {
                 include: [
@@ -128,7 +116,6 @@ exports.getOfficeSignupForUserAndDate = async (userId, date) => {
                 transaction: t
             })
 
-            console.log("signup found for user ", userId, " on ", date);
             const signups = person.signups;
             let ret = undefined;
             for (let i=0; i < signups.length; i++) {
@@ -148,7 +135,6 @@ exports.addUser = (user) => {
         real_name: user.real_name
     })
     .then((person) => {
-        console.log("person created ");
         return person;
     })
     .catch((err) => {
@@ -159,7 +145,6 @@ exports.addUser = (user) => {
 exports.getSlackId = (id) => {
     return Person.findByPk(id)
     .then((user) => {
-        console.log("found user ");
         return user.slack_id;
     })
     .catch((err) => {
@@ -167,18 +152,20 @@ exports.getSlackId = (id) => {
     });
 };
 
-exports.removeSignup = (id, date) => {
-    return Signup.destroy({
-        where: {
-            office_date: date,
-            PersonId: id
-        }
-    })
-    .then((signup) => {
-        console.log("Signup removed ", signup);
-    })
-    .catch((err) => {
+exports.removeSignup = async (userId, date) => {
+    try {
+        const result = await sequelize.transaction(async t => {
+            const user = await getUser(userId, t)
+
+            await Signup.destroy({
+                where: {
+                    office_date: date,
+                    PersonId: user.id
+                }
+            })
+        })
+    } catch (err) {
         console.log("Error while removing signup ", err);
-    });
-};
+    }
+}
 
