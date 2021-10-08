@@ -29,10 +29,10 @@ const generateDateTitle = (date) => {
   return res
 }
 
-const generateWeek = (day) => {
+const generateDaysStartingFrom = (day, n) => {
   const res = []
   const currDate = new Date(day)
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < n; i++) {
     dayNumber = currDate.getDay();
     if (dayNumber === 6 || dayNumber === 0) {
       currDate.setDate(currDate.getDate() + 1)
@@ -57,16 +57,7 @@ const generateWeek = (day) => {
 }
 
 const getEnrollmentsFor = async (date) => {
-  const dbIds = await db.getAllOfficeSignupsForADate(date)
-
-  const slackIds = []
-  if (dbIds.length != 0) {
-    for (let i = 0; i < dbIds.length; i++) {
-      slackIds.push(await db.getSlackId(dbIds[i]))
-    }
-  }
-
-  console.log("slackIds for : ", date, slackIds)
+  const slackIds = await db.getAllOfficeSignupsForADate(date)
   return slackIds
 }
 
@@ -91,7 +82,7 @@ module.exports = {
   daysUntilMonday,
   generateNextWeek,
   generateDateTitle,
-  generateWeek,
+  generateDaysStartingFrom,
   getEnrollmentsFor,
   toggleSignup,
   userInOffice,

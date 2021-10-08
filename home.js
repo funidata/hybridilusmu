@@ -7,7 +7,7 @@ const { button } = require('./blocks/elements/button')
 
 const update = async (client, userId) => {
   const date = new Date()
-  const days = logic.generateWeek(date)
+  const days = logic.generateDaysStartingFrom(date, 14)
   let dayBlocks = []
 
   dayBlocks = dayBlocks.concat(
