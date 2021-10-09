@@ -56,4 +56,3 @@ jobs:
         POSTGRES_HOST: localhost
           # The default PostgreSQL port
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
-
