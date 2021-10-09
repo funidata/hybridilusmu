@@ -38,18 +38,12 @@ const generateDaysStartingFrom = (day, n) => {
       currDate.setDate(currDate.getDate() + 1)
       continue
     }
-    var month = ''
-    if (currDate.getMonth() < 9) {
-      month = `0${currDate.getMonth() + 1}`
-    } else {
-       month = `${currDate.getMonth() + 1}`
-    }
-    var dayNum = ''
-    if (currDate.getDate() < 10 ) {
-      dayNum = `0${currDate.getDate()}`
-    } else {
-      dayNum = `${currDate.getDate()}`
-    }
+    const month = currDate.getMonth() < 9 ? 
+        `0${currDate.getMonth() + 1}` : 
+        `${currDate.getMonth() + 1}`
+    const dayNum = currDate.getDate() < 10 ?
+        `0${currDate.getDate()}`:
+        `${currDate.getDate()}`
     res.push(`${currDate.getFullYear()}-${month}-${dayNum}`)
     currDate.setDate(currDate.getDate() + 1)
   }
