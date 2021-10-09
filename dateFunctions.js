@@ -34,14 +34,13 @@ const generateNextWeek = date => {
   return result
 }
 
-  const parts = date.split('-')
 /*
  * Lists n weekdays from given day onwards.
  * Returns a list of strings, where strings are weekdays in format YYYY-MM-DD, starting from the given day.
  * @day First day (in some acceptable format)
  * @n How many weekdays are listed
  */
-const generateDaysStartingFrom = (day, n) => {
+const listNWeekdays = (day, n, pretty) => {
   const res = []
   const currDate = new Date(day)
   for (let i = 0; i < n; i++) {
@@ -50,7 +49,7 @@ const generateDaysStartingFrom = (day, n) => {
       currDate.setDate(currDate.getDate() + 1)
       continue
     }
-    res.push(toYYYY_MM_DD(currDate))
+    res.push(toISODate(currDate))
     currDate.setDate(currDate.getDate() + 1)
   }
   return res;
@@ -115,7 +114,7 @@ const editDistance = (str1, str2) => {
 /*
  * Transforms a string from YYYY-MM-DD format to "Weekday day.month." -format
  */
-const toPrettyFormat = (date) => {
+const fromISODatetoPrettyFormat = (date) => {
   const parts = date.split('-')
   const newDate = new Date(parts[0], parts[1] -1, parts[2])
   const weekday = weekdays[newDate.getDay() -1]
@@ -126,7 +125,7 @@ const toPrettyFormat = (date) => {
 /* 
  * Returns a string YYYY-MM-DD representation with leading zeroes of the given JavaScript Date object.
  */
-const toYYYY_MM_DD = date => {
+const toISODate = date => {
     let month = ''
     if (date.getMonth() < 9) {
       month = `0${date.getMonth() + 1}`
@@ -143,9 +142,8 @@ const toYYYY_MM_DD = date => {
 }
 
 module.exports = {
-  generateDaysStartingFrom,
+  listNWeekdays,
   generateNextWeek,
   parseDate,
-  toPrettyFormat,
-  toYYYY_MM_DD
+  fromISODatetoPrettyFormat
 };

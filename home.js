@@ -10,7 +10,7 @@ const SHOW_DAYS_UNTIL = 14
 
 const update = async (client, userId) => {
   const date = new Date()
-  const days = dfunc.generateDaysStartingFrom(date, SHOW_DAYS_UNTIL)
+  const days = dfunc.listNWeekdays(date, SHOW_DAYS_UNTIL)
   let blocks = []
 
   blocks = blocks.concat(
@@ -25,7 +25,7 @@ const update = async (client, userId) => {
     const d = days[i]
 
     blocks = blocks.concat(
-      header(dfunc.toPrettyFormat(d))
+      header(dfunc.fromISODatetoPrettyFormat(d))
     )
     const enrollments = await logic.getEnrollmentsFor(d)
     let usersString = enrollments.length === 0 ? "Kukaan ei ole ilmoittautunut toimistolle!" : "Toimistolla aikoo olla:\n"

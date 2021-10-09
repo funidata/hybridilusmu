@@ -46,7 +46,7 @@ app.event('message', async({ event, say }) => {
     const date = dfunc.parseDate(event.text)
     if (date.isValid) {
       let response = ""
-      const enrollments = await logic.getEnrollmentsFor(dfunc.toYYYY_MM_DD(new Date(date.toString())))
+      const enrollments = await logic.getEnrollmentsFor(date.toISODate())
       if (enrollments.length == 0) response = "Kukaan ei ole toimistolla tuona päivänä."
       enrollments.forEach((user) => {
         response += `<@${user}>\n`
