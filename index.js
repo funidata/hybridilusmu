@@ -3,6 +3,9 @@ const { DateTime } = require("luxon");
 const schedule = require('node-schedule');
 const { App } = require('@slack/bolt');
 const logic = require('./logic');
+const home = require('./home')
+const db = require('./database');
+const controller = require('./controllers/db.controllers');
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -11,28 +14,52 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN
 });
 
+/*
 app.message('viikko', async({ message, say }) => {
   for (const lineToPrint of logic.generateNextWeek(new Date())) {
       await say(lineToPrint)
   }
 });
+*/
 
 app.event('reaction_added', async ({ event, client }) => {
-  console.log(`User <${event.user}> reacted`)
+  console.log(`User <${event.user}> reacted`);
+});
+
+app.event('app_home_opened', async ({ event, client }) => {
+  home.update(client, event.user);
+});
+
+app.action(`toimistolla_click`, async ({ body, ack, client}) => {
+  await logic.toggleSignup(body.user.id, body.actions[0].value)
+  home.update(client, body.user.id);
+  await ack();
+});
+
+app.action(`etana_click`, async ({ body, ack, client}) => {
+  await logic.toggleSignup(body.user.id, body.actions[0].value, false)
+  home.update(client, body.user.id);
+  await ack();
+});
+
+app.action(`update_click`, async ({ body, ack, client}) => {
+  home.update(client, body.user.id);
+  await ack();
 });
 
 app.event('message', async({ event, say }) => {
   if (event.channel_type == "im") {
     const date = logic.parseDate(event.text)
     if (date.isValid) {
-        console.log(date.toString())
+      console.log(date.toString())
       let response = ""
-      for (const name of logic.getPeopleInOffice(date)) {
-      response += name + "\n"
-      }
+      const enrollments = await logic.getEnrollmentsFor(logic.generateDayStringFrom(new Date(date.toString())))
+      if (enrollments.length == 0) response = "Kukaan ei ole toimistolla tuona päivänä."
+      enrollments.forEach((user) => {
+        response += `<@${user}>\n`
+      })
       await say(response)  
     } else await say("Anteeksi, en ymmärtänyt äskeistä.")
-    
   }
 });
 
