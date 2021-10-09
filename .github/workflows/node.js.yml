@@ -23,8 +23,8 @@ jobs:
         # Provide the password for postgres
         env:
           POSTGRES_DB: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_USER: test
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
