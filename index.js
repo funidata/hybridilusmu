@@ -3,6 +3,7 @@ const { DateTime } = require("luxon");
 const schedule = require('node-schedule');
 const { App } = require('@slack/bolt');
 const logic = require('./logic');
+const dfunc = require('./dateFunctions');
 const home = require('./home')
 const db = require('./database');
 const controller = require('./controllers/db.controllers');
@@ -13,14 +14,6 @@ const app = new App({
   socketMode: true,
   appToken: process.env.SLACK_APP_TOKEN
 });
-
-/*
-app.message('viikko', async({ message, say }) => {
-  for (const lineToPrint of logic.generateNextWeek(new Date())) {
-      await say(lineToPrint)
-  }
-});
-*/
 
 app.event('reaction_added', async ({ event, client }) => {
   console.log(`User <${event.user}> reacted`);
@@ -48,18 +41,22 @@ app.action(`update_click`, async ({ body, ack, client}) => {
 });
 
 app.event('message', async({ event, say }) => {
+  console.log(DateTime.now().toString())
   if (event.channel_type == "im") {
-    const date = logic.parseDate(event.text)
+    const date = dfunc.parseDate(event.text)
     if (date.isValid) {
-      console.log(date.toString())
       let response = ""
-      const enrollments = await logic.getEnrollmentsFor(logic.generateDayStringFrom(new Date(date.toString())))
+      const enrollments = await logic.getEnrollmentsFor(dfunc.toYYYY_MM_DD(new Date(date.toString())))
       if (enrollments.length == 0) response = "Kukaan ei ole toimistolla tuona päivänä."
       enrollments.forEach((user) => {
         response += `<@${user}>\n`
       })
-      await say(response)  
-    } else await say("Anteeksi, en ymmärtänyt äskeistä.")
+      await say(response)
+      console.log(DateTime.now().toString())
+    } else {
+        await say("Anteeksi, en ymmärtänyt äskeistä.")
+        console.log(DateTime.now().toString())
+    }
   }
 });
 
@@ -77,7 +74,7 @@ async function startScheduling() {
   onceEverySunday.minute = 30
   console.log("scheduling posts to every public channel the bot is a member of on dayOfWeek",onceEverySunday.dayOfWeek,"at hour",onceEverySunday.hour,onceEverySunday.tz)
   const job = schedule.scheduleJob(onceEverySunday, () => {
-    weekdays = logic.generateNextWeek(new Date())
+    weekdays = dateFunctions.generateNextWeek(new Date())
     getMemberChannelIds().then((result) => result.forEach(id => {
       postMessage(id, weekdays[0])
         .then(() => postMessage(id, weekdays[1]))
