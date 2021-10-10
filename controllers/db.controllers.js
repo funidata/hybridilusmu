@@ -116,8 +116,13 @@ exports.getOfficeSignupForUserAndDate = async (userId, date) => {
                 transaction: t
             })
 
+            // if nothing is found, escape early
+            if (!person) {
+                return undefined
+            }
+
             const signups = person.signups;
-            return signups.length === 1 ? signups[0].dataValues : undefined;
+            return (signups && signups.length === 1) ? signups[0].dataValues : undefined;
         })
         return result
     } catch (err) {
