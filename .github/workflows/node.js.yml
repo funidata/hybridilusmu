@@ -14,7 +14,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    
+
     services:
       # Label used to access the service container
       postgres:
@@ -58,3 +58,4 @@ jobs:
         POSTGRES_HOST: localhost
           # The default PostgreSQL port
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+    - run: npm run report-coverage
