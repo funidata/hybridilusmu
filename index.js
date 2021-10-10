@@ -27,10 +27,13 @@ app.event('reaction_added', async ({ event, client }) => {
 })();
 
 async function startScheduling() {
-  const everySunday = new schedule.RecurrenceRule();
-  everySunday.dayOfWeek = 0
-  console.log("scheduling posts to every public channel the bot is a member of on dayOfWeek",everySunday.dayOfWeek)
-  const job = schedule.scheduleJob(everySunday, () => {
+  const onceEverySunday = new schedule.RecurrenceRule();
+  onceEverySunday.tz = 'Etc/UTC';
+  onceEverySunday.dayOfWeek = 0
+  onceEverySunday.hour = 10
+  onceEverySunday.minute = 30
+  console.log("scheduling posts to every public channel the bot is a member of on dayOfWeek",onceEverySunday.dayOfWeek,"at hour",onceEverySunday.hour,onceEverySunday.tz)
+  const job = schedule.scheduleJob(onceEverySunday, () => {
     weekdays = logic.generateNextWeek(new Date())
     getMemberChannelIds().then((result) => result.forEach(id => {
       postMessage(id, weekdays[0])
