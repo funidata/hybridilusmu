@@ -2,6 +2,9 @@ require('dotenv').config()
 const schedule = require('node-schedule');
 const { App } = require('@slack/bolt');
 const logic = require('./logic');
+const home = require('./home')
+const db = require('./database');
+const controller = require('./controllers/db.controllers');
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -17,7 +20,28 @@ app.message('viikko', async({ message, say }) => {
 });
 
 app.event('reaction_added', async ({ event, client }) => {
-  console.log(`User <${event.user}> reacted`)
+  console.log(`User <${event.user}> reacted`);
+});
+
+app.event('app_home_opened', async ({ event, client }) => {
+  home.update(client, event.user);
+});
+
+app.action(`toimistolla_click`, async ({ body, ack, client}) => {
+  await logic.toggleSignup(body.user.id, body.actions[0].value)
+  home.update(client, body.user.id);
+  await ack();
+});
+
+app.action(`etana_click`, async ({ body, ack, client}) => {
+  await logic.toggleSignup(body.user.id, body.actions[0].value, false)
+  home.update(client, body.user.id);
+  await ack();
+});
+
+app.action(`update_click`, async ({ body, ack, client}) => {
+  home.update(client, body.user.id);
+  await ack();
 });
 
 (async () => {

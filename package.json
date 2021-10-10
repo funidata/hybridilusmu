@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "migrate": "node ./bin/migrate.js",
     "test": "nyc mocha",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
@@ -21,7 +22,9 @@
   "dependencies": {
     "@slack/bolt": "^3.6.0",
     "dotenv": "^10.0.0",
-    "node-schedule": "^2.0.0"
+    "node-schedule": "^2.0.0",
+    "pg": "^8.7.1",
+    "sequelize": "^6.6.5"
   },
   "devDependencies": {
     "codecov": "^3.8.3",
