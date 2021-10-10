@@ -2,6 +2,7 @@ version: "3.7"
 services:
   postgres:
     image: postgres:14
+    restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -12,6 +13,7 @@ services:
 
   hytuslain:
     image: hytuslain/hytuslain:latest
+    restart: always
     environment:
       DB_SCHEMA: ${DB_SCHEMA:-postgres}
       DB_USER: ${DB_USER:-postgres}
