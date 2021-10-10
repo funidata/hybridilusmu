@@ -3,9 +3,9 @@ services:
   postgres:
     image: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports: 
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
       - '5432:5432'
     volumes:
       - hytuslain-db:/var/lib/postgresql/data
@@ -14,14 +14,14 @@ services:
     build:
       context: .
     environment:
-      DB_SCHEMA: postgres
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_HOST: postgres
+      DB_SCHEMA: ${DB_SCHEMA:-postgres}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_HOST: ${DB_HOST:-postgres}
     depends_on:
       - postgres
     ports:
       - '3000:3000'
-        
+
 volumes:
   hytuslain-db:
