@@ -11,8 +11,7 @@ services:
       - hytuslain-db:/var/lib/postgresql/data
 
   hytuslain:
-    build:
-      context: .
+    image: hytuslain
     environment:
       DB_SCHEMA: ${DB_SCHEMA:-postgres}
       DB_USER: ${DB_USER:-postgres}
