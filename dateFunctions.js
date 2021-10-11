@@ -40,7 +40,7 @@ const generateNextWeek = date => {
  * @day First day (in some acceptable format)
  * @n How many weekdays are listed
  */
-const listNWeekdays = (day, n, pretty) => {
+const listNWeekdays = (day, n) => {
   const res = []
   const currDate = new Date(day)
   for (let i = 0; i < n; i++) {

@@ -42,20 +42,20 @@ app.action(`update_click`, async ({ body, ack, client}) => {
 
 app.event('message', async({ event, say }) => {
   console.log(DateTime.now().toString())
-  if (event.channel_type == "im") {
+  if (event.channel_type === "im") {
     const date = dfunc.parseDate(event.text)
     if (date.isValid) {
       let response = ""
       const enrollments = await logic.getEnrollmentsFor(date.toISODate())
-      if (enrollments.length == 0) response = "Kukaan ei ole toimistolla tuona päivänä."
+      if (enrollments.length === 0) response = "Kukaan ei ole toimistolla tuona päivänä."
       enrollments.forEach((user) => {
         response += `<@${user}>\n`
       })
       await say(response)
       console.log(DateTime.now().toString())
     } else {
-        await say("Anteeksi, en ymmärtänyt äskeistä.")
-        console.log(DateTime.now().toString())
+      await say("Anteeksi, en ymmärtänyt äskeistä.")
+      console.log(DateTime.now().toString())
     }
   }
 });
