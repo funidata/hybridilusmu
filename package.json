@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "mocha",
-    "migrate": "node ./bin/migrate.js"
+    "migrate": "node ./bin/migrate.js",
+    "test": "nyc mocha",
+    "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,8 @@
     "sequelize": "^6.6.5"
   },
   "devDependencies": {
-    "mocha": "^9.1.1"
+    "codecov": "^3.8.3",
+    "mocha": "^9.1.1",
+    "nyc": "^15.1.0"
   }
 }

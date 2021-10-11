@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   postgres:
-    image: postgres
+    image: postgres:14
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -12,8 +12,7 @@ services:
       - hytuslain-db:/var/lib/postgresql/data
 
   hytuslain:
-    build:
-      context: .
+    image: hytuslain/hytuslain:latest
     restart: always
     environment:
       DB_SCHEMA: ${DB_SCHEMA:-postgres}
