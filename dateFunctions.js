@@ -143,6 +143,7 @@ const toISODate = date => {
 
 module.exports = {
   listNWeekdays,
+  matchWeekday,
   generateNextWeek,
   parseDate,
   fromISODatetoPrettyFormat
