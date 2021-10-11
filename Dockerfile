@@ -1,4 +1,4 @@
-FROM node:14.18.0
+FROM node:16.11.0
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 WORKDIR /home/node/hytuslain
 COPY package.json ./
