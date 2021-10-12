@@ -15,7 +15,7 @@ const MAX_DIFFERENCE = 2
 /**
  * Returns the number of days until next monday, starting from given day.
  * @param {Date} day - Starting day.
- */
+ **/
 const daysUntilMonday = day => day.getDay() === 0 ? 1 : 8 - day.getDay()
 
 /**
@@ -34,7 +34,7 @@ const generateNextWeek = date => {
   return result
 }
 
-/*
+/**
  * Lists n weekdays from given day onwards.
  * Returns a list of strings, where strings are weekdays in format YYYY-MM-DD, starting from the given day.
  * @param {(Date | string)} day - Starting day as a Date object or a datestring.
@@ -55,7 +55,7 @@ const listNWeekdays = (day, n) => {
   return res;
 }
 
-/* 
+/** 
  * Returns a Luxon Date-object representing the given string or a 0-day -object, if the string is not of accepted format.
  * Accepted forms are:
  * Weekday, for example "Maanantai" (case is ignored)
@@ -79,7 +79,8 @@ const parseDate = input => {
 }
 
 
-/* Checks if the string represents a weekday.
+/** 
+ * Checks if the string represents a weekday.
  * Returns 0 if string is not a weekday, 1 if it matches "Maanantai", 2 for "Tiistai" etc.
  * Case is ignored and typos up to MAX_DIFFERENCE allowed.
  * @param {string} str - String to be matched.
@@ -95,7 +96,8 @@ const matchWeekday = str => {
     return 0
 }
 
-/* Calculates and returns the edit distance of given strings.
+/** 
+ * Calculates and returns the edit distance of given strings.
  * @param {string} str1 - First string.
  * @param {string} str2 - Second string.
  */
@@ -115,7 +117,7 @@ const editDistance = (str1, str2) => {
    return dp[a][b]
 }
 
-/*
+/**
  * Transforms a string from YYYY-MM-DD format to "Weekday day.month." -format
  * @param {string} date - String in the format YYYY-MM-DD.
  */
@@ -127,7 +129,7 @@ const fromISODatetoPrettyFormat = (date) => {
   return res
 }
 
-/* 
+/**
  * Returns YYYY-MM-DD representation with leading zeroes of the given JavaScript Date object.
  * @param {Date} date - Date object to be parsed into a datestring of form "YYYY-MM-DD".
  */
