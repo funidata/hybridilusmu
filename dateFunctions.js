@@ -21,7 +21,7 @@ const daysUntilMonday = day => day.getDay() === 0 ? 1 : 8 - day.getDay()
 /**
  * Returns a list of strings representing one week, starting from next monday, calculated from the given date.
  * Strings are of format "Maanantai 11.10."
- * @param {(Date | string)} day - Starting day as a Date object or a datestring.
+ * @param {(Date | string)} date - Starting day as a Date object or a datestring.
  */
 const generateNextWeek = date => {
   const day = new Date(date)
