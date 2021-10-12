@@ -41,8 +41,7 @@ app.action(`update_click`, async ({ body, ack, client}) => {
 });
 
 app.event('message', async({ event, say }) => {
-  console.log(DateTime.now().toString())
-  if (event.channel_type === "im") {
+  if (event.channel_type === "im" && event.text !== undefined) {
     const date = dfunc.parseDate(event.text)
     if (date.isValid) {
       let response = ""
@@ -52,10 +51,8 @@ app.event('message', async({ event, say }) => {
         response += `<@${user}>\n`
       })
       await say(response)
-      console.log(DateTime.now().toString())
     } else {
       await say("Anteeksi, en ymmärtänyt äskeistä.")
-      console.log(DateTime.now().toString())
     }
   }
 });
