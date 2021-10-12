@@ -12,16 +12,16 @@ const MAX_INPUT_LENGTH = 20
 const RECORD_LIMIT = 180
 const MAX_DIFFERENCE = 2
 
-/*
+/**
  * Returns the number of days until next monday, starting from given day.
- * @day JavaScript Date object
+ * @param {Date} day - Starting day.
  */
 const daysUntilMonday = day => day.getDay() === 0 ? 1 : 8 - day.getDay()
 
-/*
+/**
  * Returns a list of strings representing one week, starting from next monday, calculated from the given date.
  * Strings are of format "Maanantai 11.10."
- * @day (in some acceptable format)
+ * @param {(Date | string)} day - Starting day as a Date object or a datestring.
  */
 const generateNextWeek = date => {
   const day = new Date(date)
@@ -37,10 +37,10 @@ const generateNextWeek = date => {
 /*
  * Lists n weekdays from given day onwards.
  * Returns a list of strings, where strings are weekdays in format YYYY-MM-DD, starting from the given day.
- * @day First day (in some acceptable format)
- * @n How many weekdays are listed
+ * @param {(Date | string)} day - Starting day as a Date object or a datestring.
+ * @param {number} n - How many weekdays are listed.
  */
-const listNWeekdays = (day, n, pretty) => {
+const listNWeekdays = (day, n) => {
   const res = []
   const currDate = new Date(day)
   for (let i = 0; i < n; i++) {
@@ -61,7 +61,7 @@ const listNWeekdays = (day, n, pretty) => {
  * Weekday, for example "Maanantai" (case is ignored)
  * Day.Month, for example "10.10"
  * Day.Month., for example "10.10."
- * @input String
+ * @param {string} input - String to be parsed.
  */
 const parseDate = input => {
   weekday = matchWeekday(input)
@@ -82,6 +82,7 @@ const parseDate = input => {
 /* Checks if the string represents a weekday.
  * Returns 0 if string is not a weekday, 1 if it matches "Maanantai", 2 for "Tiistai" etc.
  * Case is ignored and typos up to MAX_DIFFERENCE allowed.
+ * @param {string} str - String to be matched.
  */
 const matchWeekday = str => {
     if (str.length > MAX_INPUT_LENGTH) return 0
@@ -94,7 +95,10 @@ const matchWeekday = str => {
     return 0
 }
 
-/* Calculates and returns the edit distance of given strings. */
+/* Calculates and returns the edit distance of given strings.
+ * @param {string} str1 - First string.
+ * @param {string} str2 - Second string.
+ */
 const editDistance = (str1, str2) => {
    a = str1.length
    b = str2.length
@@ -113,6 +117,7 @@ const editDistance = (str1, str2) => {
 
 /*
  * Transforms a string from YYYY-MM-DD format to "Weekday day.month." -format
+ * @param {string} date - String in the format YYYY-MM-DD.
  */
 const fromISODatetoPrettyFormat = (date) => {
   const parts = date.split('-')
@@ -123,7 +128,8 @@ const fromISODatetoPrettyFormat = (date) => {
 }
 
 /* 
- * Returns a string YYYY-MM-DD representation with leading zeroes of the given JavaScript Date object.
+ * Returns YYYY-MM-DD representation with leading zeroes of the given JavaScript Date object.
+ * @param {Date} date - Date object to be parsed into a datestring of form "YYYY-MM-DD".
  */
 const toISODate = date => {
     let month = ''
