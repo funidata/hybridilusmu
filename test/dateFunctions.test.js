@@ -2,6 +2,8 @@ const assert = require('assert');
 const dfunc = require('../dateFunctions');
 const { DateTime } = require("luxon");
 
+const RECORD_LIMIT = 180
+
 describe('List Next Week Test', () => {
   it('Asked on Monday', () => {
     const wantedResult = [
@@ -100,17 +102,56 @@ describe('List N Weekdays Test', () => {
 });
 
 describe('Parse Date Tests', () => {
+    it('Normal case without a dot 1', () => {
+        const today = DateTime.local(2021, 10, 11)
+        assert.equal(dfunc.parseDate("14.10", today).toString(), 
+                     DateTime.local(2021, 10, 14).toString())
+    });
+    it('Normal case without a dot 2', () => {
+        const today = DateTime.local(2021, 10, 16)
+        assert.equal(dfunc.parseDate("18.10", today).toString(), 
+                     DateTime.local(2021, 10, 18).toString())
+    });
+    it('Normal case with a dot', () => {
+        const today = DateTime.local(2021, 10, 7)
+        assert.equal(dfunc.parseDate("21.10.", today).toString(), 
+                     DateTime.local(2021, 10, 21).toString())
+    });
+    it('Normal case with a dot', () => {
+        const today = DateTime.local(2021, 12, 8)
+        assert.equal(dfunc.parseDate("14.12.", today).toString(), 
+                     DateTime.local(2021, 12, 14).toString())
+    });
+    it('Asking far away into the future', () => {
+        const today = DateTime.local(2021, 10, 1)
+        assert.equal(dfunc.parseDate("3.12.", today).toString(), 
+                     DateTime.local(2021, 12, 3).toString())
+    });
+    it('Asking even further away into the future', () => {
+        const today = DateTime.local(2021, 10, 1)
+        assert.equal(dfunc.parseDate("1.2.", today).toString(), 
+                     DateTime.local(2022, 2, 1).toString())
+    });
+    it('Asking about the past', () => {
+        const today = DateTime.local(2021, 10, 13)
+        assert.equal(dfunc.parseDate("1.10.", today).toString(), 
+                     DateTime.local(2021, 10, 1).toString())
+    });
+    it('Asking beyond the RECORD_LIMIT', () => {
+        const today = DateTime.local(2021, 10, 13)
+        const pastDay = today.minus({ days : (RECORD_LIMIT + 1) })
+        const input = pastDay.day + "." + pastDay.month + "."
+        assert.equal(dfunc.parseDate(input, today).toString(), 
+                     pastDay.plus({ years : 1 }).toString())
+    });
     it('Empty string', () => {
-        assert.equal(dfunc.parseDate("").toString(), DateTime.fromObject({ day: 0 }).toString())
+        assert.equal(dfunc.parseDate("", DateTime.now()).toString(), DateTime.fromObject({ day: 0 }).toString())
     });
-    it('Input is not a date string', () => {
-        assert.equal(dfunc.parseDate("asdasdasd").toString(), DateTime.fromObject({ day: 0 }).toString())
+    it('Input does not match regex 1', () => {
+        assert.equal(dfunc.parseDate("asdasdasd", DateTime.now()).toString(), DateTime.fromObject({ day: 0 }).toString())
     });
-    it('Input is not of form numeral.numeral or numeral.numeral.', () => {
-        assert.equal(dfunc.parseDate("1.1.2020").toString(), DateTime.fromObject({ day: 0 }).toString())
-    });
-    it('Input is not of form numeral.numeral or numeral.numeral.', () => {
-        assert.equal(dfunc.parseDate("1234.1234").toString(), DateTime.fromObject({ day: 0 }).toString())
+    it('Input does not match regex 2', () => {
+        assert.equal(dfunc.parseDate("1.1.2020", DateTime.now()).toString(), DateTime.fromObject({ day: 0 }).toString())
     });
 });
 

@@ -67,7 +67,7 @@ app.action(`update_click`, async ({ body, ack, client}) => {
  */
 app.event('message', async({ event, say }) => {
   if (event.channel_type === "im" && event.text !== undefined) {
-    const date = dfunc.parseDate(event.text)
+    const date = dfunc.parseDate(event.text, DateTime.now())
     if (date.isValid) {
       const enrollments = await service.getEnrollmentsFor(date.toISODate())
       let response = ""
