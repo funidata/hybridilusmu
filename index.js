@@ -131,3 +131,11 @@ async function postMessage(channelId, text) {
   startScheduling();
   console.log('⚡️ Bolt app is running!');
 })();
+
+// workaround for Node 14.x not crashing if our WebSocket
+// disconnects and Bolt doesn't reconnect nicely
+// see https://github.com/slackapi/node-slack-sdk/issues/1243
+// we could specify node 16.x in our Dockerfile which would make that a crashing error
+process.on("unhandledRejection", error => {
+	throw error;
+});
