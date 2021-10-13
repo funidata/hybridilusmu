@@ -13,44 +13,31 @@ const RECORD_LIMIT = 180
 const MAX_DIFFERENCE = 2
 
 /**
- * Returns the number of days until next monday, starting from given day.
- * @param {Date} day - Starting day.
- **/
-const daysUntilMonday = day => day.getDay() === 0 ? 1 : 8 - day.getDay()
-
-/**
- * Returns a list of strings representing one week, starting from next monday, calculated from the given date.
+ * Returns a list of strings representing one week, starting from next monday calculated from the given day.
  * Strings are of format "Maanantai 11.10."
- * @param {(Date | string)} date - Starting day as a Date object or a datestring.
+ * @param {Luxon Date} day - Starting day as a Luxon Date object.
  */
-const generateNextWeek = date => {
-  const day = new Date(date)
-  day.setDate(day.getDate() + daysUntilMonday(day))
-  const result = []
-  for (const weekday of weekdays) {
-    result.push(`${weekday} ${day.getDate()}.${day.getMonth() + 1}.`)
-    day.setDate(day.getDate() + 1)
+const listNextWeek = (day) => {
+  const nextMonday = day.plus({ days: (8 - day.weekday) })
+  const res = []
+  for (const line of listNWeekdays(nextMonday, 5)) {
+      res.push(toPrettyFormat(line))
   }
-  return result
+  return res
 }
 
 /**
  * Lists n weekdays from given day onwards.
  * Returns a list of strings, where strings are weekdays in format YYYY-MM-DD, starting from the given day.
- * @param {(Date | string)} day - Starting day as a Date object or a datestring.
+ * @param {Luxon Date} day - Starting day as a Luxon Date object.
  * @param {number} n - How many weekdays are listed.
  */
 const listNWeekdays = (day, n) => {
   const res = []
-  const currDate = new Date(day)
   for (let i = 0; i < n; i++) {
-    dayNumber = currDate.getDay();
-    if (dayNumber === 6 || dayNumber === 0) {
-      currDate.setDate(currDate.getDate() + 1)
-      continue
-    }
-    res.push(toISODate(currDate))
-    currDate.setDate(currDate.getDate() + 1)
+    while (day.weekday >= 6) day = day.plus({ days: 1 })
+    res.push(day.toISODate())
+    day = day.plus({ days: 1 })
   }
   return res;
 }
@@ -119,40 +106,19 @@ const editDistance = (str1, str2) => {
 
 /**
  * Transforms a string from YYYY-MM-DD format to "Weekday day.month." -format
- * @param {string} date - String in the format YYYY-MM-DD.
+ * @param {string} datestring - String in the format YYYY-MM-DD.
  */
-const fromISODatetoPrettyFormat = (date) => {
-  const parts = date.split('-')
-  const newDate = new Date(parts[0], parts[1] -1, parts[2])
-  const weekday = weekdays[newDate.getDay() -1]
-  const res = `${weekday} ${newDate.getDate()}.${newDate.getMonth() +1}.`
+const toPrettyFormat = (datestring) => {
+  const parts = datestring.split('-')
+  const newDate = DateTime.fromObject({ year: parts[0], month: parts[1], day: parts[2] })
+  const res = `${weekdays[newDate.weekday - 1]} ${newDate.day}.${newDate.month}.`
   return res
-}
-
-/**
- * Returns YYYY-MM-DD representation with leading zeroes of the given JavaScript Date object.
- * @param {Date} date - Date object to be parsed into a datestring of form "YYYY-MM-DD".
- */
-const toISODate = date => {
-    let month = ''
-    if (date.getMonth() < 9) {
-      month = `0${date.getMonth() + 1}`
-    } else {
-       month = `${date.getMonth() + 1}`
-    }
-    let dayNum = ''
-    if (date.getDate() < 10 ) {
-      dayNum = `0${date.getDate()}`
-    } else {
-      dayNum = `${date.getDate()}`
-    }
-    return `${date.getFullYear()}-${month}-${dayNum}`
 }
 
 module.exports = {
   listNWeekdays,
   matchWeekday,
-  generateNextWeek,
+  listNextWeek,
   parseDate,
-  fromISODatetoPrettyFormat
+  toPrettyFormat
 };

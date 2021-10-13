@@ -1,12 +1,12 @@
 require('dotenv').config()
-const { DateTime } = require("luxon");
-const schedule = require('node-schedule');
 const { App } = require('@slack/bolt');
-const logic = require('./logic');
+const schedule = require('node-schedule');
+const service = require('./databaseService');
 const dfunc = require('./dateFunctions');
 const home = require('./home')
 const db = require('./database');
 const controller = require('./controllers/db.controllers');
+const { DateTime } = require("luxon");
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -14,6 +14,12 @@ const app = new App({
   socketMode: true,
   appToken: process.env.SLACK_APP_TOKEN
 });
+
+// app.message('viikko', async({ message, say }) => {
+//   for (const line of dfunc.listNextWeek(DateTime.now())) {
+//       await say(line)
+//   }
+// });
 
 app.event('reaction_added', async ({ event, client }) => {
   console.log(`User <${event.user}> reacted`);
@@ -24,13 +30,13 @@ app.event('app_home_opened', async ({ event, client }) => {
 });
 
 app.action(`toimistolla_click`, async ({ body, ack, client}) => {
-  await logic.toggleSignup(body.user.id, body.actions[0].value)
+  await service.toggleSignup(body.user.id, body.actions[0].value)
   home.update(client, body.user.id);
   await ack();
 });
 
 app.action(`etana_click`, async ({ body, ack, client}) => {
-  await logic.toggleSignup(body.user.id, body.actions[0].value, false)
+  await service.toggleSignup(body.user.id, body.actions[0].value, false)
   home.update(client, body.user.id);
   await ack();
 });
@@ -45,7 +51,7 @@ app.event('message', async({ event, say }) => {
     const date = dfunc.parseDate(event.text)
     if (date.isValid) {
       let response = ""
-      const enrollments = await logic.getEnrollmentsFor(date.toISODate())
+      const enrollments = await service.getEnrollmentsFor(date.toISODate())
       if (enrollments.length === 0) response = "Kukaan ei ole toimistolla tuona päivänä."
       enrollments.forEach((user) => {
         response += `<@${user}>\n`
@@ -71,7 +77,7 @@ async function startScheduling() {
   onceEverySunday.minute = 30
   console.log("scheduling posts to every public channel the bot is a member of on dayOfWeek",onceEverySunday.dayOfWeek,"at hour",onceEverySunday.hour,onceEverySunday.tz)
   const job = schedule.scheduleJob(onceEverySunday, () => {
-    weekdays = dateFunctions.generateNextWeek(new Date())
+    weekdays = dfunc.listNextWeek(DateTime.now())
     getMemberChannelIds().then((result) => result.forEach(id => {
       postMessage(id, weekdays[0])
         .then(() => postMessage(id, weekdays[1]))
