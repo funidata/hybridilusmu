@@ -21,37 +21,56 @@ const app = new App({
 //   }
 // });
 
+/**
+ * Prints the Slack user id of a user that reacts to a message on any channel, where the bot is.
+ * Works also in private messages.
+ */
 app.event('reaction_added', async ({ event, client }) => {
   console.log(`User <${event.user}> reacted`);
 });
 
+/**
+ * Updates the App-Home page for the specified user when they click on the Home tab.
+ */
 app.event('app_home_opened', async ({ event, client }) => {
   home.update(client, event.user);
 });
 
-app.action(`toimistolla_click`, async ({ body, ack, client}) => {
+/**
+ * Marks the user present in the office for the selected day and updates the App-Home page.
+ */
+app.action(`toimistolla_click`, async ({ body, ack, client }) => {
   await service.toggleSignup(body.user.id, body.actions[0].value)
   home.update(client, body.user.id);
   await ack();
 });
 
+/**
+ * Marks the user not present in the office for the selected day and updates the App-Home page.
+ */
 app.action(`etana_click`, async ({ body, ack, client}) => {
   await service.toggleSignup(body.user.id, body.actions[0].value, false)
   home.update(client, body.user.id);
   await ack();
 });
 
+/**
+ * Updates the App-Home page for the specified user.
+ */
 app.action(`update_click`, async ({ body, ack, client}) => {
   home.update(client, body.user.id);
   await ack();
 });
 
+/**
+ * Listens to a command in private messages and prints a list of people at the office on the given day.
+ */
 app.event('message', async({ event, say }) => {
   if (event.channel_type === "im" && event.text !== undefined) {
     const date = dfunc.parseDate(event.text)
     if (date.isValid) {
-      let response = ""
       const enrollments = await service.getEnrollmentsFor(date.toISODate())
+      let response = ""
       if (enrollments.length === 0) response = "Kukaan ei ole toimistolla tuona päivänä."
       enrollments.forEach((user) => {
         response += `<@${user}>\n`
@@ -63,12 +82,9 @@ app.event('message', async({ event, say }) => {
   }
 });
 
-(async () => {
-  await app.start(process.env.PORT || 3000);
-  startScheduling();
-  console.log('⚡️ Bolt app is running!');
-})();
-
+/**
+ * Sends a scheduled message every Sunday to all the channels the bot is in.
+ */
 async function startScheduling() {
   const onceEverySunday = new schedule.RecurrenceRule();
   onceEverySunday.tz = 'Etc/UTC';
@@ -88,15 +104,30 @@ async function startScheduling() {
   })
 }
 
+/**
+ * Returns a list of all the channels the bot is a member of.
+ */
 async function getMemberChannelIds() {
   return (await app.client.conversations.list()).channels
     .filter(c => c.is_member)
     .map(c => c.id)
 }
 
+/**
+ * Posts a message to the given channel.
+ */
 async function postMessage(channelId, text) {
   await app.client.chat.postMessage({
     channel: channelId,
     text: text
   })
 }
+
+/**
+ * Starts the bot.
+ */
+(async () => {
+  await app.start(process.env.PORT || 3000);
+  startScheduling();
+  console.log('⚡️ Bolt app is running!');
+})();

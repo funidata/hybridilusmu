@@ -46,11 +46,13 @@ const listNWeekdays = (day, n) => {
  * Returns a Luxon Date-object representing the given string or a 0-day -object, if the string is not of accepted format.
  * Accepted forms are:
  * Weekday, for example "Maanantai" (case is ignored)
- * Day.Month, for example "10.10"
- * Day.Month., for example "10.10."
+ * Numeral.Numeral 
+ * Numeral.Numeral.
+ * 
  * @param {string} input - String to be parsed.
+ * @param {Luxon Date} today - Date that serves as the central date, from which 
  */
-const parseDate = input => {
+const parseDate = (input, today) => {
   weekday = matchWeekday(input)
   if (weekday != 0) {
     let date = DateTime.now()
@@ -111,6 +113,7 @@ const editDistance = (str1, str2) => {
 const toPrettyFormat = (datestring) => {
   const parts = datestring.split('-')
   const newDate = DateTime.fromObject({ year: parts[0], month: parts[1], day: parts[2] })
+  if (newDate.weekday - 1 >= weekdays.length) return ""
   const res = `${weekdays[newDate.weekday - 1]} ${newDate.day}.${newDate.month}.`
   return res
 }

@@ -10,6 +10,9 @@ const { DateTime } = require("luxon");
 const SHOW_DAYS_UNTIL = 10
 const format = {...DateTime.DATETIME_MED, month: 'long' };
 
+/**
+ * Updates the App-Home page.
+ */
 const update = async (client, userId) => {
   const today = DateTime.now()
   const days = dfunc.listNWeekdays(today, SHOW_DAYS_UNTIL)
