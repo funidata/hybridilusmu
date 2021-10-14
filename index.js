@@ -1,3 +1,11 @@
+(() => {
+  const origLogger = console.log
+  console.log = (...args) => {
+    const ts = "[" + new Date().toISOString().replace('T', ' ') + "]"
+    origLogger.apply(console, [ts, ...args])
+  }
+})()
+
 require('dotenv').config()
 require('./quotenv').checkEnv([
   'SLACK_BOT_TOKEN',
