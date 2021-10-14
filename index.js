@@ -1,10 +1,12 @@
 require('dotenv').config()
-const schedule = require('node-schedule');
 const { App } = require('@slack/bolt');
-const logic = require('./logic');
+const schedule = require('node-schedule');
+const service = require('./databaseService');
+const dfunc = require('./dateFunctions');
 const home = require('./home')
 const db = require('./database');
 const controller = require('./controllers/db.controllers');
+const { DateTime } = require("luxon");
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -13,43 +15,76 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN
 });
 
-app.message('viikko', async({ message, say }) => {
-  for (const lineToPrint of logic.generateNextWeek(new Date())) {
-      await say(lineToPrint)
-  }
-});
+// app.message('viikko', async({ message, say }) => {
+//   for (const line of dfunc.listNextWeek(DateTime.now())) {
+//       await say(line)
+//   }
+// });
 
+/**
+ * Prints the Slack user id of a user that reacts to a message on any channel, where the bot is.
+ * Works also in private messages.
+ */
 app.event('reaction_added', async ({ event, client }) => {
   console.log(`User <${event.user}> reacted`);
 });
 
+/**
+ * Updates the App-Home page for the specified user when they click on the Home tab.
+ */
 app.event('app_home_opened', async ({ event, client }) => {
   home.update(client, event.user);
 });
 
-app.action(`toimistolla_click`, async ({ body, ack, client}) => {
-  await logic.toggleSignup(body.user.id, body.actions[0].value)
+/**
+ * Marks the user present in the office for the selected day and updates the App-Home page.
+ */
+app.action(`toimistolla_click`, async ({ body, ack, client }) => {
+  await service.toggleSignup(body.user.id, body.actions[0].value)
   home.update(client, body.user.id);
   await ack();
 });
 
+/**
+ * Marks the user not present in the office for the selected day and updates the App-Home page.
+ */
 app.action(`etana_click`, async ({ body, ack, client}) => {
-  await logic.toggleSignup(body.user.id, body.actions[0].value, false)
+  await service.toggleSignup(body.user.id, body.actions[0].value, false)
   home.update(client, body.user.id);
   await ack();
 });
 
+/**
+ * Updates the App-Home page for the specified user.
+ */
 app.action(`update_click`, async ({ body, ack, client}) => {
   home.update(client, body.user.id);
   await ack();
 });
 
-(async () => {
-  await app.start(process.env.PORT || 3000);
-  startScheduling();
-  console.log('⚡️ Bolt app is running!');
-})();
+/**
+ * Listens to a command in private messages and prints a list of people at the office on the given day.
+ */
+app.event('message', async({ event, say }) => {
+  if (event.channel_type === "im" && event.text !== undefined) {
+    const date = dfunc.parseDate(event.text, DateTime.now())
+    if (date.isValid) {
+      const enrollments = await service.getEnrollmentsFor(date.toISODate())
+      let response = ""
+      if (enrollments.length === 0) response = "Kukaan ei ole toimistolla tuona päivänä."
+      enrollments.forEach((user) => {
+        response += `<@${user}>\n`
+      })
+      await say(response)
+    } else {
+      await say("Anteeksi, en ymmärtänyt äskeistä.")
+    }
+  }
+});
 
+/**
+ * Sends a scheduled message every Sunday to all the channels the bot is in.
+ */
 async function startScheduling() {
   const onceEverySunday = new schedule.RecurrenceRule();
   onceEverySunday.tz = 'Etc/UTC';
@@ -58,7 +93,7 @@ async function startScheduling() {
   onceEverySunday.minute = 30
   console.log("scheduling posts to every public channel the bot is a member of on dayOfWeek",onceEverySunday.dayOfWeek,"at hour",onceEverySunday.hour,onceEverySunday.tz)
   const job = schedule.scheduleJob(onceEverySunday, () => {
-    weekdays = logic.generateNextWeek(new Date())
+    weekdays = dfunc.listNextWeek(DateTime.now())
     getMemberChannelIds().then((result) => result.forEach(id => {
       postMessage(id, weekdays[0])
         .then(() => postMessage(id, weekdays[1]))
@@ -69,18 +104,33 @@ async function startScheduling() {
   })
 }
 
+/**
+ * Returns a list of all the channels the bot is a member of.
+ */
 async function getMemberChannelIds() {
   return (await app.client.conversations.list()).channels
     .filter(c => c.is_member)
     .map(c => c.id)
 }
 
+/**
+ * Posts a message to the given channel.
+ */
 async function postMessage(channelId, text) {
   await app.client.chat.postMessage({
     channel: channelId,
     text: text
   })
 }
+
+/**
+ * Starts the bot.
+ */
+(async () => {
+  await app.start(process.env.PORT || 3000);
+  startScheduling();
+  console.log('⚡️ Bolt app is running!');
+})();
 
 // workaround for Node 14.x not crashing if our WebSocket
 // disconnects and Bolt doesn't reconnect nicely

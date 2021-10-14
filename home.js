@@ -1,17 +1,25 @@
-const logic = require('./logic');
+const service = require('./databaseService');
+const dfunc = require('./dateFunctions');
 const { plain_text, mrkdwn } = require('./blocks/section')
 const { header } = require('./blocks/header')
 const { actions } = require('./blocks/actions')
 const { divider } = require('./blocks/divider')
 const { button } = require('./blocks/elements/button')
+const { DateTime } = require("luxon");
 
+const SHOW_DAYS_UNTIL = 10
+const format = {...DateTime.DATETIME_MED, month: 'long' };
+
+/**
+ * Updates the App-Home page.
+ */
 const update = async (client, userId) => {
-  const date = new Date()
-  const days = logic.generateDaysStartingFrom(date, 14)
+  const today = DateTime.now()
+  const days = dfunc.listNWeekdays(today, SHOW_DAYS_UNTIL)
   let blocks = []
-
+  
   blocks = blocks.concat(
-    plain_text(`Tiedot päivitetty ${date.toLocaleString("fi-FI", { timeZone: 'Europe/Helsinki' })}`),
+    plain_text(`Tiedot päivitetty ${today.setZone("Europe/Helsinki").setLocale('fi').toLocaleString(format)}`),
     actions([
       button('Päivitä', 'update_click', 'updated')
     ]),
@@ -22,10 +30,9 @@ const update = async (client, userId) => {
     const d = days[i]
 
     blocks = blocks.concat(
-      header(logic.generateDateTitle(d))
+      header(dfunc.toPrettyFormat(d))
     )
-
-    const enrollments = await logic.getEnrollmentsFor(d)
+    const enrollments = await service.getEnrollmentsFor(d)
     let usersString = enrollments.length === 0 ? "Kukaan ei ole ilmoittautunut toimistolle!" : "Toimistolla aikoo olla:\n"
     enrollments.forEach((user) => {
       usersString += `<@${user}>\n`
@@ -35,8 +42,8 @@ const update = async (client, userId) => {
       mrkdwn(usersString),
       plain_text("Oma ilmoittautumiseni:"),
       actions([
-        button('Toimistolla', 'toimistolla_click', d, `${await logic.userInOffice(userId, d) ? 'primary' : null}`),
-        button('Etänä', 'etana_click', d, `${await logic.userIsRemote(userId, d) ? 'primary' : null}`)
+        button('Toimistolla', 'toimistolla_click', d, `${await service.userInOffice(userId, d) ? 'primary' : null}`),
+        button('Etänä', 'etana_click', d, `${await service.userIsRemote(userId, d) ? 'primary' : null}`)
       ]),
       divider()
     )
