@@ -1,4 +1,14 @@
 require('dotenv').config()
+require('./quotenv').checkEnv([
+  'SLACK_BOT_TOKEN',
+  'SLACK_APP_TOKEN',
+  'SLACK_SIGNING_SECRET',
+  'DB_SCHEMA',
+  'DB_USER',
+  'DB_PASSWORD',
+  'DB_HOST',
+  'DB_PORT'
+])
 const { App } = require('@slack/bolt');
 const schedule = require('node-schedule');
 const service = require('./databaseService');
