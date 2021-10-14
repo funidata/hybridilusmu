@@ -19,7 +19,9 @@ services:
       DB_SCHEMA: ${DB_SCHEMA:-postgres}
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      DB_HOST: ${DB_HOST:-postgres}
+      # host should only be set here in compose
+      DB_HOST: postgres
+      DB_PORT: 5432
       SLACK_APP_TOKEN:
       SLACK_BOT_TOKEN:
       SLACK_SIGNING_SECRET:
