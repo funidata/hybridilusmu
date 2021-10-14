@@ -9,7 +9,8 @@ const sequelize = new Sequelize(process.env.DB_SCHEMA || 'postgres',
                                     dialect: 'postgres',
                                     dialectOptions: {
                                         ssl: process.env.DB_SSL == "true"
-                                    }
+                                    },
+                                    logging: false
                                 });
 
 const db = {};

@@ -40,7 +40,8 @@ app.event('app_home_opened', async ({ event, client }) => {
  * Marks the user present in the office for the selected day and updates the App-Home page.
  */
 app.action(`toimistolla_click`, async ({ body, ack, client }) => {
-  await service.toggleSignup(body.user.id, body.actions[0].value)
+  const data = JSON.parse(body.actions[0].value)
+  await service.toggleSignup(body.user.id, data.date, !data.inOffice)
   home.update(client, body.user.id);
   await ack();
 });
@@ -49,7 +50,8 @@ app.action(`toimistolla_click`, async ({ body, ack, client }) => {
  * Marks the user not present in the office for the selected day and updates the App-Home page.
  */
 app.action(`etana_click`, async ({ body, ack, client}) => {
-  await service.toggleSignup(body.user.id, body.actions[0].value, false)
+  const data = JSON.parse(body.actions[0].value)
+  await service.toggleSignup(body.user.id, data.date, !data.isRemote, false)
   home.update(client, body.user.id);
   await ack();
 });
