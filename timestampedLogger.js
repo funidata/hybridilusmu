@@ -54,10 +54,19 @@ const replaceLoggers = () => {
             )
           } else {
             // Because calling util.format() with just one parameter does not do what we
-            // want it to do, we'll just do a simple replacement here.
-            //   util.format("%%")           => "%%"
-            //   util.format("%%", '')       => "% "
-            //   util.format("%% %s", "foo") => "%foo"
+            // want it to do, we'll just do a simple replacement here and fall back to our
+            // non-formatted log behaviour. Here's an example of undesired behaviour:
+            //   > console.log("%% yadda yadda", "foo", { foo: 2 })
+            //   = %% yadda yadda foo { foo: 2 } // <- WRONG!
+            // This would be correct behaviour:
+            //   > console.log("%% yadda yadda", "foo", { foo: 2 })
+            //   = % yadda yadda foo { foo: 2 }
+            // This should fix up the behaviour to match normal console logging.
+            //   util.format("%%")          => "%%"
+            //   util.format("%%", '')      => "% "
+            //   util.format("%%%s", "foo") => "%foo"
+            // Note that a console.log("%%") call would still output "%%", which is also what we want.
+            // Confused yet? No big deal, so am I.
             args[0] = args[0].replaceAll("%%", "%")
           }
         }
