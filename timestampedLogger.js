@@ -45,8 +45,8 @@ const replaceLoggers = () => {
                 // we'll only pass the consumed parameters to util.format()
                 // and leave the rest intact for the logger
                 util.format(
-                firstArg,
-                ...(args.slice(1, formatCount + 1))
+                  firstArg,
+                  ...(args.slice(1, formatCount + 1))
                 ),
                 // like so
                 ...(args.slice(formatCount + 1))
