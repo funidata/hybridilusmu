@@ -15,8 +15,8 @@ const getEnrollmentsFor = async (date) => {
  * @param {string} userId - Slack user id.
  * @param {string} date - Date string in the ISO date format.
  */
-const toggleSignup = async (userId, date, atOffice = true) => {
-  if (await userInOffice(userId, date, atOffice)) {
+const toggleSignup = async (userId, date, signIn, atOffice = true) => {
+  if (!signIn) {
     await db.removeSignup(userId, date)
   } else {
     await db.addSignupForUser(userId, date, atOffice)

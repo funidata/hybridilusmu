@@ -38,12 +38,18 @@ const update = async (client, userId) => {
       usersString += `<@${user}>\n`
     })
 
+    const buttonValue = {
+      date: d,
+      inOffice: await service.userInOffice(userId, d),
+      isRemote: await service.userIsRemote(userId, d)
+    }
+
     blocks = blocks.concat(
       mrkdwn(usersString),
       plain_text("Oma ilmoittautumiseni:"),
       actions([
-        button('Toimistolla', 'toimistolla_click', d, `${await service.userInOffice(userId, d) ? 'primary' : null}`),
-        button('Etänä', 'etana_click', d, `${await service.userIsRemote(userId, d) ? 'primary' : null}`)
+        button('Toimistolla', 'toimistolla_click', JSON.stringify(buttonValue), `${buttonValue.inOffice ? 'primary' : null}`),
+        button('Etänä', 'etana_click', JSON.stringify(buttonValue), `${buttonValue.isRemote ? 'primary' : null}`)
       ]),
       divider()
     )
