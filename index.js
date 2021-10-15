@@ -1,9 +1,11 @@
 (() => {
-  const origLogger = console.log
-  console.log = (...args) => {
-    const ts = "[" + new Date().toISOString().replace('T', ' ') + "]"
-    origLogger.apply(console, [ts, ...args])
-  }
+  ["log", "info", "error", "warn", "debug"].forEach((v) => {
+    const origLogger = console[v]
+    console[v] = (...args) => {
+      const ts = "[" + new Date().toISOString().replace('T', ' ') + "]"
+      origLogger.apply(console, [ts, ...args])
+    }
+  })
 })()
 
 require('dotenv').config()
