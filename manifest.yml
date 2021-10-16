@@ -3,6 +3,7 @@ _metadata:
   minor_version: 1
 display_information:
   name: Hybridilusmu
+  description: Hybridityöskentelyn tukisovellus
 features:
   app_home:
     home_tab_enabled: true
@@ -32,6 +33,9 @@ settings:
       - message.mpim
       - reaction_added
       - app_home_opened
+      - subteam_created
+      - subteam_members_changed
+      - subteam_updated
   interactivity:
     is_enabled: true
   org_deploy_enabled: false
