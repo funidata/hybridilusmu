@@ -45,6 +45,24 @@ const initSlackUser = (slack_user_id) => {
   }
 }
 
+const dropSlackUserFromUsergroup = (slack_user_id, slack_usergroup_id) => {
+  const ug = usergroups[groups[i]]
+  if (!ug) { continue; }
+  delete ug.users_lkup[slack_user_id]
+  ug.users.filter((u) => u !== slack_user_id)
+  ug.user_count = ug.users.length
+}
+
+const dropSlackUser = (slack_user_id) => {
+  if (usersLookup[slack_user_id]) {
+    const groups = Object.keys(usersLookup[slack_user_id])
+    for (let i = 0; i < groups.length; ++i) {
+      dropSlackUserFromUsergroup(slack_user_id, slack_usergroup_id)
+    }
+  }
+  delete usersLookup[slack_user_id]
+}
+
 const initSlackUsergroup = (slack_usergroup_id) => {
   if (!usergroups[slack_usergroup_id]) {
     usergroups[slack_usergroup_id] = {
@@ -54,6 +72,16 @@ const initSlackUsergroup = (slack_usergroup_id) => {
   if (!usergroups[slack_usergroup_id].users_lkup) {
     usergroups[slack_usergroup_id].users_lkup = {}
   }
+}
+
+const dropSlackUsergroup = (slack_usergroup_id) => {
+  Object.keys(usersLookup).forEach((slack_user_id) => {
+    delete usersLookup[slack_user_id][slack_usergroup_id]
+    if (Object.keys(usersLookup[slack_user_id]).length === 0) {
+      dropSlackUser(slack_user_id)
+    }
+  })
+  delete usergroups[slack_usergroup_id]
 }
 
 /**
@@ -118,5 +146,6 @@ const insertUsergroupUsersFromAPIListResponse = (response, slack_usergroup_id) =
 
 module.exports = {
   insertUsergroup,
-  insertUsergroupsFromAPIListResponse
+  insertUsergroupsFromAPIListResponse,
+  insertUsergroupUsersFromAPIListResponse
 }
