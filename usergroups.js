@@ -46,8 +46,8 @@ const initSlackUser = (slack_user_id) => {
 }
 
 const dropSlackUserFromUsergroup = (slack_user_id, slack_usergroup_id) => {
-  const ug = usergroups[groups[i]]
-  if (!ug) { continue; }
+  const ug = usergroups[slack_usergroup_id]
+  if (!ug) { return; }
   delete ug.users_lkup[slack_user_id]
   ug.users.filter((u) => u !== slack_user_id)
   ug.user_count = ug.users.length
