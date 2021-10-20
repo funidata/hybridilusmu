@@ -171,17 +171,17 @@ exports.removeSignup = async (userId, date) => {
     }
 }
 
-exports.addDeaultSignupForUser = async (userId, weekday, atOffice) => {
+exports.addDefaultSignupForUser = async (userId, weekday, atOffice) => {
     try {
         const result = await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t)
-
+            console.log("NULLLIIIIIIIIIIII " + atOffice)
             const defaultsignup = await Defaultsignup.upsert({
                 weekday: weekday,
                 at_office: atOffice,
                 PersonId: user.id,
             }, {transaction: t})
-
+            console.log("JOUUUUUUUUUUUUUUUU")
             return defaultsignup
         })
     } catch (err) {
@@ -233,7 +233,7 @@ exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
                 include: [
                     {
                         model: Defaultsignup,
-                        as: "signups",
+                        as: "defaultsignups",
                         where: {weekday: weekday}
                     }
                 ],
@@ -245,7 +245,7 @@ exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
                 return undefined
             }
 
-            const signups = person.signups;
+            const signups = person.defaultsignups;
             return (signups && signups.length === 1) ? signups[0].dataValues : undefined;
         })
         return result

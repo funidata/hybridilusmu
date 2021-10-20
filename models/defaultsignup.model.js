@@ -6,7 +6,7 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             allowNull: false
         },
-        at_Office: {
+        at_office: {
             type: Sequelize.BOOLEAN,
             allowNull: false
         }

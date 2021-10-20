@@ -82,6 +82,8 @@ app.action('default_change', async ({ body, ack, client }) => {
   const weekday = data.weekday
   const value = data.value
   console.log(user_id + " " + weekday + " " + value)
+  await service.toggleDefaultSignup(user_id, weekday, true, value)
+  //home.update(client, user_id);
   await ack();
 });
 
