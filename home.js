@@ -17,7 +17,7 @@ const update = async (client, userId) => {
   const today = DateTime.now()
   const days = dfunc.listNWeekdays(today, SHOW_DAYS_UNTIL)
   let blocks = []
-  
+
   blocks = blocks.concat(
         {
 			"type": "section",

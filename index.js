@@ -1,12 +1,5 @@
-(() => {
-  const origLogger = console.log
-  console.log = (...args) => {
-    const ts = "[" + new Date().toISOString().replace('T', ' ') + "]"
-    origLogger.apply(console, [ts, ...args])
-  }
-})()
-
-require('dotenv').config()
+require('./timestampedLogger').replaceLoggers();
+require('dotenv').config();
 require('./quotenv').checkEnv([
   'SLACK_BOT_TOKEN',
   'SLACK_APP_TOKEN',
@@ -16,7 +9,7 @@ require('./quotenv').checkEnv([
   'DB_PASSWORD',
   'DB_HOST',
   'DB_PORT'
-])
+]);
 const { App } = require('@slack/bolt');
 const schedule = require('node-schedule');
 const service = require('./databaseService');
