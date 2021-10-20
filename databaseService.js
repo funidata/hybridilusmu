@@ -63,6 +63,10 @@ const userInOfficeByDefault = async (userId, weekday, atOffice = true) => {
   return enrollment && enrollment.at_office === atOffice
 }
 
+const userIsRemoteByDefault = async (userId, weekday) => {
+  return userInOfficeByDefault(userId, weekday, false)
+}
+
 module.exports = {
   getEnrollmentsFor,
   getDefaultEnrollmentsFor,
@@ -70,5 +74,6 @@ module.exports = {
   toggleDefaultSignup,
   userInOffice,
   userIsRemote,
-  userInOfficeByDefault
+  userInOfficeByDefault,
+  userIsRemoteByDefault
 };

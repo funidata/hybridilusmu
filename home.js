@@ -19,45 +19,30 @@ const update = async (client, userId) => {
   let blocks = []
 
   blocks = blocks.concat(
-        {
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Oletusarvoisesti olen..."
-			}
-		})
-  for (let i = 0; i < 5; i++) {
-      
-    blocks = blocks.concat({
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "*" + dfunc.weekdays[i] + "*"
-			},
-			"accessory": {
-				"type": "radio_buttons",
-				"options": [
-					{
-						"text": {
-							"type": "plain_text",
-							"text": "Toimistolla",
-							"emoji": true
-						},
-						"value": JSON.stringify({ "weekday": dfunc.weekdays[i], "value": true })
-					},
-					{
-						"text": {
-							"type": "plain_text",
-							"text": "Etänä",
-							"emoji": true
-						},
-						"value": JSON.stringify({ "weekday": dfunc.weekdays[i], "value": false })
-					}
-				],
-				"action_id": "default_change"
-			}
-		})    
-  }
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "Oletusarvoisesti olen..."
+        }
+    })
+    for (let i = 0; i < 5; i++) {
+        const weekday = dfunc.weekdays[i]
+
+        const buttonValue = {
+        weekday: weekday,
+        defaultInOffice: await service.userInOfficeByDefault(userId, weekday),
+        defaultIsRemote: await service.userIsRemoteByDefault(userId, weekday)
+        }
+
+        blocks = blocks.concat(
+        mrkdwn("*" + weekday + "*"),
+        actions([
+            button('Toimistolla', 'default_toimistolla', JSON.stringify(buttonValue), `${buttonValue.defaultInOffice ? 'primary' : null}`),
+            button('Etänä', 'default_etana', JSON.stringify(buttonValue), `${buttonValue.defaultIsRemote ? 'primary' : null}`)
+        ])
+        )
+    }
   
   blocks = blocks.concat(
     plain_text(`Tiedot päivitetty ${today.setZone("Europe/Helsinki").setLocale('fi').toLocaleString(format)}`),

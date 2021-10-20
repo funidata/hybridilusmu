@@ -175,13 +175,11 @@ exports.addDefaultSignupForUser = async (userId, weekday, atOffice) => {
     try {
         const result = await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t)
-            console.log("NULLLIIIIIIIIIIII " + atOffice)
             const defaultsignup = await Defaultsignup.upsert({
                 weekday: weekday,
                 at_office: atOffice,
                 PersonId: user.id,
             }, {transaction: t})
-            console.log("JOUUUUUUUUUUUUUUUU")
             return defaultsignup
         })
     } catch (err) {
