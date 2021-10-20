@@ -9,10 +9,8 @@ const button = (text, callback, value, style) => {
       value: value,
       action_id: callback
   }
-
-  if(style === 'primary' || style === 'danger') {button.style = style}
-
-  return(button)
+  if (style === 'primary' || style === 'danger') { button.style = style }
+  return (button)
 }
 
 module.exports = { button }

@@ -19,6 +19,47 @@ const update = async (client, userId) => {
   let blocks = []
   
   blocks = blocks.concat(
+        {
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Oletusarvoisesti olen..."
+			}
+		})
+  for (let i = 0; i < 5; i++) {
+      
+    blocks = blocks.concat({
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "*" + dfunc.weekdays[i] + "*"
+			},
+			"accessory": {
+				"type": "radio_buttons",
+				"options": [
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Toimistolla",
+							"emoji": true
+						},
+						"value": JSON.stringify({ "weekday": dfunc.weekdays[i], "value": true })
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Etänä",
+							"emoji": true
+						},
+						"value": JSON.stringify({ "weekday": dfunc.weekdays[i], "value": false })
+					}
+				],
+				"action_id": "default_change"
+			}
+		})    
+  }
+  
+  blocks = blocks.concat(
     plain_text(`Tiedot päivitetty ${today.setZone("Europe/Helsinki").setLocale('fi').toLocaleString(format)}`),
     actions([
       button('Päivitä', 'update_click', 'updated')

@@ -67,7 +67,7 @@ app.action(`toimistolla_click`, async ({ body, ack, client }) => {
 /**
  * Marks the user not present in the office for the selected day and updates the App-Home page.
  */
-app.action(`etana_click`, async ({ body, ack, client}) => {
+app.action(`etana_click`, async ({ body, ack, client }) => {
   const data = JSON.parse(body.actions[0].value)
   await service.toggleSignup(body.user.id, data.date, !data.isRemote, false)
   home.update(client, body.user.id);
@@ -77,8 +77,18 @@ app.action(`etana_click`, async ({ body, ack, client}) => {
 /**
  * Updates the App-Home page for the specified user.
  */
-app.action(`update_click`, async ({ body, ack, client}) => {
+app.action(`update_click`, async ({ body, ack, client }) => {
   home.update(client, body.user.id);
+  await ack();
+});
+
+app.action('default_change', async ({ body, ack, client }) => {
+  console.log("MIAUUUU!")
+  const user_id = body.user.id
+  const data = JSON.parse(body.actions[0].selected_option.value)
+  const weekday = data.weekday
+  const value = data.value
+  console.log(user_id + " " + weekday + " " + value)
   await ack();
 });
 
