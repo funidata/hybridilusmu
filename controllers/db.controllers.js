@@ -2,6 +2,7 @@ const { Sequelize, sequelize } = require("../database");
 const db = require("../database");
 const Person = db.Person;
 const Signup = db.Signup;
+const Defaultsignup = db.Defaultsignup;
 const Op = Sequelize.Op;
 
 const getUser = async (userId, transaction) => {
@@ -167,6 +168,89 @@ exports.removeSignup = async (userId, date) => {
         })
     } catch (err) {
         console.log("Error while removing signup ", err);
+    }
+}
+
+exports.addDeaultSignupForUser = async (userId, weekday, atOffice) => {
+    try {
+        const result = await sequelize.transaction(async (t) => {
+            const user = await getUser(userId, t)
+
+            const defaultsignup = await Defaultsignup.upsert({
+                weekday: weekday,
+                at_office: atOffice,
+                PersonId: user.id,
+            }, {transaction: t})
+
+            return defaultsignup
+        })
+    } catch (err) {
+        console.log("Error while adding a default signup ", err);
+    }
+}
+
+exports.removeDefaultSignup = async (userId, weekday) => {
+    try {
+        const result = await sequelize.transaction(async t => {
+            const user = await getUser(userId, t)
+
+            await Defaultsignup.destroy({
+                where: {
+                    weekday: weekday,
+                    PersonId: user.id
+                }
+            })
+        })
+    } catch (err) {
+        console.log("Error while removing default signup ", err);
+    }
+}
+
+exports.getAllOfficeDefaultSignupsForAWeekday = (weekday) => {
+    return Defaultsignup.findAll({
+        attributes: ['PersonId'],
+        where: {
+            weekday: weekday,
+            at_office: true,
+        },
+        include: {model: Person, as: 'person'}
+    })
+    .then((signups) => {const ids = signups.map(s => s.dataValues.person.dataValues.slack_id)
+        return ids;
+    })
+    .catch((err) => {
+        console.log("Error while finding default signups ", err);
+    });
+
+};
+
+exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
+    try {
+        const result = await sequelize.transaction(async (t) => {
+            const user = await getUser(userId, t)
+
+            const person = await Person.findByPk(user.id, {
+                include: [
+                    {
+                        model: Defaultsignup,
+                        as: "signups",
+                        where: {weekday: weekday}
+                    }
+                ],
+                transaction: t
+            })
+
+            // if nothing is found, escape early
+            if (!person) {
+                return undefined
+            }
+
+            const signups = person.signups;
+            return (signups && signups.length === 1) ? signups[0].dataValues : undefined;
+        })
+        return result
+    } catch (err) {
+        console.log("Error while finding default signups ", err);
     }
 }
 

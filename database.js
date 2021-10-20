@@ -20,11 +20,18 @@ db.sequelize = sequelize;
 
 db.Person = require("./models/person.model.js")(sequelize, Sequelize);
 db.Signup = require("./models/signup.model.js")(sequelize, Sequelize);
+db.Defaultsignup = require("./models/defaultsignup.model.js")(sequelize, Sequelize);
 
 
 db.Person.hasMany(db.Signup, { as: "signups" });
+db.Person.hasMany(db.Defaultsignup, { as: "defaultsignups" });
 
 db.Signup.belongsTo(db.Person, {
+    foreignKey: "PersonId",
+    as: "person",
+});
+
+db.Defaultsignup.belongsTo(db.Person, {
     foreignKey: "PersonId",
     as: "person",
 });

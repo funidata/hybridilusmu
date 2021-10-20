@@ -38,9 +38,37 @@ const userIsRemote = async (userId, date) => {
   return userInOffice(userId, date, false)
 }
 
+/**
+ * Changes the default signup for the user to the opposite for the given weekday.
+ * @param {string} userId - Slack user id.
+ */
+const toggleDefaultSignup = async (userId, weekday, signIn, atOffice = true) => {
+  if (!signIn) {
+    await db.removeDefaultSignup(userId, weekday)
+  } else {
+    await db.addDefaultSignupForUser(userId, weekday, atOffice)
+  }
+}
+
+const getDefaultEnrollmentsFor = async (weekday) => {
+  const slackIds = await db.getAllOfficeDefaultSignupsForAWeekday(weekday)
+  return slackIds
+}
+
+/**
+ * Returns true, if user is marked as present at the office on the given weekday by default.
+ */
+const userInOfficeByDefault = async (userId, weekday, atOffice = true) => {
+  const enrollment = await db.getOfficeDefaultSignupForUserAndWeekday(userId, weekday)
+  return enrollment && enrollment.at_office === atOffice
+}
+
 module.exports = {
   getEnrollmentsFor,
+  getDefaultEnrollmentsFor,
   toggleSignup,
+  toggleDefaultSignup,
   userInOffice,
-  userIsRemote
+  userIsRemote,
+  userInOfficeByDefault
 };
