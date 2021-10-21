@@ -8,86 +8,90 @@ const { button } = require('./blocks/elements/button')
 const { DateTime } = require("luxon");
 
 const SHOW_DAYS_UNTIL = 10
+const DAYS_IN_WEEK = 5;
 const format = {...DateTime.DATETIME_MED, month: 'long' };
 
 /**
  * Updates the App-Home page.
  */
 const update = async (client, userId) => {
-  const today = DateTime.now()
-  const days = dfunc.listNWeekdays(today, SHOW_DAYS_UNTIL)
-  let blocks = []
-
-  blocks = blocks.concat(
-    {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": "Oletusarvoisesti olen..."
+    let menu = await getMenu()
+    let settings = await getSettingsPage(userId)
+    let updateBlock = await getUpdateBlock()
+    let enrollments = await getEnrollmentsPage(userId)
+    let blocks = menu.concat(settings, updateBlock, enrollments)
+    client.views.publish({
+        user_id: userId,
+        view: {
+            type:"home",
+            blocks: blocks
         }
     })
-    for (let i = 0; i < 5; i++) {
+}
+
+const getMenu = async () => {
+    let menu = []
+    return menu
+}
+
+const getSettingsPage = async (userId) => {
+    let settingsPage = []
+    settingsPage.push(mrkdwn("Oletusarvoisesti olen..."))
+    for (let i = 0; i < DAYS_IN_WEEK; i++) {
         const weekday = dfunc.weekdays[i]
-
         const buttonValue = {
-        weekday: weekday,
-        defaultInOffice: await service.userInOfficeByDefault(userId, weekday),
-        defaultIsRemote: await service.userIsRemoteByDefault(userId, weekday)
+            weekday: weekday,
+            defaultInOffice: await service.userInOfficeByDefault(userId, weekday),
+            defaultIsRemote: await service.userIsRemoteByDefault(userId, weekday)
         }
-
-        blocks = blocks.concat(
-        mrkdwn("*" + weekday + "*"),
-        actions([
-            button('Toimistolla', 'default_toimistolla', JSON.stringify(buttonValue), `${buttonValue.defaultInOffice ? 'primary' : null}`),
-            button('Etänä', 'default_etana', JSON.stringify(buttonValue), `${buttonValue.defaultIsRemote ? 'primary' : null}`)
-        ])
+        settingsPage.push(
+            mrkdwn("*" + weekday + "na*"),
+            actions([
+                button('Toimistolla', 'default_toimistolla', JSON.stringify(buttonValue), `${buttonValue.defaultInOffice ? 'primary' : null}`),
+                button('Etänä', 'default_etana', JSON.stringify(buttonValue), `${buttonValue.defaultIsRemote ? 'primary' : null}`)
+            ])
         )
     }
-  
-  blocks = blocks.concat(
-    plain_text(`Tiedot päivitetty ${today.setZone("Europe/Helsinki").setLocale('fi').toLocaleString(format)}`),
-    actions([
-      button('Päivitä', 'update_click', 'updated')
-    ]),
-    divider()
-  )
+    return settingsPage
+}
 
-  for (let i = 0; i < days.length; i++) {
-    const d = days[i]
-
-    blocks = blocks.concat(
-      header(dfunc.toPrettyFormat(d))
+const getUpdateBlock = async () => {
+    let updateBlock = []
+    updateBlock.push(
+        plain_text(`Tiedot päivitetty ${DateTime.now().setZone("Europe/Helsinki").setLocale('fi').toLocaleString(format)}`),
+        actions([button('Päivitä', 'update_click', 'updated')]),
+        divider()
     )
-    const enrollments = await service.getEnrollmentsFor(d)
-    let usersString = enrollments.length === 0 ? "Kukaan ei ole ilmoittautunut toimistolle!" : "Toimistolla aikoo olla:\n"
-    enrollments.forEach((user) => {
-      usersString += `<@${user}>\n`
-    })
+    return updateBlock
+}
 
-    const buttonValue = {
-      date: d,
-      inOffice: await service.userInOffice(userId, d),
-      isRemote: await service.userIsRemote(userId, d)
+const getEnrollmentsPage = async (userId) => {
+    let enrollmentsPage = []
+    const dates = dfunc.listNWeekdays(DateTime.now(), SHOW_DAYS_UNTIL)
+    for (let i = 0; i < dates.length; i++) {
+        const date = dates[i]
+        enrollmentsPage.push(header(dfunc.toPrettyFormat(date)))
+        const enrollments = await service.getEnrollmentsFor(date)
+        let usersString = enrollments.length === 0 ? "Kukaan ei ole ilmoittautunut toimistolle!" : "Toimistolla aikoo olla:\n"
+        enrollments.forEach((user) => {
+            usersString += `<@${user}>\n`
+        })
+        const buttonValue = {
+            date: date,
+            inOffice: await service.userInOffice(userId, date),
+            isRemote: await service.userIsRemote(userId, date)
+        }
+        enrollmentsPage.push(
+            mrkdwn(usersString),
+            plain_text("Oma ilmoittautumiseni:"),
+            actions([
+                button('Toimistolla', 'toimistolla_click', JSON.stringify(buttonValue), `${buttonValue.inOffice ? 'primary' : null}`),
+                button('Etänä', 'etana_click', JSON.stringify(buttonValue), `${buttonValue.isRemote ? 'primary' : null}`)
+            ]),
+            divider()
+        )
     }
-
-    blocks = blocks.concat(
-      mrkdwn(usersString),
-      plain_text("Oma ilmoittautumiseni:"),
-      actions([
-        button('Toimistolla', 'toimistolla_click', JSON.stringify(buttonValue), `${buttonValue.inOffice ? 'primary' : null}`),
-        button('Etänä', 'etana_click', JSON.stringify(buttonValue), `${buttonValue.isRemote ? 'primary' : null}`)
-      ]),
-      divider()
-    )
-  }
-
-  client.views.publish({
-    user_id: userId,
-    view: {
-       type:"home",
-       blocks: blocks
-    }
-  })
+    return enrollmentsPage
 }
 
 module.exports = { update }

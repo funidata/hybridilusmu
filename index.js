@@ -76,7 +76,6 @@ app.action(`update_click`, async ({ body, ack, client }) => {
 });
 
 app.action('default_toimistolla', async ({ body, ack, client }) => {
-  console.log("MIAUUUUUUUUUU1")
   const data = JSON.parse(body.actions[0].value)
   await service.toggleDefaultSignup(body.user.id, data.weekday, !data.defaultInOffice)
   home.update(client, body.user.id);
@@ -84,7 +83,6 @@ app.action('default_toimistolla', async ({ body, ack, client }) => {
 });
 
 app.action('default_etana', async ({ body, ack, client }) => {
-  console.log("MIAUUUUUUUUUU2")
   const data = JSON.parse(body.actions[0].value)
   await service.toggleDefaultSignup(body.user.id, data.weekday, !data.defaultIsRemote, false)
   home.update(client, body.user.id);
