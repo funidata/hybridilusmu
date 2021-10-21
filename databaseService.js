@@ -1,5 +1,7 @@
 
 const db = require('./controllers/db.controllers');
+const dfunc = require('./dateFunctions');
+const { DateTime } = require("luxon");
 
 /**
  * Returns a list of Slack ids of people who are at the office on the given day.
@@ -7,7 +9,14 @@ const db = require('./controllers/db.controllers');
  */
 const getEnrollmentsFor = async (date) => {
   const slackIds = await db.getAllOfficeSignupsForADate(date)
-  return slackIds
+  const homeIds = await db.getAllOfficeSignupsForADate(date, false)
+  const defaultIds = await db.getAllOfficeDefaultSignupsForAWeekday(dfunc.weekdays[DateTime.fromISO(date).weekday-1])
+  let set = new Set(slackIds)
+  let etana = new Set(homeIds)
+  defaultIds.forEach((id) => {
+      if (!etana.has(id)) set.add(id)
+  })
+  return Array.from(set)
 }
 
 /**

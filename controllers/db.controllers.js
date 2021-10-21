@@ -58,12 +58,13 @@ exports.addSignupForUser = async (userId, date, atOffice) => {
 
 // hakee tietylle päivämäärälle ilmoittautuneet käyttäjät
 // palauttaa arrayn käyttäjien id:stä
-exports.getAllOfficeSignupsForADate = (date) => {
+//atOffice = true antaa toimistolle ilmoittautuneet ja false etänä ilmoittautuneet
+exports.getAllOfficeSignupsForADate = (date, atOffice = true) => {
     return Signup.findAll({
         attributes: ['PersonId'],
         where: {
             office_date: date,
-            at_office: true,
+            at_office: atOffice,
         },
         include: {model: Person, as: 'person'}
     })
