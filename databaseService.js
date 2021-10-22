@@ -72,6 +72,9 @@ const userInOfficeByDefault = async (userId, weekday, atOffice = true) => {
   return enrollment && enrollment.at_office === atOffice
 }
 
+/**
+ * Returns true, if user is not marked present at the office on the given weekday by default.
+ */
 const userIsRemoteByDefault = async (userId, weekday) => {
   return userInOfficeByDefault(userId, weekday, false)
 }
