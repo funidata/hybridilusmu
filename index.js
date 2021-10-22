@@ -27,14 +27,6 @@ const app = new App({
 });
 
 /**
- * Prints the Slack user id of a user that reacts to a message on any channel, where the bot is.
- * Works also in private messages.
- */
-app.event('reaction_added', async ({ event, client }) => {
-    console.log(`User <${event.user}> reacted`);
-});
-
-/**
  * Updates the App-Home page for the specified user when they click on the Home tab.
  */
 app.event('app_home_opened', async ({ event, client }) => {
@@ -89,13 +81,18 @@ app.action('default_etana', async ({ body, ack, client }) => {
 app.event('message', async({ event, say }) => {
     if (event.channel_type === "im" && event.text !== undefined) {
         const date = dfunc.parseDate(event.text, DateTime.now())
-        if (date.isValid) {
+        if (date.isValid && dfunc.isWeekday(date)) {
             const enrollments = await service.getEnrollmentsFor(date.toISODate())
             let response = ""
-            if (enrollments.length === 0) response = "Kukaan ei ole toimistolla tuona päivänä."
-            enrollments.forEach((user) => {
-                response += `<@${user}>\n`
-            })
+            if (enrollments.length === 0) response = "Kukaan ei ole toimistolla " + dfunc.weekdays[date.weekday - 1].toLowerCase() + "na " + date.day + "." + date.month + "."
+            else {
+                response = dfunc.weekdays[date.weekday - 1] + "na " + date.day + "." + date.month + ". toimistolla "
+                if (enrollments.length === 1) response += "on:\n"
+                else response += "ovat:\n"
+                enrollments.forEach((user) => {
+                    response += `<@${user}>\n`
+                })
+            }
             await say(response)
         } else {
             await say("Anteeksi, en ymmärtänyt äskeistä.")
