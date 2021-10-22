@@ -16,7 +16,7 @@ Siirryt Botin hallintapaneelin etusivulle:
 
 ## Ohjelman konfigurointi
 
-Ohjelma yhdistää Slackin rajapintaan kolmella salausavaimella ympäristömuuttujien kautta. Avaimet löytää Slack apin [hallintapaneelista](https://api.slack.com/apps/):
+Ohjelma yhdistyy Slackin rajapintaan kolmella salausavaimella ympäristömuuttujien kautta. Avaimet löytää Slack apin [hallintapaneelista](https://api.slack.com/apps/):
 
 `SLACK_SIGNING_SECRET`: Avain löytyy suoraan oikean botin etusivulta laatikosta "App credentials" nimellä "Signing Secret"
 
