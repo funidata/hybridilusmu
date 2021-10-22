@@ -15,11 +15,10 @@ const format = {...DateTime.DATETIME_MED, month: 'long' };
  * Updates the App-Home page.
  */
 const update = async (client, userId) => {
-    let menu = await getMenu()
     let settings = await getSettingsPage(userId)
     let updateBlock = await getUpdateBlock()
     let enrollments = await getEnrollmentsPage(userId)
-    let blocks = menu.concat(settings, updateBlock, enrollments)
+    let blocks = settings.concat(updateBlock, enrollments)
     client.views.publish({
         user_id: userId,
         view: {
@@ -27,11 +26,6 @@ const update = async (client, userId) => {
             blocks: blocks
         }
     })
-}
-
-const getMenu = async () => {
-    let menu = []
-    return menu
 }
 
 const getSettingsPage = async (userId) => {
