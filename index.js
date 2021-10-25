@@ -26,52 +26,61 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN
 });
 
-async function getUserIfNotRestricted(slackUserId) {
-  return (await app.client.users.list()).members
-    .find(u => u.id === slackUserId && !u.is_restricted)
+/**
+ * Get the restriction/guest value of the given user from Slack API.
+ * @param {*} userId 
+ * @returns True iff user is restricted or not found.
+ */
+async function getUserRestriction(userId) {
+  const user = (await app.client.users.list()).members
+    .find(u => u.id === userId)
+  return user.is_restricted
 }
 
 /**
- * Global middleware that checks if the user is a guest (restricted), and if so, short-circuits requests.
+ * Bolt global middleware (runs before every request) that checks if the user 
+ * is a guest (restricted), and if so, stops further processing of the request, 
+ * displaying an error message instead.
  */
-async function guestHandler({ payload, client, context, next }) {
-  const slackUserId = payload.user;
-
-  // Approve requests which don't include payload.user
-  if (slackUserId === undefined) {
+async function guestHandler({ payload, body, client, next }) {
+  // The user ID is found in many different places depending on the type of action taken
+  var userId; // Undefined evaluates as false
+  if (!userId) try {userId = payload.user} catch (error) {} // tab
+  if (!userId) try {userId = body.user.id} catch (error) {} // button
+  if (!userId) try {userId = body.event.message.user} catch (error) {} // message edit
+  // Approve requests which don't include any of the above (couldn't find any)
+  if (!userId) {
+    console.log(`alert: guest check skipped!`)
     await next();
     return;
   }
-  
+
   try {
-    const user = await getUserIfNotRestricted(slackUserId);
-    // When the user lookup is successful, add the user details to the context
-    context.user = user;
-    if (user === undefined) {
-      throw 'User not found or restricted!';
+    if (await getUserRestriction(userId)) {
+      throw `User restricted (or not found)`;
     }
   } catch (error) {
-    // TODO: make this work
-    // This user wasn't found or it was restricted. Send them an error and don't continue processing request
-    if (error.message === 'Not Found') {
+    // This user was restricted (or wasn't found). Show them an error message and don't continue processing the request
+    if (error === 'User restricted (or not found)') {
+      const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`
+      if (payload.channel === undefined || payload.tab === 'home') {
+        home.error(client, userId, message); // Home tab requests show the message on the home tab
+      } else { // Otherwise send a private message
         await client.chat.postEphemeral({
           channel: payload.channel,
-          user: slackUserId,
-          text: `Pahoittelut, <@${slackUserId}>, olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää bottia.`
+          user: userId,
+          text: message
         });
-        return;
+      }
+      return;
     }
-    
     // Pass control to previous middleware (if any) or the global error handler
     throw error;
-    
   }
-  
   // Pass control to the next middleware (if there are any) and the listener functions
   // Note: You probably don't want to call this inside a `try` block, or any middleware
   //       after this one that throws will be caught by it. 
   await next();
-  
 }
 
 app.use(guestHandler)
