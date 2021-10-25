@@ -29,7 +29,7 @@ const app = new App({
 /**
  * Get the restriction/guest value of the given user from Slack API.
  * @param {*} userId 
- * @returns True iff user is restricted or not found.
+ * @returns True iff the user is restricted.
  */
 async function getUserRestriction(userId) {
   const user = (await app.client.users.list()).members
@@ -57,11 +57,11 @@ async function guestHandler({ payload, body, client, next }) {
 
   try {
     if (await getUserRestriction(userId)) {
-      throw `User restricted (or not found)`;
+      throw `User is restricted`;
     }
   } catch (error) {
-    // This user was restricted (or wasn't found). Show them an error message and don't continue processing the request
-    if (error === 'User restricted (or not found)') {
+    // This user is restricted. Show them an error message and don't continue processing the request
+    if (error === 'User is restricted') {
       const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`
       if (payload.channel === undefined || payload.tab === 'home') {
         home.error(client, userId, message); // Home tab requests show the message on the home tab
