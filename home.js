@@ -38,8 +38,10 @@ const getSettingsPage = async (userId) => {
             defaultInOffice: await service.userInOfficeByDefault(userId, weekday),
             defaultIsRemote: await service.userIsRemoteByDefault(userId, weekday)
         }
+        
+        if (weekday === "Keskiviikko") settingsPage.push(mrkdwn("*" + weekday + "isin*"))
+        else settingsPage.push(mrkdwn("*" + weekday + "sin*"))
         settingsPage.push(
-            mrkdwn("*" + weekday + "na*"),
             actions([
                 button('Toimistolla', 'default_toimistolla', JSON.stringify(buttonValue), `${buttonValue.defaultInOffice ? 'primary' : null}`),
                 button('Etänä', 'default_etana', JSON.stringify(buttonValue), `${buttonValue.defaultIsRemote ? 'primary' : null}`)

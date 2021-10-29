@@ -2,7 +2,7 @@ const db = require("../database");
 const assert = require('assert');
 const controller = require("../controllers/db.controllers");
 
-describe('persons test', function() {
+describe('Persons test', function() {
 
     this.beforeAll(async function() {
         await db.sequelize.sync({ force: true });

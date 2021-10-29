@@ -3,7 +3,7 @@ const assert = require('assert');
 const controller = require("../controllers/db.controllers");
 const { publicEncrypt, sign } = require("crypto");
 
-describe('signups test', function() {
+describe('Signups Tests', function() {
 
     this.beforeAll(async function() {
         await db.sequelize.sync({ force: true });
@@ -59,7 +59,6 @@ describe('signups test', function() {
         const user_id = await controller.findUserId('ABC');
         await controller.addSignupForUser('ABC', '2021-10-12', true);
         const signups = await controller.getAllOfficeSignupsForAUser(user_id);
-        console.log(signups)
         assert.equal(2, signups.length);
         assert.equal('2021-10-11', signups[0]);
     });

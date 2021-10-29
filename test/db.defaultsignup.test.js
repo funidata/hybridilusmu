@@ -3,7 +3,7 @@ const assert = require('assert');
 const controller = require("../controllers/db.controllers");
 const { publicEncrypt, sign } = require("crypto");
 
-describe('default signups test', function() {
+describe('Default signups test', function() {
 
     this.beforeAll(async function() {
         await db.sequelize.sync({ force: true });
