@@ -99,22 +99,25 @@ app.event('message', async({ event, say }) => {
  * Sends a scheduled message every Sunday to all the channels the bot is in.
  */
 async function startScheduling() {
-  const onceEverySunday = new schedule.RecurrenceRule();
-  onceEverySunday.tz = 'Etc/UTC';
-  onceEverySunday.dayOfWeek = 0
-  onceEverySunday.hour = 10
-  onceEverySunday.minute = 30
-  console.log("scheduling posts to every public channel the bot is a member of on dayOfWeek",onceEverySunday.dayOfWeek,"at hour",onceEverySunday.hour,onceEverySunday.tz)
-  const job = schedule.scheduleJob(onceEverySunday, () => {
-    weekdays = dfunc.listNextWeek(DateTime.now())
-    getMemberChannelIds().then((result) => result.forEach(id => {
-      postMessage(id, weekdays[0])
-        .then(() => postMessage(id, weekdays[1]))
-        .then(() => postMessage(id, weekdays[2]))
-        .then(() => postMessage(id, weekdays[3]))
-        .then(() => postMessage(id, weekdays[4]))
-    }))
-  })
+    const rule = new schedule.RecurrenceRule();
+    rule.tz = 'Etc/UTC';
+    rule.dayOfWeek = [1, 2, 3, 4, 5];
+    rule.hour = 4;
+    rule.minute = 0;
+    console.log("Scheduling posts to every public channel the bot is a member of every weekday at hour", rule.hour, rule.tz)
+    const job = schedule.scheduleJob(rule, async () => {
+        const enrollments = await service.getEnrollmentsFor(DateTime.now().toISODate())
+        let dailyMessage = ""
+        if (enrollments.length === 0) dailyMessage = "Kukaan ei ole tänään toimistolla."
+        else if (enrollments.length === 1) dailyMessage = "Tänään toimistolla on:\n"
+        else dailyMessage = "Tänään toimistolla ovat:\n"
+        enrollments.forEach((user) => {
+            dailyMessage += `<@${user}>\n`
+        })
+        getMemberChannelIds().then((result) => result.forEach(id => {
+            postMessage(id, dailyMessage)
+        }))
+    });
 }
 
 /**
