@@ -318,6 +318,8 @@ module.exports = {
   generatePlaintextString,
   // lookup functions
   getUsergroupsForUser,
+  getUsersForUsergroup,
+  getChannelsForUsergroup,
   isUserInUsergroup,
   isDirty,
   // data manipulation functions
