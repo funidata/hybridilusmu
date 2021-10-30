@@ -246,6 +246,20 @@ const getUsergroupsForUser = (slack_user_id) => {
   return Object.keys(uo)
 }
 
+const getUsersForUsergroup = (slack_usergroup_id) => {
+  if (!usergroups[slack_usergroup_id]) {
+    return []
+  }
+  return usergroups[slack_usergroup_id][users]
+}
+
+const getChannelsForUsergroup = (slack_usergroup_id) => {
+  if (!usergroups[slack_usergroup_id]) {
+    return []
+  }
+  return usergroups[slack_usergroup_id].prefs.channels
+}
+
 const isUserInUsergroup = (slack_user_id, slack_usergroup_id) => {
   const uo = usersLookup[slack_user_id]
   if (!uo || !uo[slack_usergroup_id]) {

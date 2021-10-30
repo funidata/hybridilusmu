@@ -141,19 +141,31 @@ async function postMessage(channelId, text) {
  * Event listener for usergroup creation events
  */
 app.event('subteam_created', async ({ event }) => {
-  usergroups.processCreationEvent(event)
+  const id = event.subteam.id
+  const type = event.type
+  const ret = usergroups.processCreationEvent(event)
+  const shorthand = usergroups.generatePlaintextString(id)
+  console.log(`ug ${shorthand} <${id}>: ${type}, returning ${ret}`)
 });
 /**
  * Event listener for usergroup update events
  */
 app.event('subteam_updated', async ({ event }) => {
-  usergroups.processUpdateEvent(event)
+  const id = event.subteam.id
+  const type = event.type
+  const ret = usergroups.processUpdateEvent(event)
+  const shorthand = usergroups.generatePlaintextString(id)
+  console.log(`ug ${shorthand} <${id}>: ${type}, returning ${ret}`)
 });
 /**
  * Event listener for usergroup member change events
  */
 app.event('subteam_members_changed', async ({ event }) => {
-  usergroups.processMembersChangedEvent(event)
+  const id = event.subteam_id
+  const type = event.type
+  const ret = usergroups.processMembersChangedEvent(event)
+  const shorthand = usergroups.generatePlaintextString(id)
+  console.log(`ug ${shorthand} <${id}>: ${type}, returning ${ret}`)
 });
 
 /**
@@ -165,6 +177,7 @@ app.event('subteam_members_changed', async ({ event }) => {
   console.log('⚡️ Bolt app is running!');
 })().then(async () => {
   let ugs = await app.client.usergroups.list()
+  console.log(`usergroups.list:`, ugs)
   if (!ugs.ok) {
     console.log('Failed fetching usergroups')
   }
@@ -177,12 +190,14 @@ app.event('subteam_members_changed', async ({ event }) => {
     if (!ug.user_count || !usergroups.isDirty(ug.id)) {
       return
     }
-    const users = await app.client.usergroups.users.list()
-    console.log(`usergroups.users.list for ug ${ug.id}:`, users)
+    console.log(`ug ${ug.id} prefs:`, ug.prefs)
+    const users = await app.client.usergroups.users.list({ usergroup: ug.id })
+    console.log(`usergroups.users.list for ug ${ug.id}:`, users, users.users)
     const res = usergroups.insertUsergroupUsersFromAPIListResponse(users, ug.id)
     if (!res) {
       console.log(`Something went awry when trying to insert usergroup users for usergroup ${ug.id}`)
     }
+    console.log(usergroups._dumpState())
   })
 });
 

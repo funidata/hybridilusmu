@@ -28,6 +28,7 @@ const createEventPayload = {
       "Umeklu",
     ],
     "user_count": 1,
+    // note that channel_count is zero, even though we have a channel under prefs.channels
     "channel_count": 0
   }
 }
@@ -61,7 +62,7 @@ const updateEventPayload = {
         "Umcafee"
       ],
       "user_count": 2,
-      "channel_count": 1
+      "channel_count": 0
   }
 }
 
