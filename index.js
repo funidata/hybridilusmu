@@ -76,14 +76,15 @@ app.action('default_etana', async ({ body, ack, client }) => {
 });
 
 /**
- * Listens to a slash-command in private messages and prints a list of people at the office on the given day.
+ * Listens to a slash-command and prints a list of people at the office on the given day.
  */
-app.command("/listaa", async ({ command, ack, say }) => {
+app.command("/listaa", async ({ command, ack, client }) => {
     try {
         await ack();
+        const channelId = command.channel_id
+        const userId = command.user_id
         let parameter = command.text //Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen
         const date = dfunc.parseDate(parameter, DateTime.now())
-        console.log(date.toString())
         if (date.isValid) {
             const enrollments = await service.getEnrollmentsFor(date.toISODate())
             let response = dfunc.weekdays[date.weekday - 1] + "na " + date.day + "." + date.month + ". toimistolla "
@@ -93,14 +94,22 @@ app.command("/listaa", async ({ command, ack, say }) => {
             enrollments.forEach((user) => {
                 response += `<@${user}>\n`
             })
-            await say(response)
+            await client.chat.postEphemeral({
+                channel: channelId,
+                user: userId,
+                text: response
+            });
         } else {
-            await say("Anteeksi, en ymmärtänyt äskeistä.")
+            await client.chat.postEphemeral({
+                channel: channelId,
+                user: userId,
+                text: "Anteeksi, en ymmärtänyt äskeistä."
+            });
         }
     } catch (error) {
         console.log("Tapahtui virhe :(")
         console.log(error)
-    } 
+    }
 });
 
 /**
