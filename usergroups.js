@@ -59,6 +59,21 @@ let usergroups = {}
 */
 let usersLookup = {}
 
+/**
+ * You probably shouldn't be calling this from outside of the library
+ */
+const _clearData = () => {
+  usergroups = {}
+  usersLookup = {}
+}
+
+const _dumpState = () => {
+  return {
+    usergroups,
+    usersLookup
+  }
+}
+
 const initSlackUser = (slack_user_id) => {
   if (!usersLookup[slack_user_id]) {
     usersLookup[slack_user_id] = {}
@@ -71,6 +86,12 @@ const dropSlackUserFromUsergroup = (slack_user_id, slack_usergroup_id) => {
   delete ug.users_lkup[slack_user_id]
   ug.users.filter((u) => u !== slack_user_id)
   ug.user_count = ug.users.length
+  if (usersLookup[slack_user_id]) {
+    delete usersLookup[slack_user_id][slack_usergroup_id]
+    if (0 === Object.keys(usersLookup[slack_user_id]).length) {
+      delete usersLookup[slack_user_id]
+    }
+  }
 }
 
 const dropSlackUser = (slack_user_id) => {
@@ -91,6 +112,23 @@ const initSlackUsergroup = (slack_usergroup_id) => {
   }
   if (!usergroups[slack_usergroup_id].users_lkup) {
     usergroups[slack_usergroup_id].users_lkup = {}
+  }
+}
+
+/**
+ * This really shouldn't be needed
+ * @param {Object} usergroup The usergroup object to edit
+ * @returns {void}
+ */
+const normaliseUsergroup = (usergroup) => {
+  if (!usergroup) {
+    return
+  }
+  if (typeof usergroup.user_count === 'string') {
+    usergroup.user_count = 1 * usergroup.user_count
+  }
+  if (typeof usergroup.channel_count === 'string') {
+    usergroup.channel_count = 1 * usergroup.channel_count
   }
 }
 
@@ -123,12 +161,14 @@ const insertUsersForUsergroup = (usergroup) => {
   if (!usergroup.users || usergroup.users.length !== usergroup.user_count) {
     return false
   }
-  for (let i = 0; i < usergroups.users.length; ++i) {
-    insertUserForUsergroup(usergroups.users[i], usergroup.id)
+  for (let i = 0; i < usergroup.users.length; ++i) {
+    insertUserForUsergroup(usergroup.users[i], usergroup.id)
   }
+  return true
 }
 
 const insertUsergroup = (usergroup) => {
+  normaliseUsergroup(usergroup)
   if (!usergroup || !usergroup.is_usergroup) {
     return false
   }
@@ -162,12 +202,77 @@ const insertUsergroupUsersFromAPIListResponse = (response, slack_usergroup_id) =
   for (let i = 0; i < response.users.length; ++i) {
     insertUserForUsergroup(response.users[i], slack_usergroup_id)
   }
+  return true
+}
+
+const getUsergroupsForUser = (slack_user_id) => {
+  const uo = usersLookup[slack_user_id]
+  if (!uo) {
+    return []
+  }
+  return Object.keys(uo)
+}
+
+const isUserInUsergroup = (slack_user_id, slack_usergroup_id) => {
+  const uo = usersLookup[slack_user_id]
+  if (!uo || !uo[slack_usergroup_id]) {
+    return false
+  }
+  return true
+}
+
+const processCreationEvent = (response) => {
+  if (!response || response.type !== 'subteam_created') {
+    return false
+  }
+  return insertUsergroup(response.subteam)
+}
+
+const processUpdateEvent = (response) => {
+  if (!response || response.type !== 'subteam_updated') {
+    return false
+  }
+  return insertUsergroup(response.subteam)
+}
+
+const processMembersChangedEvent = (response) => {
+  if (!response || response.type !== 'subteam_members_changed') {
+    return false
+  }
+  const ug = usergroups[response.subteam_id]
+  if (!ug) {
+    console.log(`received members_changed event for unknown usergroup ${response.subteam_id}`)
+    return false
+  }
+  if (response.date_previous_update !== ug.date_update) {
+    console.log(`subteam_members_changed: update time mismatch for usergroup ${ug.id}, ignoring data`)
+    return false
+  }
+  ug.date_update = response.date_update
+  for (let i = 0; i < response.added_users_count; ++i) {
+    insertUserForUsergroup(response.added_users[i], ug.id)
+  }
+  for (let i = 0; i < response.removed_users_count; ++i) {
+    dropSlackUserFromUsergroup(response.removed_users[i], ug.id)
+  }
+  return true
 }
 
 module.exports = {
+  // internal functions are denoted with an underscore here
+  _clearData,
+  _dumpState,
+  // helpers for UI stuff
   generateMentionString,
   generatePlaintextString,
+  // lookup functions
+  getUsergroupsForUser,
+  isUserInUsergroup,
+  // data manipulation functions
   insertUsergroup,
   insertUsergroupsFromAPIListResponse,
-  insertUsergroupUsersFromAPIListResponse
+  insertUsergroupUsersFromAPIListResponse,
+  processCreationEvent,
+  processUpdateEvent,
+  processMembersChangedEvent
 }
