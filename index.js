@@ -195,7 +195,6 @@ app.event('subteam_members_changed', async ({ event }) => {
 
 const readUsergroupsFromCleanSlate = async () => {
   let ugs = await app.client.usergroups.list()
-  console.log(`usergroups.list:`, ugs)
   if (!ugs.ok) {
     console.log('Failed fetching usergroups')
   }
