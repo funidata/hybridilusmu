@@ -62,7 +62,7 @@ const parseDate = (input, today) => {
     if (isToday(input)) return today
     if (isTomorrow(input)) return today.plus({ days: 1 })
     weekday = matchWeekday(input)
-    if (weekday != 0) {
+    if (weekday) {
         return today.plus({ days: (weekday + 7 - today.weekday)%7 })
     }
     const regex = /^([0-9]+\.[0-9]+(\.)?)$/

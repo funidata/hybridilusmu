@@ -76,28 +76,31 @@ app.action('default_etana', async ({ body, ack, client }) => {
 });
 
 /**
- * Listens to a command in private messages and prints a list of people at the office on the given day.
+ * Listens to a slash-command in private messages and prints a list of people at the office on the given day.
  */
-app.event('message', async({ event, say }) => {
-    if (event.channel_type === "im" && event.text !== undefined) {
-        const date = dfunc.parseDate(event.text, DateTime.now())
+app.command("/listaa", async ({ command, ack, say }) => {
+    try {
+        await ack();
+        let parameter = command.text //Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen
+        const date = dfunc.parseDate(parameter, DateTime.now())
+        console.log(date.toString())
         if (date.isValid && dfunc.isWeekday(date)) {
             const enrollments = await service.getEnrollmentsFor(date.toISODate())
-            let response = ""
+            let response = dfunc.weekdays[date.weekday - 1] + "na " + date.day + "." + date.month + ". toimistolla "
             if (enrollments.length === 0) response = "Kukaan ei ole toimistolla " + dfunc.weekdays[date.weekday - 1].toLowerCase() + "na " + date.day + "." + date.month + "."
-            else {
-                response = dfunc.weekdays[date.weekday - 1] + "na " + date.day + "." + date.month + ". toimistolla "
-                if (enrollments.length === 1) response += "on:\n"
-                else response += "ovat:\n"
-                enrollments.forEach((user) => {
-                    response += `<@${user}>\n`
-                })
-            }
+            else if (enrollments.length === 1) response += "on:\n"
+            else response += "ovat:\n"
+            enrollments.forEach((user) => {
+                response += `<@${user}>\n`
+            })
             await say(response)
         } else {
             await say("Anteeksi, en ymmärtänyt äskeistä.")
         }
-    }
+    } catch (error) {
+        console.log("Tapahtui virhe :(")
+        console.log(error)
+    } 
 });
 
 /**
