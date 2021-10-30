@@ -5,6 +5,26 @@
  */
 
 /**
+ * Generates a mention string for the given usergroup.
+ * @param {String} slack_usergroup_id The Slack id of the usergroup in question
+ * @returns {String} A string that Slack will turn into a mention
+ */
+ const generateMentionString = (slack_usergroup_id) => "<!subteam^" + slack_usergroup_id + ">"
+
+ /**
+  * Generates a plaintext string describing a usergroup.
+  * @param {String} slack_usergroup_id The Slack id of the usergroup in question
+  * @returns {String} A plain text representation of the usergroup's identity, like "Kahvinkittaajat (@kahvi)"
+  */
+ const generatePlaintextString = (slack_usergroup_id) => {
+  const ug = usergroups[slack_usergroup_id]
+   if (!ug) {
+     return ""
+   }
+   return ug.name + " (@" + ug.handle + ")"
+ }
+
+/**
  * An object containing the usergroups, keyed by id.
  * Format is roughly the following:
  *   {
@@ -145,6 +165,8 @@ const insertUsergroupUsersFromAPIListResponse = (response, slack_usergroup_id) =
 }
 
 module.exports = {
+  generateMentionString,
+  generatePlaintextString,
   insertUsergroup,
   insertUsergroupsFromAPIListResponse,
   insertUsergroupUsersFromAPIListResponse
