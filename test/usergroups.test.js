@@ -222,8 +222,13 @@ describe('usergroups: Event based population', function () {
 })
 
 describe('usergroups: String generation', function () {
-  it('mention string', function () {
-    assert.equal(usergroups.generateMentionString('Skahvi'), '<!subteam^Skahvi>')
+  it('mention string for unknown usergroup', function () {
+    assert.equal(usergroups.generateMentionString('Solematon'), '<!subteam^Solematon>')
+  })
+
+  it('mention string for known usergroup', function () {
+    usergroups.processCreationEvent(createEventPayload)
+    assert.equal(usergroups.generateMentionString('Skahvi'), '<!subteam^Skahvi|@kahvi>')
   })
 
   it('plain text descriptor string', function () {

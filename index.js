@@ -81,10 +81,20 @@ app.action(`update_click`, async ({ body, ack, client}) => {
  */
 app.event('message', async({ event, say }) => {
   if (event.channel_type === "im" && event.text !== undefined) {
-    const date = dfunc.parseDate(event.text, DateTime.now())
+    const command = event.text.trim()
+    const args = command.split(' ')
+    const date = dfunc.parseDate(args[0], DateTime.now())
+    const usergroup_id = args.length === 2 ? usergroups.parseMentionString(args[1]) : false
+    const usergroup_filter = !usergroup_id
+      ? (uid) => true
+      : (uid) => usergroups.isUserInUsergroup(uid, usergroup_id)
     if (date.isValid) {
-      const enrollments = await service.getEnrollmentsFor(date.toISODate())
-      let response = ""
+      const enrollments = (
+        await service.getEnrollmentsFor(date.toISODate())
+      ).filter(usergroup_filter)
+      let response = !usergroup_id
+        ? ""
+        : `Tiimistä ${usergroups.generateMentionString(usergroup_id)} on paikalla:\n`
       if (enrollments.length === 0) response = "Kukaan ei ole toimistolla tuona päivänä."
       enrollments.forEach((user) => {
         response += `<@${user}>\n`

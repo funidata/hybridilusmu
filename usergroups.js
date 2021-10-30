@@ -4,25 +4,53 @@
  * These are usually known as subteams in Slack API terminology.
  */
 
+/** Leading part of mention string */
+const mentionLead = "<!subteam^"
+/** Ending part of mention string */
+const mentionTail = ">"
 /**
  * Generates a mention string for the given usergroup.
  * @param {String} slack_usergroup_id The Slack id of the usergroup in question
  * @returns {String} A string that Slack will turn into a mention
  */
- const generateMentionString = (slack_usergroup_id) => "<!subteam^" + slack_usergroup_id + ">"
+const generateMentionString = (slack_usergroup_id) => {
+  const label = !usergroups[slack_usergroup_id]
+    ? ""
+    : `|@${usergroups[slack_usergroup_id].handle}`
+  return "<!subteam^" + slack_usergroup_id + label + ">"
+}
 
- /**
-  * Generates a plaintext string describing a usergroup.
-  * @param {String} slack_usergroup_id The Slack id of the usergroup in question
-  * @returns {String} A plain text representation of the usergroup's identity, like "Kahvinkittaajat (@kahvi)"
-  */
- const generatePlaintextString = (slack_usergroup_id) => {
-  const ug = usergroups[slack_usergroup_id]
-   if (!ug) {
-     return ""
-   }
-   return ug.name + " (@" + ug.handle + ")"
- }
+/**
+ * Reads a usergroup id from a mention string
+ * @param {String} str String to extract usergroup id from
+ */
+const parseMentionString = (str) => {
+  if (str.startsWith(mentionLead)) {
+    let inspect = str.substr(mentionLead.length)
+    const tail_at = inspect.indexOf(mentionTail)
+    if (tail_at > 0) {
+      inspect = inspect.substr(0, tail_at)
+      const label_at = inspect.indexOf('|')
+      if (label_at > 0) {
+        return inspect.substr(0, label_at)
+      }
+    }
+  }
+  return false
+}
+
+/**
+ * Generates a plaintext string describing a usergroup.
+ * @param {String} slack_usergroup_id The Slack id of the usergroup in question
+ * @returns {String} A plain text representation of the usergroup's identity, like "Kahvinkittaajat (@kahvi)"
+ */
+const generatePlaintextString = (slack_usergroup_id) => {
+ const ug = usergroups[slack_usergroup_id]
+  if (!ug) {
+    return ""
+  }
+  return ug.name + " (@" + ug.handle + ")"
+}
 
 /**
  * An object containing the usergroups, keyed by id.
@@ -316,6 +344,7 @@ module.exports = {
   // helpers for UI stuff
   generateMentionString,
   generatePlaintextString,
+  parseMentionString,
   // lookup functions
   getUsergroupsForUser,
   getUsersForUsergroup,
