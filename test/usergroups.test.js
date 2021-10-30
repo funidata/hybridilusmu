@@ -154,7 +154,7 @@ const usergroupsUsersListPayload = {
   ]
 }
 
-describe('Populate from API call', function () {
+describe('usergroups: Populate from API call', function () {
   this.beforeEach(function () {
     usergroups._clearData()
   })
@@ -184,7 +184,7 @@ describe('Populate from API call', function () {
   })
 })
 
-describe('Event based population', function () {
+describe('usergroups: Event based population', function () {
   this.beforeEach(function () {
     usergroups._clearData()
   })
@@ -217,5 +217,17 @@ describe('Event based population', function () {
     assert.equal(usergroups.isUserInUsergroup("Umcafee", "Skahvi"), false)
     assert.equal(usergroups.isUserInUsergroup("Ukernighan", "Skahvi"), true)
     assert.equal(usergroups.isUserInUsergroup("Uritchie", "Skahvi"), true)
+  })
+})
+
+describe('usergroups: String generation', function () {
+  it('mention string', function () {
+    assert.equal(usergroups.generateMentionString('Skahvi'), '<!subteam^Skahvi>')
+  })
+
+  it('plain text descriptor string', function () {
+    usergroups.processCreationEvent(createEventPayload)
+    assert.equal(usergroups.generatePlaintextString('Skahvi'), 'Kahvinkittaajat (@kahvi)')
+    usergroups._clearData()
   })
 })
