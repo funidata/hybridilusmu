@@ -159,11 +159,14 @@ const insertUsersForUsergroup = (usergroup) => {
     return false
   }
   if (!usergroup.users || usergroup.users.length !== usergroup.user_count) {
+    usergroup._dirty = true
     return false
   }
   for (let i = 0; i < usergroup.users.length; ++i) {
     insertUserForUsergroup(usergroup.users[i], usergroup.id)
   }
+  delete usergroup._dirty
+  delete usergroup._dirty_date
   return true
 }
 
@@ -172,8 +175,19 @@ const insertUsergroup = (usergroup) => {
   if (!usergroup || !usergroup.is_usergroup) {
     return false
   }
+  let oldState = {}
+  if (usergroups[usergroup.id]) {
+    oldState = {
+      users: usergroups[usergroup.id].users,
+      users_lkup: usergroups[usergroup.id].users_lkup,
+      user_count: usergroups[usergroup.id].user_count,
+      _dirty_date: usergroups[usergroup.id].date_update
+    }
+  }
   usergroups[usergroup.id] = usergroup
-  if (!usergroup.users) {
+  if (!usergroup.users && usergroup.user_count > 0) {
+    usergroup._dirty = true
+    usergroups[usergroup.id] = {...usergroup, ...oldState}
     return false
   }
   return insertUsersForUsergroup(usergroup)
@@ -195,6 +209,12 @@ const insertUsergroupsFromAPIListResponse = (response) => {
   return result
 }
 
+/**
+ * Inserts users for a usergroup as fetched by app.client.usergroups.users.list()
+ * @param {Object} response API response fetched via app.client.usergroups.users.list
+ * @param {String} slack_usergroup_id The Slack id of the relevant usergroup
+ * @returns {boolean} Whether the operation was successful or not
+ */
 const insertUsergroupUsersFromAPIListResponse = (response, slack_usergroup_id) => {
   if (response.ok !== true || !response.users) {
     return false
@@ -202,7 +222,20 @@ const insertUsergroupUsersFromAPIListResponse = (response, slack_usergroup_id) =
   for (let i = 0; i < response.users.length; ++i) {
     insertUserForUsergroup(response.users[i], slack_usergroup_id)
   }
+  delete usergroups[u.id]._dirty
+  delete usergroups[u.id]._dirty_date
   return true
+}
+
+const isDirty = (slack_usergroup_id) => {
+  // non-tracked ugs aren't dirty
+  if (!usergroups[slack_usergroup_id]) {
+    return false
+  }
+  if (usergroups[slack_usergroup_id]._dirty) {
+    return true
+  }
+  return false
 }
 
 const getUsergroupsForUser = (slack_user_id) => {
@@ -268,6 +301,7 @@ module.exports = {
   // lookup functions
   getUsergroupsForUser,
   isUserInUsergroup,
+  isDirty,
   // data manipulation functions
   insertUsergroup,
   insertUsergroupsFromAPIListResponse,

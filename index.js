@@ -17,6 +17,7 @@ const dfunc = require('./dateFunctions');
 const home = require('./home')
 const db = require('./database');
 const controller = require('./controllers/db.controllers');
+const usergroups = require('./usergroups')
 const { DateTime } = require("luxon");
 
 const app = new App({
@@ -143,7 +144,28 @@ async function postMessage(channelId, text) {
   await app.start(process.env.PORT || 3000);
   startScheduling();
   console.log('⚡️ Bolt app is running!');
-})();
+})().then(async () => {
+  let ugs = await app.client.usergroups.list()
+  if (!ugs.ok) {
+    console.log('Failed fetching usergroups')
+  }
+  if (!ugs.usergroups || !ugs.usergroups.length) {
+    console.log('No usergroups found')
+    return
+  }
+  let usersOkay = usergroups.insertUsergroupsFromAPIListResponse(ugs)
+  ugs.usergroups.forEach(async (ug) => {
+    if (!ug.user_count || !usergroups.isDirty(ug.id)) {
+      return
+    }
+    const users = await app.client.usergroups.users.list()
+    console.log(`usergroups.users.list for ug ${ug.id}:`, users)
+    const res = usergroups.insertUsergroupUsersFromAPIListResponse(users, ug.id)
+    if (!res) {
+      console.log(`Something went awry when trying to insert usergroup users for usergroup ${ug.id}`)
+    }
+  })
+});
 
 // workaround for Node 14.x not crashing if our WebSocket
 // disconnects and Bolt doesn't reconnect nicely
