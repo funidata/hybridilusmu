@@ -95,7 +95,12 @@ app.event('message', async({ event, say }) => {
       let response = !usergroup_id
         ? ""
         : `Tiimistä ${usergroups.generateMentionString(usergroup_id)} on paikalla:\n`
-      if (enrollments.length === 0) response = "Kukaan ei ole toimistolla tuona päivänä."
+      if (enrollments.length === 0) {
+        response = "Kukaan ei ole toimistolla tuona päivänä."
+        if (usergroup_id) {
+          response = `Kukaan tiimistä ${usergroups.generateMentionString(usergroup_id)} ei ole tuolloin toimistolla.`
+        }
+      }
       enrollments.forEach((user) => {
         response += `<@${user}>\n`
       })
