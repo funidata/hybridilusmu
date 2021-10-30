@@ -171,6 +171,16 @@ app.event('subteam_updated', async ({ event }) => {
   const ret = usergroups.processUpdateEvent(event)
   const shorthand = usergroups.generatePlaintextString(id)
   console.log(`ug ${shorthand} <${id}>: ${type}, returning ${ret}`)
+  // The usergroup user-list state can be dirty after an update event,
+  // as slack truncates the users-array to 500 elements.
+  if (!ret) {
+    console.log(`ug ${shorthand} <${id}> is dirty, refreshing users`)
+    const users = await app.client.usergroups.users.list({ usergroup: id })
+    const res = usergroups.insertUsergroupUsersFromAPIListResponse(users, id)
+    if (!res) {
+      console.log(`ug ${shorthand} <${id}> remains dirty after failed refresh`)
+    }
+  }
 });
 /**
  * Event listener for usergroup member change events
@@ -198,14 +208,11 @@ const readUsergroupsFromCleanSlate = async () => {
     if (!ug.user_count || !usergroups.isDirty(ug.id)) {
       return
     }
-    console.log(`ug ${ug.id} prefs:`, ug.prefs)
     const users = await app.client.usergroups.users.list({ usergroup: ug.id })
-    console.log(`usergroups.users.list for ug ${ug.id}:`, users, users.users)
     const res = usergroups.insertUsergroupUsersFromAPIListResponse(users, ug.id)
     if (!res) {
       console.log(`Something went awry when trying to insert usergroup users for usergroup ${ug.id}`)
     }
-    console.log(usergroups._dumpState())
   })
 };
 

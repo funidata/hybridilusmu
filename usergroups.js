@@ -21,15 +21,19 @@ const generateMentionString = (slack_usergroup_id) => {
 }
 
 /**
- * Reads a usergroup id from a mention string
+ * Reads a usergroup id from a mention string.
  * @param {String} str String to extract usergroup id from
+ * @returns {String} A Slack usergroup id
  */
 const parseMentionString = (str) => {
+  // a mention string looks roughly like <!subteam^SXYZZY>
   if (str.startsWith(mentionLead)) {
     let inspect = str.substr(mentionLead.length)
     const tail_at = inspect.indexOf(mentionTail)
     if (tail_at > 0) {
       inspect = inspect.substr(0, tail_at)
+      // there might also be a label in the mention string, which
+      // would look a little something like this: <!subteam^SXYZZY|@xyzzy>
       const label_at = inspect.indexOf('|')
       if (label_at > 0) {
         return inspect.substr(0, label_at)
@@ -172,8 +176,8 @@ const dropSlackUsergroup = (slack_usergroup_id) => {
 
 /**
  * Inserts a user to a usergroup
- * @param {string} slack_user_id      Slack id of user to add              (like "UFFFFFF")
- * @param {string} slack_usergroup_id Slack id of usergroup being added to (like "SFFFFFF")
+ * @param {String} slack_user_id      Slack id of user to add              (like "UFFFFFF")
+ * @param {String} slack_usergroup_id Slack id of usergroup being added to (like "SFFFFFF")
  */
 const insertUserForUsergroup = (slack_user_id, slack_usergroup_id) => {
   initSlackUser(slack_user_id)
