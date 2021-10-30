@@ -138,6 +138,25 @@ async function postMessage(channelId, text) {
 }
 
 /**
+ * Event listener for usergroup creation events
+ */
+app.event('subteam_created', async ({ event }) => {
+  usergroups.processCreationEvent(event)
+});
+/**
+ * Event listener for usergroup update events
+ */
+app.event('subteam_updated', async ({ event }) => {
+  usergroups.processUpdateEvent(event)
+});
+/**
+ * Event listener for usergroup member change events
+ */
+app.event('subteam_members_changed', async ({ event }) => {
+  usergroups.processMembersChangedEvent(event)
+});
+
+/**
  * Starts the bot.
  */
 (async () => {

@@ -222,8 +222,8 @@ const insertUsergroupUsersFromAPIListResponse = (response, slack_usergroup_id) =
   for (let i = 0; i < response.users.length; ++i) {
     insertUserForUsergroup(response.users[i], slack_usergroup_id)
   }
-  delete usergroups[u.id]._dirty
-  delete usergroups[u.id]._dirty_date
+  delete usergroups[slack_usergroup_id]._dirty
+  delete usergroups[slack_usergroup_id]._dirty_date
   return true
 }
 
@@ -280,6 +280,10 @@ const processMembersChangedEvent = (response) => {
   if (response.date_previous_update !== ug.date_update) {
     console.log(`subteam_members_changed: update time mismatch for usergroup ${ug.id}, ignoring data`)
     return false
+  }
+  if (!isDirty(ug.id) && response.date_update === ug.date_update) {
+    console.log(`subteam_members_changed: usergroup ${ug.id} already cleanly up-to-date`)
+    return true
   }
   ug.date_update = response.date_update
   for (let i = 0; i < response.added_users_count; ++i) {
