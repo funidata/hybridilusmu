@@ -168,14 +168,7 @@ app.event('subteam_members_changed', async ({ event }) => {
   console.log(`ug ${shorthand} <${id}>: ${type}, returning ${ret}`)
 });
 
-/**
- * Starts the bot.
- */
-(async () => {
-  await app.start(process.env.PORT || 3000);
-  startScheduling();
-  console.log('⚡️ Bolt app is running!');
-})().then(async () => {
+const readUsergroupsFromCleanSlate = async () => {
   let ugs = await app.client.usergroups.list()
   console.log(`usergroups.list:`, ugs)
   if (!ugs.ok) {
@@ -199,7 +192,27 @@ app.event('subteam_members_changed', async ({ event }) => {
     }
     console.log(usergroups._dumpState())
   })
-});
+};
+
+const scheduleUsergroupReadings = async () => {
+  const everyNight = new schedule.RecurrenceRule();
+  everyNight.tz = 'Etc/UTC';
+  everyNight.hour = 0
+  everyNight.minute = 25
+  console.log(`scheduling nightly usergroup reads at ${everyNight.hour}h ${everyNight.minute}m (${everyNight.tz})`)
+  const job = schedule.scheduleJob(everyNight, readUsergroupsFromCleanSlate)
+};
+
+/**
+ * Starts the bot.
+ */
+(async () => {
+  await app.start(process.env.PORT || 3000);
+  console.log('⚡️ Bolt app is running!');
+  startScheduling();
+  readUsergroupsFromCleanSlate();
+  scheduleUsergroupReadings();
+})();
 
 // workaround for Node 14.x not crashing if our WebSocket
 // disconnects and Bolt doesn't reconnect nicely
