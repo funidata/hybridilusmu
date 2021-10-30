@@ -10,7 +10,7 @@ const { DateTime } = require("luxon");
 const getEnrollmentsFor = async (date) => {
   const slackIds = await db.getAllOfficeSignupsForADate(date)
   const homeIds = await db.getAllOfficeSignupsForADate(date, false)
-  const defaultIds = await db.getAllOfficeDefaultSignupsForAWeekday(dfunc.weekdays[DateTime.fromISO(date).weekday-1])
+  const defaultIds = await db.getAllOfficeDefaultSignupsForAWeekday(dfunc.weekdays[DateTime.fromISO(date).weekday - 1])
   let set = new Set(slackIds)
   let etana = new Set(homeIds)
   defaultIds.forEach((id) => {

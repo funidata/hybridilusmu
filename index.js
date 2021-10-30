@@ -84,7 +84,7 @@ app.command("/listaa", async ({ command, ack, say }) => {
         let parameter = command.text //Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen
         const date = dfunc.parseDate(parameter, DateTime.now())
         console.log(date.toString())
-        if (date.isValid && dfunc.isWeekday(date)) {
+        if (date.isValid) {
             const enrollments = await service.getEnrollmentsFor(date.toISODate())
             let response = dfunc.weekdays[date.weekday - 1] + "na " + date.day + "." + date.month + ". toimistolla "
             if (enrollments.length === 0) response = "Kukaan ei ole toimistolla " + dfunc.weekdays[date.weekday - 1].toLowerCase() + "na " + date.day + "." + date.month + "."

@@ -180,11 +180,11 @@ describe('Match Weekday Tests', () => {
     it('All letters small', () => {
         assert.equal(dfunc.matchWeekday("maanantai"), 1)
     });
-    it('Input string is not a weekday', () => {
-        assert.equal(dfunc.matchWeekday("kurpitsa"), 0)
+    it('Input string is weekend', () => {
+        assert.equal(dfunc.matchWeekday("Lauantai"), 6)
     });
     it('Input string is not a weekday', () => {
-        assert.equal(dfunc.matchWeekday("Lauantai"), 0)
+        assert.equal(dfunc.matchWeekday("kurpitsa"), 0)
     });
     it('Input string is an empty string', () => {
         assert.equal(dfunc.matchWeekday(""), 0)
@@ -223,10 +223,10 @@ describe('Pretty Format Tests', () => {
         assert.equal(dfunc.toPrettyFormat("2021-10-15"), "Perjantai 15.10.")
     });
     it('Saturday returns an empty string', () => {
-        assert.equal(dfunc.toPrettyFormat("2021-10-16"), "")
+        assert.equal(dfunc.toPrettyFormat("2021-10-16"), "Lauantai 16.10.")
     });
     it('Sunday returns an empty string', () => {
-        assert.equal(dfunc.toPrettyFormat("2021-10-17"), "")
+        assert.equal(dfunc.toPrettyFormat("2021-10-17"), "Sunnuntai 17.10.")
     });
 });
 

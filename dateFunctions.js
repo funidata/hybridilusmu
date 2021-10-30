@@ -6,18 +6,23 @@ const weekdays = [
     'Tiistai',
     'Keskiviikko',
     'Torstai',
-    'Perjantai'
+    'Perjantai',
+    'Lauantai',
+    'Sunnuntai'
   ]
 const shortWeekdays = [
     'Ma',
     'Ti',
     'Ke',
     'To',
-    'Pe'
+    'Pe',
+    'La',
+    'Su'
   ]
 const MAX_INPUT_LENGTH = 20
 const RECORD_LIMIT = 180
 const MAX_DIFFERENCE = 2
+const WEEKDAYS_COUNT = 5
 
 /**
  * Returns a list of strings representing one week, starting from next monday calculated from the given day.
@@ -98,17 +103,19 @@ const isWeekday = (date) => {
  * @param {string} str - String to be matched.
  */
 const matchWeekday = str => {
-    if (str.length > MAX_INPUT_LENGTH) return 0
+    if (str.length > MAX_INPUT_LENGTH) return 0 //Ei haluta tehdä alla olevaa liian pitkille syötteille
+    //Katsotaan vastaako merkkijono jotain lyhennettä
     for (let i = 0; i < shortWeekdays.length; i++) {
         if (str.toLowerCase() === shortWeekdays[i].toLowerCase()) return i + 1
     }
+    //Katsotaan, onko merkkijono tarpeeksi lähellä mitää viikonpäivää ja jos on, palautetaan sen päivän numero
     dist = new Array(weekdays.length)
     for (let i = 0; i < weekdays.length; i++) {
         dist[i] = [editDistance(str.toLowerCase(), weekdays[i].toLowerCase()) , i]
     }
-    dist.sort((a,b) => a[0]-b[0])
+    dist.sort((a,b) => a[0] - b[0])
     if (dist[0][0] <= MAX_DIFFERENCE) return dist[0][1] + 1
-    return 0
+    return 0 //Muuten palautetaan nolla
 }
 
 /** 
@@ -139,7 +146,6 @@ const editDistance = (str1, str2) => {
 const toPrettyFormat = (datestring) => {
     const parts = datestring.split('-')
     const newDate = DateTime.fromObject({ year: parts[0], month: parts[1], day: parts[2] })
-    if (newDate.weekday - 1 >= weekdays.length) return ""
     const res = `${weekdays[newDate.weekday - 1]} ${newDate.day}.${newDate.month}.`
     return res
 }
