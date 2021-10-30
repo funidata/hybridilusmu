@@ -82,7 +82,7 @@ app.action(`update_click`, async ({ body, ack, client}) => {
 app.event('message', async({ event, say }) => {
   if (event.channel_type === "im" && event.text !== undefined) {
     const command = event.text.trim()
-    const args = command.split(' ')
+    const args = command.replaceAll('\t', ' ').split(' ').filter((str) => str.trim().length > 0)
     const date = dfunc.parseDate(args[0], DateTime.now())
     const usergroup_id = args.length === 2 ? usergroups.parseMentionString(args[1]) : false
     const usergroup_filter = !usergroup_id
