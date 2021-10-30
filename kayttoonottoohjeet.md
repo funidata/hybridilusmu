@@ -10,7 +10,7 @@ Botti ei ole saatavilla slackin lisäosavalikoimasta, vaan se tulee ottaa käytt
 - Kopioi ja liitä [manifestin sisältö](https://github.com/hytuslain/hytuslain/blob/master/manifest.yml) sitä kysyttäessä. Formaatti on YAML.
 - Klikkaa lopuksi Create
 
-Siirryt Botin hallintapaneelin etusivulle:
+Siirryt Botin hallintapaneelin sivulle "Basic Information":
 
 - Klikkaa "Install to workspace" -> "Allow"
 
@@ -18,9 +18,9 @@ Siirryt Botin hallintapaneelin etusivulle:
 
 Ohjelma yhdistyy Slackin rajapintaan kolmella salausavaimella ympäristömuuttujien kautta. Avaimet löytää Slack apin [hallintapaneelista](https://api.slack.com/apps/):
 
-`SLACK_SIGNING_SECRET`: Avain löytyy suoraan oikean botin etusivulta laatikosta "App credentials" nimellä "Signing Secret"
+`SLACK_SIGNING_SECRET`: Avain löytyy sivulta "Basic Information", laatikosta "App Credentials" nimellä "Signing Secret".
 
-`SLACK_APP_TOKEN`: Klikkaa "Generate Token and Scopes" etusivun "App-Level Tokens" -laatikosta. Anna avaimelle nimi ja klikkaa "Add Scope". Valitse "connections:write" ja klikkaa "Generate". Avain tulee näkyviin seuraavaan laatikkoon.
+`SLACK_APP_TOKEN`: "App Credentials" -laatikon alapuolelta löytyy "App-Level Tokens" -laatikko. Paina "Generate Token and Scopes", anna avaimelle nimi ja klikkaa "Add Scope". Valitse "connections:write" ja klikkaa "Generate". Avain näkyy nyt listattuna "App-Level Tokens" -laatikossa. Klikkaamalla avaimen nimeä, pääsee näkemään ja kopioimaan avaimen arvon.
 
 `SLACK_BOT_TOKEN`: Valitse vasemmasta sivupalkista "OAuth & Permissions". Avain löytyy ensimmäisestä laatikosta nimellä "Bot User OAuth Token".
 
