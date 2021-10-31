@@ -104,7 +104,7 @@ app.event('message', async({ event, say }) => {
   if (event.channel_type === "im" && event.text !== undefined) {
     const date = dfunc.parseDate(event.text, DateTime.now())
     if (dfunc.isWeekday(date)) {
-      const enrollments = await service.getEnrollmentsFor(date.toISODate())
+      const enrollments = await service.getRegistrationsFor(date.toISODate())
       let response = ""
       if (enrollments.length === 0) {
           response = "Kukaan ei ole toimistolla " + dfunc.weekdays[date.weekday - 1].toLowerCase() + "na " + date.day + "." + date.month + "."
