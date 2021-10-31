@@ -1,29 +1,29 @@
 require('./timestampedLogger').replaceLoggers();
 require('dotenv').config();
 require('./quotenv').checkEnv([
-    'SLACK_BOT_TOKEN',
-    'SLACK_APP_TOKEN',
-    'SLACK_SIGNING_SECRET',
-    'DB_SCHEMA',
-    'DB_USER',
-    'DB_PASSWORD',
-    'DB_HOST',
-    'DB_PORT'
+  'SLACK_BOT_TOKEN',
+  'SLACK_APP_TOKEN',
+  'SLACK_SIGNING_SECRET',
+  'DB_SCHEMA',
+  'DB_USER',
+  'DB_PASSWORD',
+  'DB_HOST',
+  'DB_PORT'
 ]);
 const { App } = require('@slack/bolt');
 const schedule = require('node-schedule');
 const service = require('./databaseService');
 const dfunc = require('./dateFunctions');
-const home = require('./home')
+const home = require('./home');
 const db = require('./database');
 const controller = require('./controllers/db.controllers');
 const { DateTime } = require("luxon");
 
 const app = new App({
-    token: process.env.SLACK_BOT_TOKEN,
-    signingSecret: process.env.SLACK_SIGNING_SECRET,
-    socketMode: true,
-    appToken: process.env.SLACK_APP_TOKEN
+  token: process.env.SLACK_BOT_TOKEN,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  socketMode: true,
+  appToken: process.env.SLACK_APP_TOKEN
 });
 
 
@@ -34,48 +34,48 @@ const app = new App({
  * Updates the App-Home page for the specified user.
  */
 app.action(`update_click`, async ({ body, ack, client }) => {
-    home.update(client, body.user.id);
-    await ack();
+  home.update(client, body.user.id);
+  await ack();
 });
 
 /**
  * Registers the user as present at the office for the selected day and updates the App-Home page.
  */
 app.action(`office_click`, async ({ body, ack, client }) => {
-    const data = JSON.parse(body.actions[0].value)
-    await service.changeRegistration(body.user.id, data.date, !data.atOffice)
-    home.update(client, body.user.id);
-    await ack();
+  const data = JSON.parse(body.actions[0].value)
+  await service.changeRegistration(body.user.id, data.date, !data.atOffice)
+  home.update(client, body.user.id);
+  await ack();
 });
 
 /**
  * Registers the user as not present at the office for the selected day and updates the App-Home page.
  */
 app.action(`remote_click`, async ({ body, ack, client }) => {
-    const data = JSON.parse(body.actions[0].value)
-    await service.changeRegistration(body.user.id, data.date, !data.isRemote, false)
-    home.update(client, body.user.id);
-    await ack();
+  const data = JSON.parse(body.actions[0].value)
+  await service.changeRegistration(body.user.id, data.date, !data.isRemote, false)
+  home.update(client, body.user.id);
+  await ack();
 });
 
 /**
  * Registers the user as present at the office by default for the selected day and updates the App-Home page.
  */
 app.action('default_office_click', async ({ body, ack, client }) => {
-    const data = JSON.parse(body.actions[0].value)
-    await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultAtOffice)
-    home.update(client, body.user.id);
-    await ack();
+  const data = JSON.parse(body.actions[0].value)
+  await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultAtOffice)
+  home.update(client, body.user.id);
+  await ack();
 });
 
 /**
  * Registers the user as not present at the office by default for the selected day and updates the App-Home page.
  */
 app.action('default_remote_click', async ({ body, ack, client }) => {
-    const data = JSON.parse(body.actions[0].value)
-    await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultIsRemote, false)
-    home.update(client, body.user.id);
-    await ack();
+  const data = JSON.parse(body.actions[0].value)
+  await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultIsRemote, false)
+  home.update(client, body.user.id);
+  await ack();
 });
 
 
@@ -87,7 +87,7 @@ app.action('default_remote_click', async ({ body, ack, client }) => {
  * Works also in private messages.
  */
 app.event('reaction_added', async ({ event, client }) => {
-    console.log(`User <${event.user}> reacted`);
+  console.log(`User <${event.user}> reacted`)
 });
 
 /**
@@ -101,20 +101,20 @@ app.event('app_home_opened', async ({ event, client }) => {
  * Listens to a command in private messages and prints a list of people at the office on the given day.
  */
 app.event('message', async({ event, say }) => {
-    if (event.channel_type === "im" && event.text !== undefined) {
-        const date = dfunc.parseDate(event.text, DateTime.now())
-        if (date.isValid) {
-            const registrations = await service.getRegistrationsFor(date.toISODate())
-            let response = ""
-            if (registrations.length === 0) response = "Kukaan ei ole toimistolla tuona päivänä."
-            registrations.forEach((user) => {
-                response += `<@${user}>\n`
-            })
-            await say(response)
-        } else {
-            await say("Anteeksi, en ymmärtänyt äskeistä.")
-        }
+  if (event.channel_type === "im" && event.text !== undefined) {
+    const date = dfunc.parseDate(event.text, DateTime.now())
+    if (date.isValid) {
+      const registrations = await service.getRegistrationsFor(date.toISODate())
+      let response = ""
+      if (registrations.length === 0) response = "Kukaan ei ole toimistolla tuona päivänä."
+      registrations.forEach((user) => {
+        response += `<@${user}>\n`
+      })
+      await say(response)
+    } else {
+      await say("Anteeksi, en ymmärtänyt äskeistä.")
     }
+  }
 });
 
 
@@ -139,7 +139,7 @@ async function getUserRestriction(userId) {
  */
 async function guestHandler({ payload, body, client, next }) {
   // The user ID is found in many different places depending on the type of action taken
-  var userId; // Undefined evaluates as false
+  var userId // Undefined evaluates as false
   if (!userId) try {userId = payload.user} catch (error) {} // tab
   if (!userId) try {userId = body.user.id} catch (error) {} // button
   if (!userId) try {userId = body.event.message.user} catch (error) {} // message edit
@@ -184,50 +184,50 @@ app.use(guestHandler)
  * Sends a scheduled message every Sunday to all the channels the bot is in.
  */
 async function startScheduling() {
-    const onceEverySunday = new schedule.RecurrenceRule();
-    onceEverySunday.tz = 'Etc/UTC';
-    onceEverySunday.dayOfWeek = 0
-    onceEverySunday.hour = 10
-    onceEverySunday.minute = 30
-    console.log("scheduling posts to every public channel the bot is a member of on dayOfWeek",onceEverySunday.dayOfWeek,"at hour",onceEverySunday.hour,onceEverySunday.tz)
-    const job = schedule.scheduleJob(onceEverySunday, () => {
-        weekdays = dfunc.listNextWeek(DateTime.now())
-        getMemberChannelIds().then((result) => result.forEach(id => {
-            postMessage(id, weekdays[0])
-            .then(() => postMessage(id, weekdays[1]))
-            .then(() => postMessage(id, weekdays[2]))
-            .then(() => postMessage(id, weekdays[3]))
-            .then(() => postMessage(id, weekdays[4]))
-        }))
-    })
+  const onceEverySunday = new schedule.RecurrenceRule()
+  onceEverySunday.tz = 'Etc/UTC'
+  onceEverySunday.dayOfWeek = 0
+  onceEverySunday.hour = 10
+  onceEverySunday.minute = 30
+  console.log("scheduling posts to every public channel the bot is a member of on dayOfWeek",onceEverySunday.dayOfWeek,"at hour",onceEverySunday.hour,onceEverySunday.tz)
+  const job = schedule.scheduleJob(onceEverySunday, () => {
+    weekdays = dfunc.listNextWeek(DateTime.now())
+    getMemberChannelIds().then((result) => result.forEach(id => {
+      postMessage(id, weekdays[0])
+      .then(() => postMessage(id, weekdays[1]))
+      .then(() => postMessage(id, weekdays[2]))
+      .then(() => postMessage(id, weekdays[3]))
+      .then(() => postMessage(id, weekdays[4]))
+    }))
+  })
 }
 
 /**
  * Returns a list of all the channels the bot is a member of.
  */
 async function getMemberChannelIds() {
-    return (await app.client.conversations.list()).channels
-        .filter(c => c.is_member)
-        .map(c => c.id)
+  return (await app.client.conversations.list()).channels
+    .filter(c => c.is_member)
+    .map(c => c.id)
 }
 
 /**
  * Posts a message to the given channel.
  */
 async function postMessage(channelId, text) {
-    await app.client.chat.postMessage({
-        channel: channelId,
-        text: text
-    })
+  await app.client.chat.postMessage({
+    channel: channelId,
+    text: text
+  })
 }
 
 /**
  * Starts the bot.
  */
 (async () => {
-    await app.start(process.env.PORT || 3000);
-    startScheduling();
-    console.log('⚡️ Bolt app is running!');
+  await app.start(process.env.PORT || 3000);
+  startScheduling();
+  console.log('⚡️ Bolt app is running!');
 })();
 
 /** 
@@ -236,5 +236,5 @@ async function postMessage(channelId, text) {
  * We could specify node 16.x in our Dockerfile which would make that a crashing error.
 */
 process.on("unhandledRejection", error => {
-	throw error;
+  throw error;
 });
