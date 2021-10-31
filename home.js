@@ -91,4 +91,15 @@ const getRegistrationsBlock = async (userId) => {
     return registrationsBlock
 }
 
-module.exports = { update }
+const error = async (client, userId, message) => {
+  client.views.publish({
+    user_id: userId,
+    view: {
+       type:"home",
+       blocks: [mrkdwn(message)]
+    }
+  })
+}
+
+
+module.exports = { update, error }
