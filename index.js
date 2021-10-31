@@ -103,8 +103,8 @@ app.command("/listaa", async ({ command, ack, client }) => {
     const date = dfunc.parseDate(parameter, DateTime.now())
     if (date.isValid) {
       const registrations = await service.getRegistrationsFor(date.toISODate())
-      let response = atWeekday(date) + " toimistolla "
-      if (registrations.length === 0) response = "Kukaan ei ole toimistolla " + atWeekday(date).toLowerCase()
+      let response = dfunc.atWeekday(date) + " toimistolla "
+      if (registrations.length === 0) response = "Kukaan ei ole toimistolla " + dfunc.atWeekday(date).toLowerCase()
       else if (registrations.length === 1) response += "on:\n"
       else response += "ovat:\n"
       registrations.forEach((user) => {
