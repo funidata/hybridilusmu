@@ -120,5 +120,6 @@ module.exports = {
   matchWeekday,
   listNextWeek,
   parseDate,
-  toPrettyFormat
+  toPrettyFormat,
+  weekdays
 };
