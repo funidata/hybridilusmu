@@ -4,6 +4,4 @@
 
 Toteutettu Helsingin yliopiston ohjelmistotuotantoprojektikurssin työnä syksyllä 2021.
 
-## Ohjelman käyttöohjeet
-
-Tulossa!
+[Botin käyttöönotto-ohje](https://github.com/hytuslain/hytuslain/blob/master/kayttoonottoohjeet.md)
