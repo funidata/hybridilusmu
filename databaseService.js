@@ -4,21 +4,6 @@ const dfunc = require('./dateFunctions');
 const { DateTime } = require("luxon");
 
 /**
- * Returns a list of Slack user IDs of people who are at the office on the given day.
- * @param {string} date - Date string in the ISO date format.
- */
-const getRegistrationsFor = async (date) => {
-    //Seuraava rivi antaa toistaiseksi virheen, jos botille lähettää viestinä lauantain tai sunnuntain päivämäärämuodossa. Tämä bugin on korjattu datemessage_extra-branchiin.
-    const defaultOfficeIds = await db.getAllOfficeDefaultSignupsForAWeekday(dfunc.weekdays[DateTime.fromISO(date).weekday - 1])
-    let officeIds = new Set(await db.getAllOfficeSignupsForADate(date))
-    let remoteIds = new Set(await db.getAllOfficeSignupsForADate(date, false))
-    defaultOfficeIds.forEach((id) => {
-        if (!remoteIds.has(id)) officeIds.add(id)
-    })
-    return Array.from(officeIds)
-}
-
-/**
  * Adds, removes or updates a registration for the given user, for the given day.
  * @param {string} userId - Slack user ID.
  * @param {string} date - Date string in the ISO date format.
@@ -46,6 +31,22 @@ const changeDefaultRegistration = async (userId, weekday, addRegistration, atOff
     } else {
         await db.removeDefaultSignup(userId, weekday)
     }
+}
+
+
+/**
+ * Returns a list of Slack user IDs of people who are at the office on the given day.
+ * @param {string} date - Date string in the ISO date format.
+ */
+const getRegistrationsFor = async (date) => {
+    //Seuraava rivi antaa toistaiseksi virheen, jos botille lähettää viestinä lauantain tai sunnuntain päivämäärämuodossa. Tämä bugin on korjattu datemessage_extra-branchiin.
+    const defaultOfficeIds = await db.getAllOfficeDefaultSignupsForAWeekday(dfunc.weekdays[DateTime.fromISO(date).weekday - 1])
+    let officeIds = new Set(await db.getAllOfficeSignupsForADate(date))
+    let remoteIds = new Set(await db.getAllOfficeSignupsForADate(date, false))
+    defaultOfficeIds.forEach((id) => {
+        if (!remoteIds.has(id)) officeIds.add(id)
+    })
+    return Array.from(officeIds)
 }
 
 /**
