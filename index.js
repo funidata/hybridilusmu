@@ -1,20 +1,20 @@
 require('./timestampedLogger').replaceLoggers();
 require('dotenv').config();
 require('./quotenv').checkEnv([
-  'SLACK_BOT_TOKEN',
-  'SLACK_APP_TOKEN',
-  'SLACK_SIGNING_SECRET',
-  'DB_SCHEMA',
-  'DB_USER',
-  'DB_PASSWORD',
-  'DB_HOST',
-  'DB_PORT'
+'SLACK_BOT_TOKEN',
+'SLACK_APP_TOKEN',
+'SLACK_SIGNING_SECRET',
+'DB_SCHEMA',
+'DB_USER',
+'DB_PASSWORD',
+'DB_HOST',
+'DB_PORT'
 ]);
 const { App } = require('@slack/bolt');
 const schedule = require('node-schedule');
 const service = require('./databaseService');
 const dfunc = require('./dateFunctions');
-const home = require('./home')
+const home = require('./home');
 const db = require('./database');
 const controller = require('./controllers/db.controllers');
 const { DateTime } = require("luxon");
@@ -26,18 +26,68 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN
 });
 
-// app.message('viikko', async({ message, say }) => {
-//   for (const line of dfunc.listNextWeek(DateTime.now())) {
-//       await say(line)
-//   }
-// });
+
+// BUTTON ACTION FUNCTIONS
+
 
 /**
- * Prints the Slack user id of a user that reacts to a message on any channel, where the bot is.
+ * Updates the App-Home page for the specified user.
+ */
+app.action(`update_click`, async ({ body, ack, client }) => {
+  home.update(client, body.user.id);
+  await ack();
+});
+
+/**
+ * Registers the user as present at the office for the selected day and updates the App-Home page.
+ */
+app.action(`office_click`, async ({ body, ack, client }) => {
+  const data = JSON.parse(body.actions[0].value)
+  await service.changeRegistration(body.user.id, data.date, !data.atOffice)
+  home.update(client, body.user.id);
+  await ack();
+});
+
+/**
+ * Registers the user as not present at the office for the selected day and updates the App-Home page.
+ */
+app.action(`remote_click`, async ({ body, ack, client }) => {
+  const data = JSON.parse(body.actions[0].value)
+  await service.changeRegistration(body.user.id, data.date, !data.isRemote, false)
+  home.update(client, body.user.id);
+  await ack();
+});
+
+/**
+ * Registers the user as present at the office by default for the selected day and updates the App-Home page.
+ */
+app.action('default_office_click', async ({ body, ack, client }) => {
+  const data = JSON.parse(body.actions[0].value)
+  await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultAtOffice)
+  home.update(client, body.user.id);
+  await ack();
+});
+
+/**
+ * Registers the user as not present at the office by default for the selected day and updates the App-Home page.
+ */
+app.action('default_remote_click', async ({ body, ack, client }) => {
+  const data = JSON.parse(body.actions[0].value)
+  await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultIsRemote, false)
+  home.update(client, body.user.id);
+  await ack();
+});
+
+
+// EVENT LISTENERS
+
+
+/**
+ * Prints the Slack user ID of a user that reacts to a message on any channel, where the bot is.
  * Works also in private messages.
  */
 app.event('reaction_added', async ({ event, client }) => {
-  console.log(`User <${event.user}> reacted`);
+  console.log(`User <${event.user}> reacted`)
 });
 
 /**
@@ -48,46 +98,24 @@ app.event('app_home_opened', async ({ event, client }) => {
 });
 
 /**
- * Marks the user present in the office for the selected day and updates the App-Home page.
- */
-app.action(`toimistolla_click`, async ({ body, ack, client }) => {
-  const data = JSON.parse(body.actions[0].value)
-  await service.toggleSignup(body.user.id, data.date, !data.inOffice)
-  home.update(client, body.user.id);
-  await ack();
-});
-
-/**
- * Marks the user not present in the office for the selected day and updates the App-Home page.
- */
-app.action(`etana_click`, async ({ body, ack, client}) => {
-  const data = JSON.parse(body.actions[0].value)
-  await service.toggleSignup(body.user.id, data.date, !data.isRemote, false)
-  home.update(client, body.user.id);
-  await ack();
-});
-
-/**
- * Updates the App-Home page for the specified user.
- */
-app.action(`update_click`, async ({ body, ack, client}) => {
-  home.update(client, body.user.id);
-  await ack();
-});
-
-/**
  * Listens to a command in private messages and prints a list of people at the office on the given day.
  */
 app.event('message', async({ event, say }) => {
   if (event.channel_type === "im" && event.text !== undefined) {
     const date = dfunc.parseDate(event.text, DateTime.now())
-    if (date.isValid) {
-      const enrollments = await service.getEnrollmentsFor(date.toISODate())
+    if (dfunc.isWeekday(date)) {
+      const registrations = await service.getRegistrationsFor(date.toISODate())
       let response = ""
-      if (enrollments.length === 0) response = "Kukaan ei ole toimistolla tuona päivänä."
-      enrollments.forEach((user) => {
-        response += `<@${user}>\n`
-      })
+      if (registrations.length === 0) {
+        response = "Kukaan ei ole toimistolla " + dfunc.weekdays[date.weekday - 1].toLowerCase() + "na " + date.day + "." + date.month + "."
+      } else {
+        response = dfunc.weekdays[date.weekday - 1] + "na " + date.day + "." + date.month + ". toimistolla "
+        if (registrations.length === 1) response += "on:\n"
+        else response += "ovat:\n"
+        registrations.forEach((user) => {
+          response += `<@${user}>\n`
+        })
+      }
       await say(response)
     } else {
       await say("Anteeksi, en ymmärtänyt äskeistä.")
@@ -95,29 +123,92 @@ app.event('message', async({ event, say }) => {
   }
 });
 
+
+// OTHER APP FUNCTIONS
+
+
+/**
+ * Get the restriction/guest value of the given user from Slack API.
+ * @param {*} userId 
+ * @returns True iff the user is restricted.
+ */
+async function getUserRestriction(userId) {
+  const user = (await app.client.users.list()).members
+  .find(u => u.id === userId)
+  return user.is_restricted
+}
+
+/**
+ * Bolt global middleware (runs before every request) that checks if the user 
+ * is a guest (restricted), and if so, stops further processing of the request, 
+ * displaying an error message instead.
+ */
+async function guestHandler({ payload, body, client, next }) {
+  // The user ID is found in many different places depending on the type of action taken
+  var userId // Undefined evaluates as false
+  if (!userId) try {userId = payload.user} catch (error) {} // tab
+  if (!userId) try {userId = body.user.id} catch (error) {} // button
+  if (!userId) try {userId = body.event.message.user} catch (error) {} // message edit
+  // Approve requests which don't include any of the above (couldn't find any)
+  if (!userId) {
+    console.log(`alert: guest check skipped!`)
+    await next();
+    return;
+  }
+  
+  try {
+    if (await getUserRestriction(userId)) {
+      throw `User is restricted`;
+    }
+  } catch (error) {
+    // This user is restricted. Show them an error message and don't continue processing the request
+    if (error === 'User is restricted') {
+      const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`
+      if (payload.channel === undefined || payload.tab === 'home') {
+        home.error(client, userId, message); // Home tab requests show the message on the home tab
+      } else { // Otherwise send a private message
+        await client.chat.postEphemeral({
+          channel: payload.channel,
+          user: userId,
+          text: message
+        });
+      }
+      return;
+    }
+    // Pass control to previous middleware (if any) or the global error handler
+    throw error;
+  }
+  // Pass control to the next middleware (if there are any) and the listener functions
+  // Note: You probably don't want to call this inside a `try` block, or any middleware
+  //       after this one that throws will be caught by it. 
+  await next();
+}
+
+app.use(guestHandler)
+
 /**
  * Sends a scheduled message every Sunday to all the channels the bot is in.
  */
 async function startScheduling() {
-    const rule = new schedule.RecurrenceRule();
-    rule.tz = 'Etc/UTC';
-    rule.dayOfWeek = [1, 2, 3, 4, 5];
-    rule.hour = 4;
-    rule.minute = 0;
-    console.log("Scheduling posts to every public channel the bot is a member of every weekday at hour", rule.hour, rule.tz)
-    const job = schedule.scheduleJob(rule, async () => {
-        const enrollments = await service.getEnrollmentsFor(DateTime.now().toISODate())
-        let dailyMessage = ""
-        if (enrollments.length === 0) dailyMessage = "Kukaan ei ole tänään toimistolla."
-        else if (enrollments.length === 1) dailyMessage = "Tänään toimistolla on:\n"
-        else dailyMessage = "Tänään toimistolla ovat:\n"
-        enrollments.forEach((user) => {
-            dailyMessage += `<@${user}>\n`
-        })
-        getMemberChannelIds().then((result) => result.forEach(id => {
-            postMessage(id, dailyMessage)
-        }))
-    });
+  const rule = new schedule.RecurrenceRule();
+  rule.tz = 'Etc/UTC';
+  rule.dayOfWeek = [1, 2, 3, 4, 5];
+  rule.hour = 4;
+  rule.minute = 0;
+  console.log("Scheduling posts to every public channel the bot is a member of every weekday at hour", rule.hour, rule.tz)
+  const job = schedule.scheduleJob(rule, async () => {
+    const registrations = await service.getRegistrationsFor(DateTime.now().toISODate())
+    let dailyMessage = ""
+    if (registrations.length === 0) dailyMessage = "Kukaan ei ole tänään toimistolla."
+    else if (registrations.length === 1) dailyMessage = "Tänään toimistolla on:\n"
+    else dailyMessage = "Tänään toimistolla ovat:\n"
+    registrations.forEach((user) => {
+      dailyMessage += `<@${user}>\n`
+    })
+    getMemberChannelIds().then((result) => result.forEach(id => {
+      postMessage(id, dailyMessage)
+    }))
+  });
 }
 
 /**
@@ -125,8 +216,8 @@ async function startScheduling() {
  */
 async function getMemberChannelIds() {
   return (await app.client.conversations.list()).channels
-    .filter(c => c.is_member)
-    .map(c => c.id)
+  .filter(c => c.is_member)
+  .map(c => c.id)
 }
 
 /**
@@ -148,10 +239,11 @@ async function postMessage(channelId, text) {
   console.log('⚡️ Bolt app is running!');
 })();
 
-// workaround for Node 14.x not crashing if our WebSocket
-// disconnects and Bolt doesn't reconnect nicely
-// see https://github.com/slackapi/node-slack-sdk/issues/1243
-// we could specify node 16.x in our Dockerfile which would make that a crashing error
+/** 
+ * Workaround for Node 14.x not crashing if our WebSocket disconnects and Bolt doesn't reconnect nicely.
+ * See https://github.com/slackapi/node-slack-sdk/issues/1243.
+ * We could specify node 16.x in our Dockerfile which would make that a crashing error.
+ */
 process.on("unhandledRejection", error => {
-	throw error;
+  throw error;
 });
