@@ -157,7 +157,7 @@ exports.getSlackId = (id) => {
 
 exports.removeSignup = async (userId, date) => {
     try {
-        const result = await sequelize.transaction(async t => {
+        const result = await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t)
 
             await Signup.destroy({
@@ -190,7 +190,7 @@ exports.addDefaultSignupForUser = async (userId, weekday, atOffice) => {
 
 exports.removeDefaultSignup = async (userId, weekday) => {
     try {
-        const result = await sequelize.transaction(async t => {
+        const result = await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t)
 
             await Defaultsignup.destroy({
