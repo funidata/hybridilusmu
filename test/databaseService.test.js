@@ -10,46 +10,46 @@ describe('DatabaseService Tests', function() {
         await db.sequelize.sync({ force: true });
     });
             
-    it('ToggleSignup test, adding a signup works.', async function() {
-        let signups = await controller.getAllOfficeSignupsForADate('2021-10-21');
-        assert.equal(0, signups.length);
-        await service.toggleSignup('userId', '2021-10-21', true, true);
-        signups = await controller.getAllOfficeSignupsForADate('2021-10-21');
-        assert.equal(1, signups.length);
+    it('ToggleSignup test, adding a registration works.', async function() {
+        let registrations = await controller.getAllOfficeSignupsForADate('2021-10-21');
+        assert.equal(0, registrations.length);
+        await service.changeRegistration('userId', '2021-10-21', true, true);
+        registrations = await controller.getAllOfficeSignupsForADate('2021-10-21');
+        assert.equal(1, registrations.length);
     });
     
-    it('ToggleDefaultSignup test, adding default signup works.', async function() {
-        let signups = await controller.getAllOfficeDefaultSignupsForAWeekday('Torstai');
-        assert.equal(0, signups.length);
-        await service.toggleDefaultSignup('userId', 'Torstai', true, true);
-        signups = await controller.getAllOfficeDefaultSignupsForAWeekday('Torstai');
-        assert.equal(1, signups.length);
+    it('ToggleDefaultSignup test, adding a default registration works.', async function() {
+        let registrations = await controller.getAllOfficeDefaultSignupsForAWeekday('Torstai');
+        assert.equal(0, registrations.length);
+        await service.changeDefaultRegistration('userId', 'Torstai', true, true);
+        registrations = await controller.getAllOfficeDefaultSignupsForAWeekday('Torstai');
+        assert.equal(1, registrations.length);
     });
     
-    it('GetEnrollmentsFor test, default to "Etana" does not overwrite already made normal office signup.', async function() {
-        let enrollments = await service.getEnrollmentsFor('2021-10-21');
-        assert.equal(1, enrollments.length);
-        await service.toggleDefaultSignup('userId', 'Torstai', true, false);
-        enrollments = await service.getEnrollmentsFor('2021-10-21');
-        assert.equal(1, enrollments.length);
+    it('GetEnrollmentsFor test, changing default to "Etana" does not overwrite already made normal office registration.', async function() {
+        let registrations = await service.getRegistrationsFor('2021-10-21');
+        assert.equal(1, registrations.length);
+        await service.changeDefaultRegistration('userId', 'Torstai', true, false);
+        registrations = await service.getRegistrationsFor('2021-10-21');
+        assert.equal(1, registrations.length);
     });
     
-    it('GetEnrollmentsFor test, default singup registers if no normal signup for that day.', async function() {
-        await service.toggleSignup('userId', '2021-10-21', false, true);
-        let enrollments = await service.getEnrollmentsFor('2021-10-21');
-        assert.equal(0, enrollments.length);
-        await service.toggleDefaultSignup('userId', 'Torstai', true, true);
-        enrollments = await service.getEnrollmentsFor('2021-10-21');
-        assert.equal(1, enrollments.length);
+    it('GetEnrollmentsFor test, default registration registers if no normal registration for that day.', async function() {
+        await service.changeRegistration('userId', '2021-10-21', false, true);
+        let registrations = await service.getRegistrationsFor('2021-10-21');
+        assert.equal(0, registrations.length);
+        await service.changeDefaultRegistration('userId', 'Torstai', true, true);
+        registrations = await service.getRegistrationsFor('2021-10-21');
+        assert.equal(1, registrations.length);
     });
 
-    it('GetEnrollmentsFor test, many users signing up with normal and default signup increases amount of participants.', async function() {
-        await service.toggleSignup('userId2', '2021-10-21', true, true);
-        let enrollments = await service.getEnrollmentsFor('2021-10-21');
-        assert.equal(2, enrollments.length);
-        await service.toggleDefaultSignup('userId3', 'Torstai', true, true);
-        enrollments = await service.getEnrollmentsFor('2021-10-21');
-        assert.equal(3, enrollments.length);
+    it('GetEnrollmentsFor test, many users registering with normal and default registration increases the amount of participants.', async function() {
+        await service.changeRegistration('userId2', '2021-10-21', true, true);
+        let registrations = await service.getRegistrationsFor('2021-10-21');
+        assert.equal(2, registrations.length);
+        await service.changeDefaultRegistration('userId3', 'Torstai', true, true);
+        registrations = await service.getRegistrationsFor('2021-10-21');
+        assert.equal(3, registrations.length);
     });
     
 });

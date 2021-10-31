@@ -26,8 +26,64 @@ const app = new App({
     appToken: process.env.SLACK_APP_TOKEN
 });
 
+
+// BUTTON ACTION FUNCTIONS
+
+
 /**
- * Prints the Slack user id of a user that reacts to a message on any channel, where the bot is.
+ * Updates the App-Home page for the specified user.
+ */
+app.action(`update_click`, async ({ body, ack, client }) => {
+    home.update(client, body.user.id);
+    await ack();
+});
+
+/**
+ * Registers the user as present at the office for the selected day and updates the App-Home page.
+ */
+app.action(`office_click`, async ({ body, ack, client }) => {
+    const data = JSON.parse(body.actions[0].value)
+    await service.changeRegistration(body.user.id, data.date, !data.atOffice)
+    home.update(client, body.user.id);
+    await ack();
+});
+
+/**
+ * Registers the user as not present at the office for the selected day and updates the App-Home page.
+ */
+app.action(`remote_click`, async ({ body, ack, client }) => {
+    const data = JSON.parse(body.actions[0].value)
+    await service.changeRegistration(body.user.id, data.date, !data.isRemote, false)
+    home.update(client, body.user.id);
+    await ack();
+});
+
+/**
+ * Registers the user as present at the office by default for the selected day and updates the App-Home page.
+ */
+app.action('default_office_click', async ({ body, ack, client }) => {
+    const data = JSON.parse(body.actions[0].value)
+    await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultAtOffice)
+    home.update(client, body.user.id);
+    await ack();
+});
+
+/**
+ * Registers the user as not present at the office by default for the selected day and updates the App-Home page.
+ */
+app.action('default_remote_click', async ({ body, ack, client }) => {
+    const data = JSON.parse(body.actions[0].value)
+    await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultIsRemote, false)
+    home.update(client, body.user.id);
+    await ack();
+});
+
+
+// EVENT LISTENERS
+
+
+/**
+ * Prints the Slack user ID of a user that reacts to a message on any channel, where the bot is.
  * Works also in private messages.
  */
 app.event('reaction_added', async ({ event, client }) => {
@@ -42,58 +98,16 @@ app.event('app_home_opened', async ({ event, client }) => {
 });
 
 /**
- * Marks the user present in the office for the selected day and updates the App-Home page.
- */
-app.action(`toimistolla_click`, async ({ body, ack, client }) => {
-    const data = JSON.parse(body.actions[0].value)
-    await service.toggleSignup(body.user.id, data.date, !data.inOffice)
-    home.update(client, body.user.id);
-    await ack();
-});
-
-/**
- * Marks the user not present in the office for the selected day and updates the App-Home page.
- */
-app.action(`etana_click`, async ({ body, ack, client }) => {
-    const data = JSON.parse(body.actions[0].value)
-    await service.toggleSignup(body.user.id, data.date, !data.isRemote, false)
-    home.update(client, body.user.id);
-    await ack();
-});
-
-/**
- * Updates the App-Home page for the specified user.
- */
-app.action(`update_click`, async ({ body, ack, client }) => {
-    home.update(client, body.user.id);
-    await ack();
-});
-
-app.action('default_toimistolla', async ({ body, ack, client }) => {
-    const data = JSON.parse(body.actions[0].value)
-    await service.toggleDefaultSignup(body.user.id, data.weekday, !data.defaultInOffice)
-    home.update(client, body.user.id);
-    await ack();
-});
-
-app.action('default_etana', async ({ body, ack, client }) => {
-    const data = JSON.parse(body.actions[0].value)
-    await service.toggleDefaultSignup(body.user.id, data.weekday, !data.defaultIsRemote, false)
-    home.update(client, body.user.id);
-    await ack();
-});
-
-/**
  * Listens to a command in private messages and prints a list of people at the office on the given day.
  */
 app.event('message', async({ event, say }) => {
     if (event.channel_type === "im" && event.text !== undefined) {
         const date = dfunc.parseDate(event.text, DateTime.now())
         if (date.isValid) {
-            const enrollments = await service.getEnrollmentsFor(date.toISODate())
+            const registrations = await service.getRegistrationsFor(date.toISODate())
             let response = ""
-            if (enrollments.length === 0) response = "Kukaan ei ole toimistolla tuona päivänä."
-            enrollments.forEach((user) => {
+            if (registrations.length === 0) response = "Kukaan ei ole toimistolla tuona päivänä."
+            registrations.forEach((user) => {
                 response += `<@${user}>\n`
             })
             await say(response)
@@ -102,6 +116,10 @@ app.event('message', async({ event, say }) => {
         }
     }
 });
+
+
+// OTHER APP FUNCTIONS
+
 
 /**
  * Sends a scheduled message every Sunday to all the channels the bot is in.
@@ -153,10 +171,11 @@ async function postMessage(channelId, text) {
     console.log('⚡️ Bolt app is running!');
 })();
 
-// workaround for Node 14.x not crashing if our WebSocket
-// disconnects and Bolt doesn't reconnect nicely
-// see https://github.com/slackapi/node-slack-sdk/issues/1243
-// we could specify node 16.x in our Dockerfile which would make that a crashing error
+/** 
+ * Workaround for Node 14.x not crashing if our WebSocket disconnects and Bolt doesn't reconnect nicely.
+ * See https://github.com/slackapi/node-slack-sdk/issues/1243.
+ * We could specify node 16.x in our Dockerfile which would make that a crashing error.
+*/
 process.on("unhandledRejection", error => {
 	throw error;
 });

@@ -15,10 +15,12 @@ const format = {...DateTime.DATETIME_MED, month: 'long' };
  * Updates the App-Home page.
  */
 const update = async (client, userId) => {
-    let settings = await getSettingsPage(userId)
-    let updateBlock = await getUpdateBlock()
-    let enrollments = await getEnrollmentsPage(userId)
-    let blocks = settings.concat(updateBlock, enrollments)
+    let blocks = []
+    blocks = blocks.concat(
+        await getDefaultSettingsBlock(userId), 
+        await getUpdateBlock(), 
+        await getRegistrationsBlock(userId)
+    )
     client.views.publish({
         user_id: userId,
         view: {
@@ -28,27 +30,26 @@ const update = async (client, userId) => {
     })
 }
 
-const getSettingsPage = async (userId) => {
-    let settingsPage = []
-    settingsPage.push(mrkdwn("Oletusarvoisesti olen..."))
+const getDefaultSettingsBlock = async (userId) => {
+    let settingsBlock = []
+    settingsBlock.push(mrkdwn("Oletusarvoisesti olen..."))
     for (let i = 0; i < DAYS_IN_WEEK; i++) {
         const weekday = dfunc.weekdays[i]
         const buttonValue = {
             weekday: weekday,
-            defaultInOffice: await service.userInOfficeByDefault(userId, weekday),
+            defaultAtOffice: await service.userAtOfficeByDefault(userId, weekday),
             defaultIsRemote: await service.userIsRemoteByDefault(userId, weekday)
         }
-        
-        if (weekday === "Keskiviikko") settingsPage.push(mrkdwn("*" + weekday + "isin*"))
-        else settingsPage.push(mrkdwn("*" + weekday + "sin*"))
-        settingsPage.push(
+        if (weekday === "Keskiviikko") settingsBlock.push(mrkdwn("*" + weekday + "isin*"))
+        else settingsBlock.push(mrkdwn("*" + weekday + "sin*"))
+        settingsBlock.push(
             actions([
-                button('Toimistolla', 'default_toimistolla', JSON.stringify(buttonValue), `${buttonValue.defaultInOffice ? 'primary' : null}`),
-                button('Etänä', 'default_etana', JSON.stringify(buttonValue), `${buttonValue.defaultIsRemote ? 'primary' : null}`)
+                button('Toimistolla', 'default_office_click', JSON.stringify(buttonValue), `${buttonValue.defaultAtOffice ? 'primary' : null}`),
+                button('Etänä', 'default_remote_click', JSON.stringify(buttonValue), `${buttonValue.defaultIsRemote ? 'primary' : null}`)
             ])
         )
     }
-    return settingsPage
+    return settingsBlock
 }
 
 const getUpdateBlock = async () => {
@@ -61,33 +62,33 @@ const getUpdateBlock = async () => {
     return updateBlock
 }
 
-const getEnrollmentsPage = async (userId) => {
-    let enrollmentsPage = []
+const getRegistrationsBlock = async (userId) => {
+    let registrationsBlock = []
     const dates = dfunc.listNWeekdays(DateTime.now(), SHOW_DAYS_UNTIL)
     for (let i = 0; i < dates.length; i++) {
         const date = dates[i]
-        enrollmentsPage.push(header(dfunc.toPrettyFormat(date)))
-        const enrollments = await service.getEnrollmentsFor(date)
-        let usersString = enrollments.length === 0 ? "Kukaan ei ole ilmoittautunut toimistolle!" : "Toimistolla aikoo olla:\n"
-        enrollments.forEach((user) => {
-            usersString += `<@${user}>\n`
+        registrationsBlock.push(header(dfunc.toPrettyFormat(date)))
+        const registrations = await service.getRegistrationsFor(date)
+        let userIdList = registrations.length === 0 ? "Kukaan ei ole ilmoittautunut toimistolle!" : "Toimistolla aikoo olla:\n"
+        registrations.forEach((user) => {
+            userIdList += `<@${user}>\n`
         })
         const buttonValue = {
             date: date,
-            inOffice: await service.userInOffice(userId, date),
+            atOffice: await service.userAtOffice(userId, date),
             isRemote: await service.userIsRemote(userId, date)
         }
-        enrollmentsPage.push(
-            mrkdwn(usersString),
+        registrationsBlock.push(
+            mrkdwn(userIdList),
             plain_text("Oma ilmoittautumiseni:"),
             actions([
-                button('Toimistolla', 'toimistolla_click', JSON.stringify(buttonValue), `${buttonValue.inOffice ? 'primary' : null}`),
-                button('Etänä', 'etana_click', JSON.stringify(buttonValue), `${buttonValue.isRemote ? 'primary' : null}`)
+                button('Toimistolla', 'office_click', JSON.stringify(buttonValue), `${buttonValue.atOffice ? 'primary' : null}`),
+                button('Etänä', 'remote_click', JSON.stringify(buttonValue), `${buttonValue.isRemote ? 'primary' : null}`)
             ]),
             divider()
         )
     }
-    return enrollmentsPage
+    return registrationsBlock
 }
 
 module.exports = { update }
