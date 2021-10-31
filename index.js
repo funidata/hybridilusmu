@@ -103,11 +103,12 @@ app.event('app_home_opened', async ({ event, client }) => {
 app.event('message', async({ event, say }) => {
   if (event.channel_type === "im" && event.text !== undefined) {
     const date = dfunc.parseDate(event.text, DateTime.now())
-    if (date.isValid && dfunc.isWeekday(date)) {
+    if (dfunc.isWeekday(date)) {
       const enrollments = await service.getEnrollmentsFor(date.toISODate())
       let response = ""
-      if (enrollments.length === 0) response = "Kukaan ei ole toimistolla " + dfunc.weekdays[date.weekday - 1].toLowerCase() + "na " + date.day + "." + date.month + "."
-      else {
+      if (enrollments.length === 0) {
+          response = "Kukaan ei ole toimistolla " + dfunc.weekdays[date.weekday - 1].toLowerCase() + "na " + date.day + "." + date.month + "."
+      } else {
         response = dfunc.weekdays[date.weekday - 1] + "na " + date.day + "." + date.month + ". toimistolla "
         if (enrollments.length === 1) response += "on:\n"
         else response += "ovat:\n"
