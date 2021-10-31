@@ -197,6 +197,7 @@ const readUsergroupsFromCleanSlate = async () => {
   let ugs = await app.client.usergroups.list()
   if (!ugs.ok) {
     console.log('Failed fetching usergroups')
+    return
   }
   if (!ugs.usergroups || !ugs.usergroups.length) {
     console.log('No usergroups found')
