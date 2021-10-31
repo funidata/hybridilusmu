@@ -103,13 +103,19 @@ app.event('app_home_opened', async ({ event, client }) => {
 app.event('message', async({ event, say }) => {
   if (event.channel_type === "im" && event.text !== undefined) {
     const date = dfunc.parseDate(event.text, DateTime.now())
-    if (date.isValid) {
+    if (dfunc.isWeekday(date)) {
       const registrations = await service.getRegistrationsFor(date.toISODate())
       let response = ""
-      if (registrations.length === 0) response = "Kukaan ei ole toimistolla tuona päivänä."
-      registrations.forEach((user) => {
-        response += `<@${user}>\n`
-      })
+      if (registrations.length === 0) {
+          response = "Kukaan ei ole toimistolla " + dfunc.weekdays[date.weekday - 1].toLowerCase() + "na " + date.day + "." + date.month + "."
+      } else {
+        response = dfunc.weekdays[date.weekday - 1] + "na " + date.day + "." + date.month + ". toimistolla "
+        if (registrations.length === 1) response += "on:\n"
+        else response += "ovat:\n"
+        registrations.forEach((user) => {
+           response += `<@${user}>\n`
+        })
+      }
       await say(response)
     } else {
       await say("Anteeksi, en ymmärtänyt äskeistä.")
