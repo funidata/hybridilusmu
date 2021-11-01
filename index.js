@@ -134,7 +134,7 @@ let usercache = {};
  * @returns {Object} The user object as originally returned by Slack
  */
 async function getCachedUser(userId) {
-  if (usercache[userId] && usercache[userId].date + 60000 > new Date()) {
+  if (usercache[userId] && usercache[userId].date + 60000 > new Date().getTime()) {
     console.log(`cache hit for user ${userId}`)
     return usercache[userId].user
   }
@@ -148,7 +148,7 @@ async function getCachedUser(userId) {
   console.log(`caching user ${userId}`)
   usercache[userId] = {
     user: user.user,
-    date: new Date()
+    date: new Date().getTime()
   }
   return user
 }
