@@ -143,7 +143,7 @@ async function getUserRestriction(userId) {
  * is a guest (restricted), and if so, stops further processing of the request, 
  * displaying an error message instead.
  */
-async function guestHandler({ payload, body, client, next }) {
+async function guestHandler({ payload, body, client, next, event }) {
   // The user ID is found in many different places depending on the type of action taken
   var userId // Undefined evaluates as false
   if (!userId) try {userId = payload.user} catch (error) {} // tab
@@ -163,6 +163,9 @@ async function guestHandler({ payload, body, client, next }) {
   } catch (error) {
     // This user is restricted. Show them an error message and don't continue processing the request
     if (error === 'User is restricted') {
+      if (event.channel_type === 'channel') { //Don't send the error message in this case
+        return
+      }
       const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`
       if (payload.channel === undefined || payload.tab === 'home') {
         home.error(client, userId, message); // Home tab requests show the message on the home tab
