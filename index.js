@@ -126,15 +126,44 @@ app.event('message', async({ event, say }) => {
 
 // OTHER APP FUNCTIONS
 
+let usercache = {};
+
+/**
+ * Try to cache our user data so that getUserRestriction() doesn't bump into rate limits
+ * @param {*} userId
+ * @returns {Object} The user object as originally returned by Slack
+ */
+async function getCachedUser(userId) {
+  if (usercache[userId] && usercache[userId].date + 60000 < new Date()) {
+    console.log(`cache hit for user ${userId}`)
+    return usercache[userId].user
+  }
+  const user = await app.client.users.info({user: userId})
+  // something went wrong
+  if (!user.ok) {
+    console.log(`users.info failed for uid ${userId}`)
+    return null
+  }
+  // success
+  console.log(`caching user ${userId}`)
+  usercache[userId] = {
+    user: user.user,
+    date: new Date()
+  }
+  return user
+}
 
 /**
  * Get the restriction/guest value of the given user from Slack API.
- * @param {*} userId 
- * @returns True iff the user is restricted.
+ * @param {*} userId
+ * @returns True if the user is restricted.
  */
 async function getUserRestriction(userId) {
-  const user = (await app.client.users.list()).members
-    .find(u => u.id === userId)
+  const user = await getCachedUser(userId)
+  // if we don't have a successful api call, default to restriction
+  if (!user) {
+    return true
+  }
   return user.is_restricted
 }
 
