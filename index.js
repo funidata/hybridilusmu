@@ -126,6 +126,21 @@ app.event('message', async({ event, say }) => {
 
 // OTHER APP FUNCTIONS
 
+/**
+ * Our user API object cache. Format is the following:
+ * {
+ *   <userId>: {
+ *     user: {
+ *       id: <userId>,
+ *       real_name: "Matti Meikäläinen",
+ *       is_restricted: false
+ *     },
+ *     date: <timestamp in milliseconds>
+ *   },
+ *   <userId>: { ... },
+ *   ...
+ * }
+ */
 let usercache = {};
 
 /**
