@@ -173,7 +173,7 @@ async function getCachedUser(userId) {
 async function getUserRestriction(userId) {
   const user = await getCachedUser(userId)
   // if we don't have a successful api call, default to restriction
-  if (!user) {
+  if (!user || user.is_restricted === undefined) {
     return true
   }
   return user.is_restricted
@@ -187,7 +187,6 @@ async function getUserRestriction(userId) {
 async function guestHandler({ payload, body, client, next, ack, event }) {
   // The user ID is found in many different places depending on the type of action taken
   let userId // Undefined evaluates as false
-  console.log(payload)
   if (!userId) try {userId = payload.user} catch (error) {} // tab
   if (!userId) try {userId = payload.user_id} catch (error) {} // slash command
   if (!userId) try {userId = body.user.id} catch (error) {} // button
@@ -207,20 +206,20 @@ async function guestHandler({ payload, body, client, next, ack, event }) {
   } catch (error) {
     // This user is restricted. Show them an error message and don't continue processing the request
     if (error === 'User is restricted') {
-      if (event.channel_type === 'channel') { //Don't send the error message in this case
+      if (event.channel_type !== undefined && event.channel_type === 'channel') { // Don't send the error message, if message comes from a normal channel
         return
       }
       const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`
-      if (payload.command !== undefined) { //Send an ephemeral message back to the channel where the slack command came from
+      if (payload.command !== undefined) { // Responds to a slash-command with an ephemeral message.
         await ack();
         await client.chat.postEphemeral({
           channel: payload.channel_id,
           user: userId,
           text: message
         });
-      } else if (payload.channel === undefined || payload.tab === 'home') {
-        home.error(client, userId, message); // Home tab requests show the message on the home tab
-      } else { // Otherwise send a private message
+      } else if (payload.channel === undefined || payload.tab === 'home') { // Shows an error message on the home tab.
+        home.error(client, userId, message);
+      } else { // Responds to a private message with an ephemeral message.
         await client.chat.postEphemeral({
           channel: payload.channel,
           user: userId,
