@@ -11,6 +11,10 @@ features:
   bot_user:
     display_name: hybridilusmu
     always_online: true
+  slash_commands:
+    - command: /listaa
+      description: Listaa paikallaolijat
+      usage_hint: /listaa päivä
 oauth_config:
   scopes:
     bot:

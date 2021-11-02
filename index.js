@@ -140,10 +140,15 @@ async function getUserRestriction(userId) {
  * is a guest (restricted), and if so, stops further processing of the request, 
  * displaying an error message instead.
  */
-async function guestHandler({ payload, body, client, next }) {
+async function guestHandler({ payload, body, client, next, ack }) {
   // The user ID is found in many different places depending on the type of action taken
+  console.log(payload)
   var userId // Undefined evaluates as false
   if (!userId) try {userId = payload.user} catch (error) {} // tab
+  if (!userId) try { // slash command
+    await ack();
+    userId = payload.user_id
+  } catch (error) {}
   if (!userId) try {userId = body.user.id} catch (error) {} // button
   if (!userId) try {userId = body.event.message.user} catch (error) {} // message edit
   // Approve requests which don't include any of the above (couldn't find any)
@@ -161,7 +166,13 @@ async function guestHandler({ payload, body, client, next }) {
     // This user is restricted. Show them an error message and don't continue processing the request
     if (error === 'User is restricted') {
       const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`
-      if (payload.channel === undefined || payload.tab === 'home') {
+      if (payload.channel === undefined && payload.tab === undefined) { //Send an ephemeral message back to the channel where the slack command came from
+        await client.chat.postEphemeral({
+          channel: payload.channel_id,
+          user: userId,
+          text: message
+        });
+      } else if (payload.channel === undefined || payload.tab === 'home') {
         home.error(client, userId, message); // Home tab requests show the message on the home tab
       } else { // Otherwise send a private message
         await client.chat.postEphemeral({
