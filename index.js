@@ -206,7 +206,7 @@ async function guestHandler({ payload, body, client, next, ack, event }) {
   } catch (error) {
     // This user is restricted. Show them an error message and don't continue processing the request
     if (error === 'User is restricted') {
-      if (event.channel_type !== undefined && event.channel_type === 'channel') { // Don't send the error message, if message comes from a normal channel
+      if (event !== undefined && event.channel_type === 'channel') { // Don't send the error message, if message comes from a normal channel
         return
       }
       const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`
