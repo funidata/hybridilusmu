@@ -126,15 +126,59 @@ app.event('message', async({ event, say }) => {
 
 // OTHER APP FUNCTIONS
 
+/**
+ * Our user API object cache. Format is the following:
+ * {
+ *   <userId>: {
+ *     user: {
+ *       id: <userId>,
+ *       real_name: "Matti Meikäläinen",
+ *       is_restricted: false
+ *     },
+ *     date: <timestamp in milliseconds>
+ *   },
+ *   <userId>: { ... },
+ *   ...
+ * }
+ */
+let usercache = {};
+
+/**
+ * Try to cache our user data so that getUserRestriction() doesn't bump into rate limits
+ * @param {*} userId
+ * @returns {Object} The user object as originally returned by Slack
+ */
+async function getCachedUser(userId) {
+  if (usercache[userId] && usercache[userId].date + 60000 > new Date().getTime()) {
+    console.log(`cache hit for user ${userId}`)
+    return usercache[userId].user
+  }
+  const user = await app.client.users.info({user: userId})
+  // something went wrong
+  if (!user.ok) {
+    console.log(`users.info failed for uid ${userId}`)
+    return null
+  }
+  // success
+  console.log(`caching user ${userId}`)
+  usercache[userId] = {
+    user: user.user,
+    date: new Date().getTime()
+  }
+  return user
+}
 
 /**
  * Get the restriction/guest value of the given user from Slack API.
- * @param {*} userId 
- * @returns True iff the user is restricted.
+ * @param {*} userId
+ * @returns True if the user is restricted.
  */
 async function getUserRestriction(userId) {
-  const user = (await app.client.users.list()).members
-  .find(u => u.id === userId)
+  const user = await getCachedUser(userId)
+  // if we don't have a successful api call, default to restriction
+  if (!user || user.is_restricted === undefined) {
+    return true
+  }
   return user.is_restricted
 }
 
@@ -143,7 +187,7 @@ async function getUserRestriction(userId) {
  * is a guest (restricted), and if so, stops further processing of the request, 
  * displaying an error message instead.
  */
-async function guestHandler({ payload, body, client, next }) {
+async function guestHandler({ payload, body, client, next, event }) {
   // The user ID is found in many different places depending on the type of action taken
   var userId // Undefined evaluates as false
   if (!userId) try {userId = payload.user} catch (error) {} // tab
@@ -163,6 +207,9 @@ async function guestHandler({ payload, body, client, next }) {
   } catch (error) {
     // This user is restricted. Show them an error message and don't continue processing the request
     if (error === 'User is restricted') {
+      if (event !== undefined && event.channel_type === 'channel') { //Don't send the error message in this case
+        return
+      }
       const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`
       if (payload.channel === undefined || payload.tab === 'home') {
         home.error(client, userId, message); // Home tab requests show the message on the home tab
