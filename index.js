@@ -96,7 +96,7 @@ app.event('app_home_opened', async ({ event, client }) => {
 /**
  * Listens to a slash-command and prints a list of people at the office on the given day.
  */
-app.command("/listaa", async ({ command, ack, client }) => {
+app.command("/listaa", async ({ command, ack }) => {
   try {
     await ack();
     let parameter = command.text //Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen
@@ -104,16 +104,55 @@ app.command("/listaa", async ({ command, ack, client }) => {
     if (date.isValid) {
       const registrations = await service.getRegistrationsFor(date.toISODate())
       let response = dfunc.atWeekday(date) + " toimistolla "
-      if (registrations.length === 0) response = "Kukaan ei ole toimistolla " + dfunc.atWeekday(date).toLowerCase()
-      else if (registrations.length === 1) response += "on:\n"
-      else response += "ovat:\n"
+      if (registrations.length === 0) {
+        response = "Kukaan ei ole toimistolla " + dfunc.atWeekday(date).toLowerCase()
+      } else if (registrations.length === 1) {
+        response += "on:\n"
+      } else {
+        response += "ovat:\n"
+      }
       registrations.forEach((user) => {
         response += `<@${user}>\n`
       })
       postEphemeralMessage(command.channel_id, command.user_id, response)
     } else {
-      postEphemeralMessage(command.channel_id, command.user_id, "Anteeksi, en ymmärtänyt äskeistä.")
+      postEphemeralMessage(command.channel_id, command.user_id, "Anna parametrina jokin päivä.")
     }
+  } catch (error) {
+    console.log("Tapahtui virhe :(")
+    console.log(error)
+  }
+});
+
+/**
+ * Listens to a slash-command and signs user up for given day.
+ */
+app.command("/ilmo", async ({ command, ack }) => {
+  try {
+    await ack();
+    const userId = command.user_id
+    let parameters = command.text //Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen
+    const pieces = parameters.split(" ")
+    let response = "Anna parametrina päivä ja status."
+    if (pieces.length === 2) {
+      const dateString = pieces[0]
+      const status = pieces[1]
+      const date = dfunc.parseDate(dateString, DateTime.now())
+      if (dfunc.isWeekday(date) && (status === "toimisto" || status === "etä")) {
+        await service.changeRegistration(userId, date.toISODate(), true, status === "toimisto" ? true : false)
+        response = "Ilmoittautuminen onnistui - " + dfunc.atWeekday(date).toLowerCase()
+        if (status === "toimisto") {
+          response += " toimistolla."
+        } else {
+          response += " etänä."
+        }
+      } else if (dfunc.isWeekend(date)) {
+        response = "Et voi lisätä ilmoittautumista viikonlopulle."
+      } else if (!date.isValid) {
+        response = "Anna parametrina jokin päivä."
+      } else if (status !== "toimisto" && status !== "etä") response = "Anna statuksena joko \"toimisto\" tai \"etä\"."
+    }
+    postEphemeralMessage(command.channel_id, userId, response)
   } catch (error) {
     console.log("Tapahtui virhe :(")
     console.log(error)

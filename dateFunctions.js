@@ -95,6 +95,11 @@ const isWeekday = (date) => {
   return true
 }
 
+const isWeekend = (date) => {
+  if (!date.isValid || date.weekday < 6) return false
+  return true
+}
+
 
 /** 
  * Checks if the string represents a weekday.
@@ -162,6 +167,7 @@ const atWeekday = (date) => {
 module.exports = {
   atWeekday,
   isWeekday,
+  isWeekend,
   listNWeekdays,
   listNextWeek,
   matchWeekday,
