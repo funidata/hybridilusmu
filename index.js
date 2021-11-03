@@ -1,14 +1,14 @@
 require('./timestampedLogger').replaceLoggers();
 require('dotenv').config();
 require('./quotenv').checkEnv([
-'SLACK_BOT_TOKEN',
-'SLACK_APP_TOKEN',
-'SLACK_SIGNING_SECRET',
-'DB_SCHEMA',
-'DB_USER',
-'DB_PASSWORD',
-'DB_HOST',
-'DB_PORT'
+  'SLACK_BOT_TOKEN',
+  'SLACK_APP_TOKEN',
+  'SLACK_SIGNING_SECRET',
+  'DB_SCHEMA',
+  'DB_USER',
+  'DB_PASSWORD',
+  'DB_HOST',
+  'DB_PORT'
 ]);
 const { App } = require('@slack/bolt');
 const schedule = require('node-schedule');
@@ -199,7 +199,6 @@ async function guestHandler({ payload, body, client, next, event }) {
     await next();
     return;
   }
-  
   try {
     if (await getUserRestriction(userId)) {
       throw `User is restricted`;
@@ -263,8 +262,8 @@ async function startScheduling() {
  */
 async function getMemberChannelIds() {
   return (await app.client.conversations.list()).channels
-  .filter(c => c.is_member)
-  .map(c => c.id)
+    .filter(c => c.is_member)
+    .map(c => c.id)
 }
 
 /**
