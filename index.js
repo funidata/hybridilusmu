@@ -90,43 +90,6 @@ app.action('default_remote_click', async ({ body, ack, client }) => {
 // EVENT LISTENERS
 
 
-app.event('message', async({ event, say }) => {
-  try {
-    if (event.channel_type === "im" && event.text !== undefined) {
-      const command = event.text.trim()
-      const args = command.replaceAll('\t', ' ').split(' ').filter((str) => str.trim().length > 0)
-      const date = dfunc.parseDate(args[0], DateTime.now())
-      const usergroup_id = args.length === 2 ? usergroups.parseMentionString(args[1]) : false
-      const usergroup_filter = !usergroup_id
-        ? (uid) => true
-        : (uid) => usergroups.isUserInUsergroup(uid, usergroup_id)
-      if (date.isValid) {
-        const enrollments = (
-          await service.getRegistrationsFor(date.toISODate())
-        ).filter(usergroup_filter)
-        let response = !usergroup_id
-          ? ""
-          : `Tiimistä ${usergroups.generateMentionString(usergroup_id)} on paikalla:\n`
-        if (enrollments.length === 0) {
-          response = "Kukaan ei ole toimistolla tuona päivänä."
-          if (usergroup_id) {
-            response = `Kukaan tiimistä ${usergroups.generateMentionString(usergroup_id)} ei ole tuolloin toimistolla.`
-          }
-        }
-        enrollments.forEach((user) => {
-          response += `<@${user}>\n`
-        })
-        await say(response)
-      } else {
-        await say("Anteeksi, en ymmärtänyt äskeistä.")
-      }
-    }
-  } catch (error) {
-    console.log("Tapahtui virhe :(")
-    console.log(error)
-  }
-});
-
 /**
  * Updates the App-Home page for the specified user when they click on the Home tab.
  */
