@@ -19,6 +19,11 @@ const db = require('./database');
 const controller = require('./controllers/db.controllers');
 const { DateTime } = require("luxon");
 
+/**
+ * An optional prefix for our slash-commands. When set to e.g. 'h', '/listaa' becomes '/hlistaa'.
+ * This requires manual command configuration on the Slack side of things, as in you must alter
+ * the manifest for all the commands we have.
+ */
 const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX : ''
 
 const app = new App({
