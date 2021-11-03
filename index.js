@@ -19,6 +19,8 @@ const db = require('./database');
 const controller = require('./controllers/db.controllers');
 const { DateTime } = require("luxon");
 
+const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX : ''
+
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -96,7 +98,7 @@ app.event('app_home_opened', async ({ event, client }) => {
 /**
  * Listens to a slash-command and prints a list of people at the office on the given day.
  */
-app.command("/listaa", async ({ command, ack, client }) => {
+app.command("/" + COMMAND_PREFIX + "listaa", async ({ command, ack, client }) => {
   try {
     await ack();
     let parameter = command.text //Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen
