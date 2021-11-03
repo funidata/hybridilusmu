@@ -145,13 +145,25 @@ app.command("/" + COMMAND_PREFIX + "listaa", async ({ command, ack, client }) =>
   try {
     await ack();
     let parameter = command.text //Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen
-    const date = dfunc.parseDate(parameter, DateTime.now())
+    const args = parameter.replaceAll('\t', ' ').split(' ').filter((str) => str.trim().length > 0)
+    const date = dfunc.parseDate(args[0], DateTime.now())
+    const usergroup_id = args.length === 2 ? usergroups.parseMentionString(args[1]) : false
+    const usergroup_filter = !usergroup_id
+      ? (uid) => true
+      : (uid) => usergroups.isUserInUsergroup(uid, usergroup_id)
     if (date.isValid) {
-      const registrations = await service.getRegistrationsFor(date.toISODate())
-      let response = dfunc.atWeekday(date) + " toimistolla "
-      if (registrations.length === 0) response = "Kukaan ei ole toimistolla " + dfunc.atWeekday(date).toLowerCase()
-      else if (registrations.length === 1) response += "on:\n"
-      else response += "ovat:\n"
+      const registrations = (
+        await service.getRegistrationsFor(date.toISODate())
+      ).filter(usergroup_filter)
+      let specifier = !usergroup_id
+        ? ""
+        : ` tiimistä ${usergroups.generateMentionString(usergroup_id)}`
+      let predicate = registrations.length === 1 ? 'on' : 'ovat'
+      let response = !usergroup_id
+        ? `${dfunc.atWeekday(date)} toimistolla ${predicate}:`
+        : `${dfunc.atWeekday(date)}${specifier} ${predicate} toimistolla:`
+      if (registrations.length === 0) response = `Kukaan${specifier} ei ole toimistolla ${dfunc.atWeekday(date).toLowerCase()}`
+      response += '\n'
       registrations.forEach((user) => {
         response += `<@${user}>\n`
       })
