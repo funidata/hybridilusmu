@@ -285,10 +285,10 @@ async function postMessage(channelId, text) {
  */
 async function postEphemeralMessage(channelId, userId, text) {
   await app.client.chat.postEphemeral({
-        channel: channelId,
-        user: userId,
-        text: text
-      });
+    channel: channelId,
+    user: userId,
+    text: text
+  });
 }
 
 /**

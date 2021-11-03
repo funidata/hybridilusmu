@@ -222,10 +222,10 @@ describe('Pretty Format Tests', () => {
     it('Normal weekday 2', () => {
         assert.equal(dfunc.toPrettyFormat("2021-10-15"), "Perjantai 15.10.")
     });
-    it('Saturday returns an empty string', () => {
+    it('Weekend 1, Saturday', () => {
         assert.equal(dfunc.toPrettyFormat("2021-10-16"), "Lauantai 16.10.")
     });
-    it('Sunday returns an empty string', () => {
+    it('Weekend 2, Sunday', () => {
         assert.equal(dfunc.toPrettyFormat("2021-10-17"), "Sunnuntai 17.10.")
     });
 });

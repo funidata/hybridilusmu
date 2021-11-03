@@ -80,8 +80,8 @@ const parseDate = (input, today) => {
 
 const isToday = (input) => {
   if (input.length > MAX_INPUT_LENGTH) return false
-    if (editDistance(input.toLowerCase(), "tänään") <= MAX_DIFFERENCE) return true
-      return false
+  if (editDistance(input.toLowerCase(), "tänään") <= MAX_DIFFERENCE) return true
+  return false
 }
 
 const isTomorrow = (input) => {
