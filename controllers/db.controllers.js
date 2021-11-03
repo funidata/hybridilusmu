@@ -2,6 +2,7 @@ const { Sequelize, sequelize } = require("../database");
 const db = require("../database");
 const Person = db.Person;
 const Signup = db.Signup;
+const Defaultsignup = db.Defaultsignup;
 const Op = Sequelize.Op;
 
 const getUser = async (userId, transaction) => {
@@ -57,12 +58,13 @@ exports.addSignupForUser = async (userId, date, atOffice) => {
 
 // hakee tietylle päivämäärälle ilmoittautuneet käyttäjät
 // palauttaa arrayn käyttäjien id:stä
-exports.getAllOfficeSignupsForADate = (date) => {
+//atOffice = true antaa toimistolle ilmoittautuneet ja false etänä ilmoittautuneet
+exports.getAllOfficeSignupsForADate = (date, atOffice = true) => {
     return Signup.findAll({
         attributes: ['PersonId'],
         where: {
             office_date: date,
-            at_office: true,
+            at_office: atOffice,
         },
         include: {model: Person, as: 'person'}
     })
@@ -155,7 +157,7 @@ exports.getSlackId = (id) => {
 
 exports.removeSignup = async (userId, date) => {
     try {
-        const result = await sequelize.transaction(async t => {
+        const result = await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t)
 
             await Signup.destroy({
@@ -167,6 +169,87 @@ exports.removeSignup = async (userId, date) => {
         })
     } catch (err) {
         console.log("Error while removing signup ", err);
+    }
+}
+
+exports.addDefaultSignupForUser = async (userId, weekday, atOffice) => {
+    try {
+        const result = await sequelize.transaction(async (t) => {
+            const user = await getUser(userId, t)
+            const defaultsignup = await Defaultsignup.upsert({
+                weekday: weekday,
+                at_office: atOffice,
+                PersonId: user.id,
+            }, {transaction: t})
+            return defaultsignup
+        })
+    } catch (err) {
+        console.log("Error while adding a default signup ", err);
+    }
+}
+
+exports.removeDefaultSignup = async (userId, weekday) => {
+    try {
+        const result = await sequelize.transaction(async (t) => {
+            const user = await getUser(userId, t)
+
+            await Defaultsignup.destroy({
+                where: {
+                    weekday: weekday,
+                    PersonId: user.id
+                }
+            })
+        })
+    } catch (err) {
+        console.log("Error while removing default signup ", err);
+    }
+}
+
+exports.getAllOfficeDefaultSignupsForAWeekday = (weekday) => {
+    return Defaultsignup.findAll({
+        attributes: ['PersonId'],
+        where: {
+            weekday: weekday,
+            at_office: true,
+        },
+        include: {model: Person, as: 'person'}
+    })
+    .then((signups) => {const ids = signups.map(s => s.dataValues.person.dataValues.slack_id)
+        return ids;
+    })
+    .catch((err) => {
+        console.log("Error while finding default signups ", err);
+    });
+
+};
+
+exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
+    try {
+        const result = await sequelize.transaction(async (t) => {
+            const user = await getUser(userId, t)
+
+            const person = await Person.findByPk(user.id, {
+                include: [
+                    {
+                        model: Defaultsignup,
+                        as: "defaultsignups",
+                        where: {weekday: weekday}
+                    }
+                ],
+                transaction: t
+            })
+
+            // if nothing is found, escape early
+            if (!person) {
+                return undefined
+            }
+
+            const signups = person.defaultsignups;
+            return (signups && signups.length === 1) ? signups[0].dataValues : undefined;
+        })
+        return result
+    } catch (err) {
+        console.log("Error while finding default signups ", err);
     }
 }
 
