@@ -197,7 +197,7 @@ const insertUsersForUsergroup = (usergroup) => {
         usergroup._dirty = true;
         return false;
     }
-    for (let i = 0; i < usergroup.users.length; ++i) {
+    for (let i = 0; i < usergroup.users.length; i += 1) {
         insertUserForUsergroup(usergroup.users[i], usergroup.id);
     }
     delete usergroup._dirty;
@@ -231,7 +231,8 @@ const insertUsergroup = (usergroup) => {
 /**
  * Inserts usergroups into our thingamajig from an app.client.usergroups.list() call response
  * @param {Object} response API response fetched via app.client.usergroups.list
- * @returns {boolean} True if users were also inserted, false if you need to fetch them via app.client.usergroups.users.list
+ * @returns {boolean} True if users were also inserted, false if you need to fetch them via
+ *                    app.client.usergroups.users.list
  */
 const insertUsergroupsFromAPIListResponse = (response) => {
     if (response.ok !== true || !response.usergroups) {
@@ -254,7 +255,7 @@ const insertUsergroupUsersFromAPIListResponse = (response, slack_usergroup_id) =
     if (response.ok !== true || !response.users) {
         return false;
     }
-    for (let i = 0; i < response.users.length; ++i) {
+    for (let i = 0; i < response.users.length; i += 1) {
         insertUserForUsergroup(response.users[i], slack_usergroup_id);
     }
     delete usergroups[slack_usergroup_id]._dirty;
@@ -285,7 +286,7 @@ const getUsersForUsergroup = (slack_usergroup_id) => {
     if (!usergroups[slack_usergroup_id]) {
         return [];
     }
-    return usergroups[slack_usergroup_id][users];
+    return usergroups[slack_usergroup_id].users;
 };
 
 const getChannelsForUsergroup = (slack_usergroup_id) => {
@@ -335,10 +336,10 @@ const processMembersChangedEvent = (response) => {
         return true;
     }
     ug.date_update = response.date_update;
-    for (let i = 0; i < response.added_users_count; ++i) {
+    for (let i = 0; i < response.added_users_count; i += 1) {
         insertUserForUsergroup(response.added_users[i], ug.id);
     }
-    for (let i = 0; i < response.removed_users_count; ++i) {
+    for (let i = 0; i < response.removed_users_count; i += 1) {
         dropSlackUserFromUsergroup(response.removed_users[i], ug.id);
     }
     return true;
