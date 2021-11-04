@@ -1,15 +1,15 @@
 const assert = require('assert');
-const { publicEncrypt, sign } = require('crypto');
 const database = require('../database');
 const db = require('../controllers/db.controllers');
-const service = require('../databaseService.js');
+const service = require('../databaseService');
 
-describe('ChangeRegistration Tests', function () {
+describe('ChangeRegistration Tests', function () { // eslint-disable-line
     this.beforeAll(async () => {
         await database.sequelize.sync({ force: true });
     });
 
-    // Samassa describe():ssä olevat testit muokkaavat samaa tietokantaa, joten seuraavat testit muodostavat yhden "tarinan".
+    // Samassa describe():ssä olevat testit muokkaavat samaa tietokantaa,
+    // joten seuraavat testit muodostavat yhden "tarinan".
 
     it('Adding a normal registration works.', async () => {
         let registrations = await db.getAllOfficeSignupsForADate('2021-10-21');
@@ -66,12 +66,13 @@ describe('ChangeRegistration Tests', function () {
     });
 });
 
-describe('GetRegistrationsFor Tests', function () {
+describe('GetRegistrationsFor Tests', function () { // eslint-disable-line
     this.beforeAll(async () => {
         await database.sequelize.sync({ force: true });
     });
 
-    // Samassa describe():ssä olevat testit muokkaavat samaa tietokantaa, joten seuraavat testit muodostavat yhden "tarinan".
+    // Samassa describe():ssä olevat testit muokkaavat samaa tietokantaa,
+    // joten seuraavat testit muodostavat yhden "tarinan".
 
     it('Adding a normal registration and a default registration increases participant count by 2.', async () => {
         await service.changeRegistration('userId1', '2021-10-21', true, true);
@@ -99,7 +100,7 @@ describe('GetRegistrationsFor Tests', function () {
 
     it('Adding a normal registration with different value overwrites the default registration.', async () => {
         await service.changeRegistration('userId', '2021-10-21', true, false);
-        registrations = await service.getRegistrationsFor('2021-10-21');
+        const registrations = await service.getRegistrationsFor('2021-10-21');
         assert.equal(0, registrations.length);
     });
 
