@@ -1,5 +1,5 @@
 const button = (text, callback, value, style) => {
-    const button = {
+    const buttonElement = {
         type: 'button',
         text: {
             type: 'plain_text',
@@ -10,7 +10,7 @@ const button = (text, callback, value, style) => {
         action_id: callback,
     };
     if (style === 'primary' || style === 'danger') { button.style = style; }
-    return (button);
+    return (buttonElement);
 };
 
 module.exports = { button };

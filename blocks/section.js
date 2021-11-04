@@ -1,4 +1,4 @@
-const plain_text = (text) => (
+const plainText = (text) => (
     {
         type: 'section',
         text: {
@@ -18,4 +18,4 @@ const mrkdwn = (text) => (
     }
 );
 
-module.exports = { plain_text, mrkdwn };
+module.exports = { plainText, mrkdwn };
