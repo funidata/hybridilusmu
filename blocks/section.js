@@ -1,25 +1,21 @@
-const plain_text = (text) => {
-  return(
+const plainText = (text) => (
     {
-      type: "section",
-      text: {
-          type: "plain_text",
-          text: text
-        }
+        type: 'section',
+        text: {
+            type: 'plain_text',
+            text,
+        },
     }
-  )
-}
+);
 
-const mrkdwn = (text) => {
-  return(
+const mrkdwn = (text) => (
     {
-      type: "section",
-      text: {
-          type: "mrkdwn",
-          text: text
-        }
+        type: 'section',
+        text: {
+            type: 'mrkdwn',
+            text,
+        },
     }
-  )
-}
+);
 
-module.exports = { plain_text, mrkdwn}
+module.exports = { plainText, mrkdwn };

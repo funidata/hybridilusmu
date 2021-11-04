@@ -1,10 +1,8 @@
-const actions = (elements) => {
-  return(
+const actions = (elements) => (
     {
-      type: "actions",
-      elements: elements
+        type: 'actions',
+        elements,
     }
-  )
-}
+);
 
-module.exports = { actions }
+module.exports = { actions };

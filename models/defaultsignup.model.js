@@ -1,23 +1,21 @@
-const { sequelize, Sequelize } = require("../database");
-
 module.exports = (sequelize, Sequelize) => {
     const Defaultsignup = sequelize.define('Defaultsignup', {
         weekday: {
             type: Sequelize.STRING,
-            allowNull: false
+            allowNull: false,
         },
         at_office: {
             type: Sequelize.BOOLEAN,
-            allowNull: false
-        }
+            allowNull: false,
+        },
     }, {
         indexes: [
             {
                 // a two-field index to ensure uniqueness of signups
-                fields: ["weekday", "PersonId"],
-                unique: true
-            }
-        ]
+                fields: ['weekday', 'PersonId'],
+                unique: true,
+            },
+        ],
     });
-    return Defaultsignup
+    return Defaultsignup;
 };
