@@ -1,60 +1,11 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable camelcase */
+/* eslint-disable no-underscore-dangle */
 
 /**
  * This is an implementation of usergroup functionality.
  * These are usually known as subteams in Slack API terminology.
  */
-
-/** Leading part of mention string */
-const mentionLead = "<!subteam^"
-/** Ending part of mention string */
-const mentionTail = ">"
-/**
- * Generates a mention string for the given usergroup.
- * @param {String} slack_usergroup_id The Slack id of the usergroup in question
- * @returns {String} A string that Slack will turn into a mention
- */
-const generateMentionString = (slack_usergroup_id) => {
-  const label = !usergroups[slack_usergroup_id]
-    ? ""
-    : `|@${usergroups[slack_usergroup_id].handle}`
-  return "<!subteam^" + slack_usergroup_id + label + ">"
-}
-
-/**
- * Reads a usergroup id from a mention string.
- * @param {String} str String to extract usergroup id from
- * @returns {String} A Slack usergroup id
- */
-const parseMentionString = (str) => {
-  // a mention string looks roughly like <!subteam^SXYZZY>
-  if (str.startsWith(mentionLead)) {
-    let inspect = str.substr(mentionLead.length)
-    const tail_at = inspect.indexOf(mentionTail)
-    if (tail_at > 0) {
-      inspect = inspect.substr(0, tail_at)
-      // there might also be a label in the mention string, which
-      // would look a little something like this: <!subteam^SXYZZY|@xyzzy>
-      const label_at = inspect.indexOf('|')
-      if (label_at > 0) {
-        return inspect.substr(0, label_at)
-      }
-    }
-  }
-  return false
-}
-
-/**
- * Generates a plaintext string describing a usergroup.
- * @param {String} slack_usergroup_id The Slack id of the usergroup in question
- * @returns {String} A plain text representation of the usergroup's identity, like "Kahvinkittaajat (@kahvi)"
- */
-const generatePlaintextString = (slack_usergroup_id) => {
- const ug = usergroups[slack_usergroup_id]
-  if (!ug) {
-    return ""
-  }
-  return ug.name + " (@" + ug.handle + ")"
-}
 
 /**
  * An object containing the usergroups, keyed by id.
@@ -77,75 +28,127 @@ const generatePlaintextString = (slack_usergroup_id) => {
  *     }
  *   }
  */
-let usergroups = {}
+let usergroups = {};
 
 /**
- * A lookup table of users.
- * Format is roughly the following:
- *   {
- *     // user is in two usergroups
- *     "UFFFFFF": {"SFFFFFF": true, "S000000": true},
- *     // user is in one usergroup
- *     "U111111": {"SFFFFFF": true}
- *   }
-*/
-let usersLookup = {}
+  * A lookup table of users.
+  * Format is roughly the following:
+  *   {
+  *     // user is in two usergroups
+  *     "UFFFFFF": {"SFFFFFF": true, "S000000": true},
+  *     // user is in one usergroup
+  *     "U111111": {"SFFFFFF": true}
+  *   }
+ */
+let usersLookup = {};
+
+/** Leading part of mention string */
+const mentionLead = '<!subteam^';
+/** Ending part of mention string */
+const mentionTail = '>';
+
+/**
+ * Generates a mention string for the given usergroup.
+ * @param {String} slack_usergroup_id The Slack id of the usergroup in question
+ * @returns {String} A string that Slack will turn into a mention
+ */
+const generateMentionString = (slack_usergroup_id) => {
+    const label = !usergroups[slack_usergroup_id]
+        ? ''
+        : `|@${usergroups[slack_usergroup_id].handle}`;
+    return `<!subteam^${slack_usergroup_id}${label}>`;
+};
+
+/**
+ * Reads a usergroup id from a mention string.
+ * @param {String} str String to extract usergroup id from
+ * @returns {String} A Slack usergroup id
+ */
+const parseMentionString = (str) => {
+    // a mention string looks roughly like <!subteam^SXYZZY>
+    if (str.startsWith(mentionLead)) {
+        let inspect = str.substr(mentionLead.length);
+        const tail_at = inspect.indexOf(mentionTail);
+        if (tail_at > 0) {
+            inspect = inspect.substr(0, tail_at);
+            // there might also be a label in the mention string, which
+            // would look a little something like this: <!subteam^SXYZZY|@xyzzy>
+            const label_at = inspect.indexOf('|');
+            if (label_at > 0) {
+                return inspect.substr(0, label_at);
+            }
+        }
+    }
+    return false;
+};
+
+/**
+ * Generates a plaintext string describing a usergroup.
+ * @param {String} slack_usergroup_id The Slack id of the usergroup in question
+ * @returns {String} A plain text representation of the usergroup's identity, like
+ *                   "Kahvinkittaajat (@kahvi)"
+ */
+const generatePlaintextString = (slack_usergroup_id) => {
+    const ug = usergroups[slack_usergroup_id];
+    if (!ug) {
+        return '';
+    }
+    return `${ug.name} (@${ug.handle})`;
+};
 
 /**
  * You probably shouldn't be calling this from outside of the library
  */
 const _clearData = () => {
-  usergroups = {}
-  usersLookup = {}
-}
+    usergroups = {};
+    usersLookup = {};
+};
 
-const _dumpState = () => {
-  return {
+const _dumpState = () => ({
     usergroups,
-    usersLookup
-  }
-}
+    usersLookup,
+});
 
 const initSlackUser = (slack_user_id) => {
-  if (!usersLookup[slack_user_id]) {
-    usersLookup[slack_user_id] = {}
-  }
-}
+    if (!usersLookup[slack_user_id]) {
+        usersLookup[slack_user_id] = {};
+    }
+};
 
 const dropSlackUserFromUsergroup = (slack_user_id, slack_usergroup_id) => {
-  const ug = usergroups[slack_usergroup_id]
-  if (!ug) { return; }
-  delete ug.users_lkup[slack_user_id]
-  ug.users.filter((u) => u !== slack_user_id)
-  ug.user_count = ug.users.length
-  if (usersLookup[slack_user_id]) {
-    delete usersLookup[slack_user_id][slack_usergroup_id]
-    if (0 === Object.keys(usersLookup[slack_user_id]).length) {
-      delete usersLookup[slack_user_id]
+    const ug = usergroups[slack_usergroup_id];
+    if (!ug) { return; }
+    delete ug.users_lkup[slack_user_id];
+    ug.users.filter((u) => u !== slack_user_id);
+    ug.user_count = ug.users.length;
+    if (usersLookup[slack_user_id]) {
+        delete usersLookup[slack_user_id][slack_usergroup_id];
+        if (Object.keys(usersLookup[slack_user_id]).length === 0) {
+            delete usersLookup[slack_user_id];
+        }
     }
-  }
-}
+};
 
 const dropSlackUser = (slack_user_id) => {
-  if (usersLookup[slack_user_id]) {
-    const groups = Object.keys(usersLookup[slack_user_id])
-    for (let i = 0; i < groups.length; ++i) {
-      dropSlackUserFromUsergroup(slack_user_id, slack_usergroup_id)
+    if (usersLookup[slack_user_id]) {
+        const groups = Object.keys(usersLookup[slack_user_id]);
+        for (let i = 0; i < groups.length; i += 1) {
+            dropSlackUserFromUsergroup(slack_user_id, groups[i]);
+        }
     }
-  }
-  delete usersLookup[slack_user_id]
-}
+    delete usersLookup[slack_user_id];
+};
 
 const initSlackUsergroup = (slack_usergroup_id) => {
-  if (!usergroups[slack_usergroup_id]) {
-    usergroups[slack_usergroup_id] = {
-      id: "" + slack_usergroup_id
+    if (!usergroups[slack_usergroup_id]) {
+        usergroups[slack_usergroup_id] = {
+            id: `${slack_usergroup_id}`,
+        };
     }
-  }
-  if (!usergroups[slack_usergroup_id].users_lkup) {
-    usergroups[slack_usergroup_id].users_lkup = {}
-  }
-}
+    if (!usergroups[slack_usergroup_id].users_lkup) {
+        usergroups[slack_usergroup_id].users_lkup = {};
+    }
+};
 
 /**
  * This really shouldn't be needed
@@ -153,26 +156,26 @@ const initSlackUsergroup = (slack_usergroup_id) => {
  * @returns {void}
  */
 const normaliseUsergroup = (usergroup) => {
-  if (!usergroup) {
-    return
-  }
-  if (typeof usergroup.user_count === 'string') {
-    usergroup.user_count = 1 * usergroup.user_count
-  }
-  if (typeof usergroup.channel_count === 'string') {
-    usergroup.channel_count = 1 * usergroup.channel_count
-  }
-}
+    if (!usergroup) {
+        return;
+    }
+    if (typeof usergroup.user_count === 'string') {
+        usergroup.user_count *= 1;
+    }
+    if (typeof usergroup.channel_count === 'string') {
+        usergroup.channel_count *= 1;
+    }
+};
 
 const dropSlackUsergroup = (slack_usergroup_id) => {
-  Object.keys(usersLookup).forEach((slack_user_id) => {
-    delete usersLookup[slack_user_id][slack_usergroup_id]
-    if (Object.keys(usersLookup[slack_user_id]).length === 0) {
-      dropSlackUser(slack_user_id)
-    }
-  })
-  delete usergroups[slack_usergroup_id]
-}
+    Object.keys(usersLookup).forEach((slack_user_id) => {
+        delete usersLookup[slack_user_id][slack_usergroup_id];
+        if (Object.keys(usersLookup[slack_user_id]).length === 0) {
+            dropSlackUser(slack_user_id);
+        }
+    });
+    delete usergroups[slack_usergroup_id];
+};
 
 /**
  * Inserts a user to a usergroup
@@ -180,50 +183,50 @@ const dropSlackUsergroup = (slack_usergroup_id) => {
  * @param {String} slack_usergroup_id Slack id of usergroup being added to (like "SFFFFFF")
  */
 const insertUserForUsergroup = (slack_user_id, slack_usergroup_id) => {
-  initSlackUser(slack_user_id)
-  initSlackUsergroup(slack_usergroup_id)
-  usersLookup[slack_user_id][slack_usergroup_id] = true
-  usergroups[slack_usergroup_id].users_lkup[slack_user_id] = true
-}
+    initSlackUser(slack_user_id);
+    initSlackUsergroup(slack_usergroup_id);
+    usersLookup[slack_user_id][slack_usergroup_id] = true;
+    usergroups[slack_usergroup_id].users_lkup[slack_user_id] = true;
+};
 
 const insertUsersForUsergroup = (usergroup) => {
-  if (!usergroup || !usergroup.is_usergroup) {
-    return false
-  }
-  if (!usergroup.users || usergroup.users.length !== usergroup.user_count) {
-    usergroup._dirty = true
-    return false
-  }
-  for (let i = 0; i < usergroup.users.length; ++i) {
-    insertUserForUsergroup(usergroup.users[i], usergroup.id)
-  }
-  delete usergroup._dirty
-  delete usergroup._dirty_date
-  return true
-}
+    if (!usergroup || !usergroup.is_usergroup) {
+        return false;
+    }
+    if (!usergroup.users || usergroup.users.length !== usergroup.user_count) {
+        usergroup._dirty = true;
+        return false;
+    }
+    for (let i = 0; i < usergroup.users.length; ++i) {
+        insertUserForUsergroup(usergroup.users[i], usergroup.id);
+    }
+    delete usergroup._dirty;
+    delete usergroup._dirty_date;
+    return true;
+};
 
 const insertUsergroup = (usergroup) => {
-  normaliseUsergroup(usergroup)
-  if (!usergroup || !usergroup.is_usergroup) {
-    return false
-  }
-  let oldState = {}
-  if (usergroups[usergroup.id]) {
-    oldState = {
-      users: usergroups[usergroup.id].users,
-      users_lkup: usergroups[usergroup.id].users_lkup,
-      user_count: usergroups[usergroup.id].user_count,
-      _dirty_date: usergroups[usergroup.id].date_update
+    normaliseUsergroup(usergroup);
+    if (!usergroup || !usergroup.is_usergroup) {
+        return false;
     }
-  }
-  usergroups[usergroup.id] = usergroup
-  if (!usergroup.users && usergroup.user_count > 0) {
-    usergroup._dirty = true
-    usergroups[usergroup.id] = {...usergroup, ...oldState}
-    return false
-  }
-  return insertUsersForUsergroup(usergroup)
-}
+    let oldState = {};
+    if (usergroups[usergroup.id]) {
+        oldState = {
+            users: usergroups[usergroup.id].users,
+            users_lkup: usergroups[usergroup.id].users_lkup,
+            user_count: usergroups[usergroup.id].user_count,
+            _dirty_date: usergroups[usergroup.id].date_update,
+        };
+    }
+    usergroups[usergroup.id] = usergroup;
+    if (!usergroup.users && usergroup.user_count > 0) {
+        usergroup._dirty = true;
+        usergroups[usergroup.id] = { ...usergroup, ...oldState };
+        return false;
+    }
+    return insertUsersForUsergroup(usergroup);
+};
 
 /**
  * Inserts usergroups into our thingamajig from an app.client.usergroups.list() call response
@@ -231,15 +234,15 @@ const insertUsergroup = (usergroup) => {
  * @returns {boolean} True if users were also inserted, false if you need to fetch them via app.client.usergroups.users.list
  */
 const insertUsergroupsFromAPIListResponse = (response) => {
-  if (response.ok !== true || !response.usergroups) {
-    return false
-  }
-  let result = true
-  response.usergroups.forEach((u) => {
-    result = result && insertUsergroup(u)
-  })
-  return result
-}
+    if (response.ok !== true || !response.usergroups) {
+        return false;
+    }
+    let result = true;
+    response.usergroups.forEach((u) => {
+        result = result && insertUsergroup(u);
+    });
+    return result;
+};
 
 /**
  * Inserts users for a usergroup as fetched by app.client.usergroups.users.list()
@@ -248,118 +251,118 @@ const insertUsergroupsFromAPIListResponse = (response) => {
  * @returns {boolean} Whether the operation was successful or not
  */
 const insertUsergroupUsersFromAPIListResponse = (response, slack_usergroup_id) => {
-  if (response.ok !== true || !response.users) {
-    return false
-  }
-  for (let i = 0; i < response.users.length; ++i) {
-    insertUserForUsergroup(response.users[i], slack_usergroup_id)
-  }
-  delete usergroups[slack_usergroup_id]._dirty
-  delete usergroups[slack_usergroup_id]._dirty_date
-  return true
-}
+    if (response.ok !== true || !response.users) {
+        return false;
+    }
+    for (let i = 0; i < response.users.length; ++i) {
+        insertUserForUsergroup(response.users[i], slack_usergroup_id);
+    }
+    delete usergroups[slack_usergroup_id]._dirty;
+    delete usergroups[slack_usergroup_id]._dirty_date;
+    return true;
+};
 
 const isDirty = (slack_usergroup_id) => {
-  // non-tracked ugs aren't dirty
-  if (!usergroups[slack_usergroup_id]) {
-    return false
-  }
-  if (usergroups[slack_usergroup_id]._dirty) {
-    return true
-  }
-  return false
-}
+    // non-tracked ugs aren't dirty
+    if (!usergroups[slack_usergroup_id]) {
+        return false;
+    }
+    if (usergroups[slack_usergroup_id]._dirty) {
+        return true;
+    }
+    return false;
+};
 
 const getUsergroupsForUser = (slack_user_id) => {
-  const uo = usersLookup[slack_user_id]
-  if (!uo) {
-    return []
-  }
-  return Object.keys(uo)
-}
+    const uo = usersLookup[slack_user_id];
+    if (!uo) {
+        return [];
+    }
+    return Object.keys(uo);
+};
 
 const getUsersForUsergroup = (slack_usergroup_id) => {
-  if (!usergroups[slack_usergroup_id]) {
-    return []
-  }
-  return usergroups[slack_usergroup_id][users]
-}
+    if (!usergroups[slack_usergroup_id]) {
+        return [];
+    }
+    return usergroups[slack_usergroup_id][users];
+};
 
 const getChannelsForUsergroup = (slack_usergroup_id) => {
-  if (!usergroups[slack_usergroup_id]) {
-    return []
-  }
-  return usergroups[slack_usergroup_id].prefs.channels
-}
+    if (!usergroups[slack_usergroup_id]) {
+        return [];
+    }
+    return usergroups[slack_usergroup_id].prefs.channels;
+};
 
 const isUserInUsergroup = (slack_user_id, slack_usergroup_id) => {
-  const uo = usersLookup[slack_user_id]
-  if (!uo || !uo[slack_usergroup_id]) {
-    return false
-  }
-  return true
-}
+    const uo = usersLookup[slack_user_id];
+    if (!uo || !uo[slack_usergroup_id]) {
+        return false;
+    }
+    return true;
+};
 
 const processCreationEvent = (response) => {
-  if (!response || response.type !== 'subteam_created') {
-    return false
-  }
-  return insertUsergroup(response.subteam)
-}
+    if (!response || response.type !== 'subteam_created') {
+        return false;
+    }
+    return insertUsergroup(response.subteam);
+};
 
 const processUpdateEvent = (response) => {
-  if (!response || response.type !== 'subteam_updated') {
-    return false
-  }
-  return insertUsergroup(response.subteam)
-}
+    if (!response || response.type !== 'subteam_updated') {
+        return false;
+    }
+    return insertUsergroup(response.subteam);
+};
 
 const processMembersChangedEvent = (response) => {
-  if (!response || response.type !== 'subteam_members_changed') {
-    return false
-  }
-  const ug = usergroups[response.subteam_id]
-  if (!ug) {
-    console.log(`received members_changed event for unknown usergroup ${response.subteam_id}`)
-    return false
-  }
-  if (response.date_previous_update !== ug.date_update) {
-    console.log(`subteam_members_changed: update time mismatch for usergroup ${ug.id}, ignoring data`)
-    return false
-  }
-  if (!isDirty(ug.id) && response.date_update === ug.date_update) {
-    console.log(`subteam_members_changed: usergroup ${ug.id} already cleanly up-to-date`)
-    return true
-  }
-  ug.date_update = response.date_update
-  for (let i = 0; i < response.added_users_count; ++i) {
-    insertUserForUsergroup(response.added_users[i], ug.id)
-  }
-  for (let i = 0; i < response.removed_users_count; ++i) {
-    dropSlackUserFromUsergroup(response.removed_users[i], ug.id)
-  }
-  return true
-}
+    if (!response || response.type !== 'subteam_members_changed') {
+        return false;
+    }
+    const ug = usergroups[response.subteam_id];
+    if (!ug) {
+        console.log(`received members_changed event for unknown usergroup ${response.subteam_id}`);
+        return false;
+    }
+    if (response.date_previous_update !== ug.date_update) {
+        console.log(`subteam_members_changed: update time mismatch for usergroup ${ug.id}, ignoring data`);
+        return false;
+    }
+    if (!isDirty(ug.id) && response.date_update === ug.date_update) {
+        console.log(`subteam_members_changed: usergroup ${ug.id} already cleanly up-to-date`);
+        return true;
+    }
+    ug.date_update = response.date_update;
+    for (let i = 0; i < response.added_users_count; ++i) {
+        insertUserForUsergroup(response.added_users[i], ug.id);
+    }
+    for (let i = 0; i < response.removed_users_count; ++i) {
+        dropSlackUserFromUsergroup(response.removed_users[i], ug.id);
+    }
+    return true;
+};
 
 module.exports = {
-  // internal functions are denoted with an underscore here
-  _clearData,
-  _dumpState,
-  // helpers for UI stuff
-  generateMentionString,
-  generatePlaintextString,
-  parseMentionString,
-  // lookup functions
-  getUsergroupsForUser,
-  getUsersForUsergroup,
-  getChannelsForUsergroup,
-  isUserInUsergroup,
-  isDirty,
-  // data manipulation functions
-  insertUsergroup,
-  insertUsergroupsFromAPIListResponse,
-  insertUsergroupUsersFromAPIListResponse,
-  processCreationEvent,
-  processUpdateEvent,
-  processMembersChangedEvent
-}
+    // internal functions are denoted with an underscore here
+    _clearData,
+    _dumpState,
+    // helpers for UI stuff
+    generateMentionString,
+    generatePlaintextString,
+    parseMentionString,
+    // lookup functions
+    getUsergroupsForUser,
+    getUsersForUsergroup,
+    getChannelsForUsergroup,
+    isUserInUsergroup,
+    isDirty,
+    // data manipulation functions
+    insertUsergroup,
+    insertUsergroupsFromAPIListResponse,
+    insertUsergroupUsersFromAPIListResponse,
+    processCreationEvent,
+    processUpdateEvent,
+    processMembersChangedEvent,
+};
