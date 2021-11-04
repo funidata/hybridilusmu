@@ -1,7 +1,7 @@
 const divider = () => (
-  {
-    type: 'divider',
-  }
+    {
+        type: 'divider',
+    }
 );
 
 module.exports = { divider };

@@ -2,17 +2,17 @@ const { SocketModeClient } = require('@slack/socket-mode');
 const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize(process.env.DB_SCHEMA || 'postgres',
-  process.env.DB_USER || 'postgres',
-  process.env.DB_PASSWORD || 'postgres',
-  {
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || '5432',
-    dialect: 'postgres',
-    dialectOptions: {
-      ssl: process.env.DB_SSL == 'true',
-    },
-    logging: false,
-  });
+    process.env.DB_USER || 'postgres',
+    process.env.DB_PASSWORD || 'postgres',
+    {
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT || '5432',
+        dialect: 'postgres',
+        dialectOptions: {
+            ssl: process.env.DB_SSL == 'true',
+        },
+        logging: false,
+    });
 
 const db = {};
 
@@ -27,13 +27,13 @@ db.Person.hasMany(db.Signup, { as: 'signups' });
 db.Person.hasMany(db.Defaultsignup, { as: 'defaultsignups' });
 
 db.Signup.belongsTo(db.Person, {
-  foreignKey: 'PersonId',
-  as: 'person',
+    foreignKey: 'PersonId',
+    as: 'person',
 });
 
 db.Defaultsignup.belongsTo(db.Person, {
-  foreignKey: 'PersonId',
-  as: 'person',
+    foreignKey: 'PersonId',
+    as: 'person',
 });
 
 module.exports = db;

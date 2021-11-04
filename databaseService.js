@@ -10,11 +10,11 @@ const dfunc = require('./dateFunctions');
  * @param {boolean} atOffice - true, if we want to add an "office" registration and false, if we want to add a "remote" one. This is only taken into account, id @addRegistration is true.
  */
 const changeRegistration = async (userId, date, addRegistration, atOffice = true) => {
-  if (addRegistration) {
-    await db.addSignupForUser(userId, date, atOffice);
-  } else {
-    await db.removeSignup(userId, date);
-  }
+    if (addRegistration) {
+        await db.addSignupForUser(userId, date, atOffice);
+    } else {
+        await db.removeSignup(userId, date);
+    }
 };
 
 /**
@@ -25,11 +25,11 @@ const changeRegistration = async (userId, date, addRegistration, atOffice = true
  * @param {boolean} atOffice - true, if we want to add an "office" registration and false, if we want to add a "remote" one. This is only taken into account, id @addRegistration is true.
  */
 const changeDefaultRegistration = async (userId, weekday, addRegistration, atOffice = true) => {
-  if (addRegistration) {
-    await db.addDefaultSignupForUser(userId, weekday, atOffice);
-  } else {
-    await db.removeDefaultSignup(userId, weekday);
-  }
+    if (addRegistration) {
+        await db.addDefaultSignupForUser(userId, weekday, atOffice);
+    } else {
+        await db.removeDefaultSignup(userId, weekday);
+    }
 };
 
 /**
@@ -37,13 +37,13 @@ const changeDefaultRegistration = async (userId, weekday, addRegistration, atOff
  * @param {string} date - Date string in the ISO date format.
  */
 const getRegistrationsFor = async (date) => {
-  const defaultOfficeIds = await db.getAllOfficeDefaultSignupsForAWeekday(dfunc.weekdays[DateTime.fromISO(date).weekday - 1]);
-  const officeIds = new Set(await db.getAllOfficeSignupsForADate(date));
-  const remoteIds = new Set(await db.getAllOfficeSignupsForADate(date, false));
-  defaultOfficeIds.forEach((id) => {
-    if (!remoteIds.has(id)) officeIds.add(id);
-  });
-  return Array.from(officeIds);
+    const defaultOfficeIds = await db.getAllOfficeDefaultSignupsForAWeekday(dfunc.weekdays[DateTime.fromISO(date).weekday - 1]);
+    const officeIds = new Set(await db.getAllOfficeSignupsForADate(date));
+    const remoteIds = new Set(await db.getAllOfficeSignupsForADate(date, false));
+    defaultOfficeIds.forEach((id) => {
+        if (!remoteIds.has(id)) officeIds.add(id);
+    });
+    return Array.from(officeIds);
 };
 
 /**
@@ -53,8 +53,8 @@ const getRegistrationsFor = async (date) => {
  * @param {boolean} atOffice - True, if we want to ask whether the user is registered as present at the office. False otherwise.
  */
 const userAtOffice = async (userId, date, atOffice = true) => {
-  const registration = await db.getOfficeSignupForUserAndDate(userId, date);
-  return registration && registration.at_office === atOffice;
+    const registration = await db.getOfficeSignupForUserAndDate(userId, date);
+    return registration && registration.at_office === atOffice;
 };
 
 /**
@@ -64,8 +64,8 @@ const userAtOffice = async (userId, date, atOffice = true) => {
  * @param {boolean} atOffice - True, if we want to ask whether the user is registered as present at the office by default. False otherwise.
  */
 const userAtOfficeByDefault = async (userId, weekday, atOffice = true) => {
-  const registration = await db.getOfficeDefaultSignupForUserAndWeekday(userId, weekday);
-  return registration && registration.at_office === atOffice;
+    const registration = await db.getOfficeDefaultSignupForUserAndWeekday(userId, weekday);
+    return registration && registration.at_office === atOffice;
 };
 
 /**
@@ -83,11 +83,11 @@ const userIsRemote = async (userId, date) => userAtOffice(userId, date, false);
 const userIsRemoteByDefault = async (userId, weekday) => userAtOfficeByDefault(userId, weekday, false);
 
 module.exports = {
-  changeRegistration,
-  changeDefaultRegistration,
-  getRegistrationsFor,
-  userAtOffice,
-  userIsRemote,
-  userAtOfficeByDefault,
-  userIsRemoteByDefault,
+    changeRegistration,
+    changeDefaultRegistration,
+    getRegistrationsFor,
+    userAtOffice,
+    userIsRemote,
+    userAtOfficeByDefault,
+    userIsRemoteByDefault,
 };

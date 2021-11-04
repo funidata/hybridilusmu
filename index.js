@@ -1,14 +1,14 @@
 require('./timestampedLogger').replaceLoggers();
 require('dotenv').config();
 require('./quotenv').checkEnv([
-  'SLACK_BOT_TOKEN',
-  'SLACK_APP_TOKEN',
-  'SLACK_SIGNING_SECRET',
-  'DB_SCHEMA',
-  'DB_USER',
-  'DB_PASSWORD',
-  'DB_HOST',
-  'DB_PORT',
+    'SLACK_BOT_TOKEN',
+    'SLACK_APP_TOKEN',
+    'SLACK_SIGNING_SECRET',
+    'DB_SCHEMA',
+    'DB_USER',
+    'DB_PASSWORD',
+    'DB_HOST',
+    'DB_PORT',
 ]);
 const { App } = require('@slack/bolt');
 const schedule = require('node-schedule');
@@ -27,10 +27,10 @@ const controller = require('./controllers/db.controllers');
 const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX : '';
 
 const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET,
-  socketMode: true,
-  appToken: process.env.SLACK_APP_TOKEN,
+    token: process.env.SLACK_BOT_TOKEN,
+    signingSecret: process.env.SLACK_SIGNING_SECRET,
+    socketMode: true,
+    appToken: process.env.SLACK_APP_TOKEN,
 });
 
 // BUTTON ACTION FUNCTIONS
@@ -39,48 +39,48 @@ const app = new App({
  * Updates the App-Home page for the specified user.
  */
 app.action('update_click', async ({ body, ack, client }) => {
-  home.update(client, body.user.id);
-  await ack();
+    home.update(client, body.user.id);
+    await ack();
 });
 
 /**
  * Registers the user as present at the office for the selected day and updates the App-Home page.
  */
 app.action('office_click', async ({ body, ack, client }) => {
-  const data = JSON.parse(body.actions[0].value);
-  await service.changeRegistration(body.user.id, data.date, !data.atOffice);
-  home.update(client, body.user.id);
-  await ack();
+    const data = JSON.parse(body.actions[0].value);
+    await service.changeRegistration(body.user.id, data.date, !data.atOffice);
+    home.update(client, body.user.id);
+    await ack();
 });
 
 /**
  * Registers the user as not present at the office for the selected day and updates the App-Home page.
  */
 app.action('remote_click', async ({ body, ack, client }) => {
-  const data = JSON.parse(body.actions[0].value);
-  await service.changeRegistration(body.user.id, data.date, !data.isRemote, false);
-  home.update(client, body.user.id);
-  await ack();
+    const data = JSON.parse(body.actions[0].value);
+    await service.changeRegistration(body.user.id, data.date, !data.isRemote, false);
+    home.update(client, body.user.id);
+    await ack();
 });
 
 /**
  * Registers the user as present at the office by default for the selected day and updates the App-Home page.
  */
 app.action('default_office_click', async ({ body, ack, client }) => {
-  const data = JSON.parse(body.actions[0].value);
-  await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultAtOffice);
-  home.update(client, body.user.id);
-  await ack();
+    const data = JSON.parse(body.actions[0].value);
+    await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultAtOffice);
+    home.update(client, body.user.id);
+    await ack();
 });
 
 /**
  * Registers the user as not present at the office by default for the selected day and updates the App-Home page.
  */
 app.action('default_remote_click', async ({ body, ack, client }) => {
-  const data = JSON.parse(body.actions[0].value);
-  await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultIsRemote, false);
-  home.update(client, body.user.id);
-  await ack();
+    const data = JSON.parse(body.actions[0].value);
+    await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultIsRemote, false);
+    home.update(client, body.user.id);
+    await ack();
 });
 
 // EVENT LISTENERS
@@ -89,7 +89,7 @@ app.action('default_remote_click', async ({ body, ack, client }) => {
  * Updates the App-Home page for the specified user when they click on the Home tab.
  */
 app.event('app_home_opened', async ({ event, client }) => {
-  home.update(client, event.user);
+    home.update(client, event.user);
 });
 
 // SLASH-COMMANDS
@@ -98,27 +98,27 @@ app.event('app_home_opened', async ({ event, client }) => {
  * Listens to a slash-command and prints a list of people at the office on the given day.
  */
 app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack, client }) => {
-  try {
-    await ack();
-    const parameter = command.text; // Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen
-    const date = dfunc.parseDate(parameter, DateTime.now());
-    if (date.isValid) {
-      const registrations = await service.getRegistrationsFor(date.toISODate());
-      let response = `${dfunc.atWeekday(date)} toimistolla `;
-      if (registrations.length === 0) response = `Kukaan ei ole toimistolla ${dfunc.atWeekday(date).toLowerCase()}`;
-      else if (registrations.length === 1) response += 'on:\n';
-      else response += 'ovat:\n';
-      registrations.forEach((user) => {
-        response += `<@${user}>\n`;
-      });
-      postEphemeralMessage(command.channel_id, command.user_id, response);
-    } else {
-      postEphemeralMessage(command.channel_id, command.user_id, 'Anteeksi, en ymmärtänyt äskeistä.');
+    try {
+        await ack();
+        const parameter = command.text; // Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen
+        const date = dfunc.parseDate(parameter, DateTime.now());
+        if (date.isValid) {
+            const registrations = await service.getRegistrationsFor(date.toISODate());
+            let response = `${dfunc.atWeekday(date)} toimistolla `;
+            if (registrations.length === 0) response = `Kukaan ei ole toimistolla ${dfunc.atWeekday(date).toLowerCase()}`;
+            else if (registrations.length === 1) response += 'on:\n';
+            else response += 'ovat:\n';
+            registrations.forEach((user) => {
+                response += `<@${user}>\n`;
+            });
+            postEphemeralMessage(command.channel_id, command.user_id, response);
+        } else {
+            postEphemeralMessage(command.channel_id, command.user_id, 'Anteeksi, en ymmärtänyt äskeistä.');
+        }
+    } catch (error) {
+        console.log('Tapahtui virhe :(');
+        console.log(error);
     }
-  } catch (error) {
-    console.log('Tapahtui virhe :(');
-    console.log(error);
-  }
 });
 
 // OTHER APP FUNCTIONS
@@ -146,23 +146,23 @@ const usercache = {};
  * @returns {Object} The user object as originally returned by Slack
  */
 async function getCachedUser(userId) {
-  if (usercache[userId] && usercache[userId].date + 60000 > new Date().getTime()) {
-    console.log(`cache hit for user ${userId}`);
-    return usercache[userId].user;
-  }
-  const user = await app.client.users.info({ user: userId });
-  // something went wrong
-  if (!user.ok) {
-    console.log(`users.info failed for uid ${userId}`);
-    return null;
-  }
-  // success
-  console.log(`caching user ${userId}`);
-  usercache[userId] = {
-    user: user.user,
-    date: new Date().getTime(),
-  };
-  return user.user;
+    if (usercache[userId] && usercache[userId].date + 60000 > new Date().getTime()) {
+        console.log(`cache hit for user ${userId}`);
+        return usercache[userId].user;
+    }
+    const user = await app.client.users.info({ user: userId });
+    // something went wrong
+    if (!user.ok) {
+        console.log(`users.info failed for uid ${userId}`);
+        return null;
+    }
+    // success
+    console.log(`caching user ${userId}`);
+    usercache[userId] = {
+        user: user.user,
+        date: new Date().getTime(),
+    };
+    return user.user;
 }
 
 /**
@@ -171,12 +171,12 @@ async function getCachedUser(userId) {
  * @returns True if the user is restricted.
  */
 async function getUserRestriction(userId) {
-  const user = await getCachedUser(userId);
-  // if we don't have a successful api call, default to restriction
-  if (!user || user.is_restricted === undefined) {
-    return true;
-  }
-  return user.is_restricted;
+    const user = await getCachedUser(userId);
+    // if we don't have a successful api call, default to restriction
+    if (!user || user.is_restricted === undefined) {
+        return true;
+    }
+    return user.is_restricted;
 }
 
 /**
@@ -185,57 +185,57 @@ async function getUserRestriction(userId) {
  * displaying an error message instead.
  */
 async function guestHandler({
-  payload, body, client, next, ack, event,
+    payload, body, client, next, ack, event,
 }) {
-  // The user ID is found in many different places depending on the type of action taken
-  let userId; // Undefined evaluates as false
-  if (!userId) try { userId = payload.user; } catch (error) {} // tab
-  if (!userId) try { userId = payload.user_id; } catch (error) {} // slash command
-  if (!userId) try { userId = body.user.id; } catch (error) {} // button
-  if (!userId) try { userId = body.event.message.user; } catch (error) {} // message edit
+    // The user ID is found in many different places depending on the type of action taken
+    let userId; // Undefined evaluates as false
+    if (!userId) try { userId = payload.user; } catch (error) {} // tab
+    if (!userId) try { userId = payload.user_id; } catch (error) {} // slash command
+    if (!userId) try { userId = body.user.id; } catch (error) {} // button
+    if (!userId) try { userId = body.event.message.user; } catch (error) {} // message edit
 
-  // Approve requests which don't include any of the above (couldn't find any)
-  if (!userId) {
-    console.log('alert: guest check skipped!');
-    await next();
-    return;
-  }
-  try {
-    if (await getUserRestriction(userId)) {
-      throw 'User is restricted';
-    }
-  } catch (error) {
-    // This user is restricted. Show them an error message and don't continue processing the request
-    if (error === 'User is restricted') {
-      if (event !== undefined && (event.channel_type === 'channel' || event.channel_type === 'group')) { // Don't send the error message in this case
+    // Approve requests which don't include any of the above (couldn't find any)
+    if (!userId) {
+        console.log('alert: guest check skipped!');
+        await next();
         return;
-      }
-      const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`;
-      if (payload.command !== undefined) { // Responds to a slash-command with an ephemeral message.
-        await ack();
-        await client.chat.postEphemeral({
-          channel: payload.channel_id,
-          user: userId,
-          text: message,
-        });
-      } else if (payload.channel === undefined || payload.tab === 'home') { // Shows an error message on the home tab.
-        home.error(client, userId, message);
-      } else { // Responds to a private message with an ephemeral message.
-        await client.chat.postEphemeral({
-          channel: payload.channel,
-          user: userId,
-          text: message,
-        });
-      }
-      return;
     }
-    // Pass control to previous middleware (if any) or the global error handler
-    throw error;
-  }
-  // Pass control to the next middleware (if there are any) and the listener functions
-  // Note: You probably don't want to call this inside a `try` block, or any middleware
-  //       after this one that throws will be caught by it.
-  await next();
+    try {
+        if (await getUserRestriction(userId)) {
+            throw 'User is restricted';
+        }
+    } catch (error) {
+    // This user is restricted. Show them an error message and don't continue processing the request
+        if (error === 'User is restricted') {
+            if (event !== undefined && (event.channel_type === 'channel' || event.channel_type === 'group')) { // Don't send the error message in this case
+                return;
+            }
+            const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`;
+            if (payload.command !== undefined) { // Responds to a slash-command with an ephemeral message.
+                await ack();
+                await client.chat.postEphemeral({
+                    channel: payload.channel_id,
+                    user: userId,
+                    text: message,
+                });
+            } else if (payload.channel === undefined || payload.tab === 'home') { // Shows an error message on the home tab.
+                home.error(client, userId, message);
+            } else { // Responds to a private message with an ephemeral message.
+                await client.chat.postEphemeral({
+                    channel: payload.channel,
+                    user: userId,
+                    text: message,
+                });
+            }
+            return;
+        }
+        // Pass control to previous middleware (if any) or the global error handler
+        throw error;
+    }
+    // Pass control to the next middleware (if there are any) and the listener functions
+    // Note: You probably don't want to call this inside a `try` block, or any middleware
+    //       after this one that throws will be caught by it.
+    await next();
 }
 
 app.use(guestHandler);
@@ -244,61 +244,61 @@ app.use(guestHandler);
  * Sends a scheduled message every Sunday to all the channels the bot is in.
  */
 async function startScheduling() {
-  const onceEverySunday = new schedule.RecurrenceRule();
-  onceEverySunday.tz = 'Etc/UTC';
-  onceEverySunday.dayOfWeek = 0;
-  onceEverySunday.hour = 10;
-  onceEverySunday.minute = 30;
-  console.log('scheduling posts to every public channel the bot is a member of on dayOfWeek', onceEverySunday.dayOfWeek, 'at hour', onceEverySunday.hour, onceEverySunday.tz);
-  const job = schedule.scheduleJob(onceEverySunday, () => {
-    weekdays = dfunc.listNextWeek(DateTime.now());
-    getMemberChannelIds().then((result) => result.forEach((id) => {
-      postMessage(id, weekdays[0])
-        .then(() => postMessage(id, weekdays[1]))
-        .then(() => postMessage(id, weekdays[2]))
-        .then(() => postMessage(id, weekdays[3]))
-        .then(() => postMessage(id, weekdays[4]));
-    }));
-  });
+    const onceEverySunday = new schedule.RecurrenceRule();
+    onceEverySunday.tz = 'Etc/UTC';
+    onceEverySunday.dayOfWeek = 0;
+    onceEverySunday.hour = 10;
+    onceEverySunday.minute = 30;
+    console.log('scheduling posts to every public channel the bot is a member of on dayOfWeek', onceEverySunday.dayOfWeek, 'at hour', onceEverySunday.hour, onceEverySunday.tz);
+    const job = schedule.scheduleJob(onceEverySunday, () => {
+        weekdays = dfunc.listNextWeek(DateTime.now());
+        getMemberChannelIds().then((result) => result.forEach((id) => {
+            postMessage(id, weekdays[0])
+                .then(() => postMessage(id, weekdays[1]))
+                .then(() => postMessage(id, weekdays[2]))
+                .then(() => postMessage(id, weekdays[3]))
+                .then(() => postMessage(id, weekdays[4]));
+        }));
+    });
 }
 
 /**
  * Returns a list of all the channels the bot is a member of.
  */
 async function getMemberChannelIds() {
-  return (await app.client.conversations.list()).channels
-    .filter((c) => c.is_member)
-    .map((c) => c.id);
+    return (await app.client.conversations.list()).channels
+        .filter((c) => c.is_member)
+        .map((c) => c.id);
 }
 
 /**
  * Posts a message to the given channel.
  */
 async function postMessage(channelId, text) {
-  await app.client.chat.postMessage({
-    channel: channelId,
-    text,
-  });
+    await app.client.chat.postMessage({
+        channel: channelId,
+        text,
+    });
 }
 
 /**
  * Posts an ephemeral message to the given user at the given channel.
  */
 async function postEphemeralMessage(channelId, userId, text) {
-  await app.client.chat.postEphemeral({
-    channel: channelId,
-    user: userId,
-    text,
-  });
+    await app.client.chat.postEphemeral({
+        channel: channelId,
+        user: userId,
+        text,
+    });
 }
 
 /**
  * Starts the bot.
  */
 (async () => {
-  await app.start(process.env.PORT || 3000);
-  startScheduling();
-  console.log('⚡️ Bolt app is running!');
+    await app.start(process.env.PORT || 3000);
+    startScheduling();
+    console.log('⚡️ Bolt app is running!');
 })();
 
 /**
@@ -307,5 +307,5 @@ async function postEphemeralMessage(channelId, userId, text) {
  * We could specify node 16.x in our Dockerfile which would make that a crashing error.
 */
 process.on('unhandledRejection', (error) => {
-  throw error;
+    throw error;
 });
