@@ -17,5 +17,6 @@ module.exports = {
         'no-unused-vars': ['warn', { vars: 'all', args: 'after-used', ignoreRestSiblings: false }],
         'no-console': 'off',
         'no-empty': ['error', { allowEmptyCatch: true }],
+        'no-param-reassign': ['error', { props: false }],
     },
 };
