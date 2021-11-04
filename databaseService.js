@@ -6,8 +6,11 @@ const dfunc = require('./dateFunctions');
  * Adds, removes or updates a registration for the given user, for the given day.
  * @param {string} userId - Slack user ID.
  * @param {string} date - Date string in the ISO date format.
- * @param {boolean} addRegistration - true, if we want to add a registration and false, if we want to remove one.
- * @param {boolean} atOffice - true, if we want to add an "office" registration and false, if we want to add a "remote" one. This is only taken into account, id @addRegistration is true.
+ * @param {boolean} addRegistration - true, if we want to add a registration and
+ * false, if we want to remove one.
+ * @param {boolean} atOffice - true, if we want to add an "office" registration and
+ * false, if we want to add a "remote" one.
+ * This is only taken into account if @addRegistration is true.
  */
 const changeRegistration = async (userId, date, addRegistration, atOffice = true) => {
     if (addRegistration) {
@@ -21,8 +24,11 @@ const changeRegistration = async (userId, date, addRegistration, atOffice = true
  * Adds, removes or updates a default registration for the given user, for the given weekday.
  * @param {string} userId - Slack user ID.
  * @param {string} weekday - Weekday as in "Maanantai".
- * @param {boolean} addRegistration - true, if we want to add a registration and false, if we want to remove one.
- * @param {boolean} atOffice - true, if we want to add an "office" registration and false, if we want to add a "remote" one. This is only taken into account, id @addRegistration is true.
+ * @param {boolean} addRegistration - true, if we want to add a registration and
+ * false, if we want to remove one.
+ * @param {boolean} atOffice - true, if we want to add an "office" registration and
+ * false, if we want to add a "remote" one.
+ * This is only taken into account if @addRegistration is true.
  */
 const changeDefaultRegistration = async (userId, weekday, addRegistration, atOffice = true) => {
     if (addRegistration) {
@@ -37,7 +43,9 @@ const changeDefaultRegistration = async (userId, weekday, addRegistration, atOff
  * @param {string} date - Date string in the ISO date format.
  */
 const getRegistrationsFor = async (date) => {
-    const defaultOfficeIds = await db.getAllOfficeDefaultSignupsForAWeekday(dfunc.weekdays[DateTime.fromISO(date).weekday - 1]);
+    const defaultOfficeIds = await db.getAllOfficeDefaultSignupsForAWeekday(
+        dfunc.weekdays[DateTime.fromISO(date).weekday - 1],
+    );
     const officeIds = new Set(await db.getAllOfficeSignupsForADate(date));
     const remoteIds = new Set(await db.getAllOfficeSignupsForADate(date, false));
     defaultOfficeIds.forEach((id) => {
@@ -50,7 +58,8 @@ const getRegistrationsFor = async (date) => {
  * Returns true, if user's registration for the given day is the same as @atOffice.
  * @param {string} userId - Slack user ID.
  * @param {string} date - Date string in the ISO date format.
- * @param {boolean} atOffice - True, if we want to ask whether the user is registered as present at the office. False otherwise.
+ * @param {boolean} atOffice - True, if we want to ask whether the user is registered
+ * present at the office. False otherwise.
  */
 const userAtOffice = async (userId, date, atOffice = true) => {
     const registration = await db.getOfficeSignupForUserAndDate(userId, date);
@@ -61,7 +70,8 @@ const userAtOffice = async (userId, date, atOffice = true) => {
  * Returns true, if user's default registration for the given day is the same as @atOffice.
  * @param {string} userId - Slack user ID.
  * @param {string} weekday - Weekday as in "Maanantai".
- * @param {boolean} atOffice - True, if we want to ask whether the user is registered as present at the office by default. False otherwise.
+ * @param {boolean} atOffice - True, if we want to ask whether the user is registered
+ * present at the office by default. False otherwise.
  */
 const userAtOfficeByDefault = async (userId, weekday, atOffice = true) => {
     const registration = await db.getOfficeDefaultSignupForUserAndWeekday(userId, weekday);
@@ -80,7 +90,9 @@ const userIsRemote = async (userId, date) => userAtOffice(userId, date, false);
  * @param {string} userId - Slack user ID.
  * @param {string} weekday - Weekday as in "Maanantai".
  */
-const userIsRemoteByDefault = async (userId, weekday) => userAtOfficeByDefault(userId, weekday, false);
+const userIsRemoteByDefault = async (userId, weekday) => {
+    userAtOfficeByDefault(userId, weekday, false);
+};
 
 module.exports = {
     changeRegistration,
