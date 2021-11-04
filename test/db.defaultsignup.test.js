@@ -1,20 +1,19 @@
 const assert = require('assert');
-const { publicEncrypt, sign } = require('crypto');
 const db = require('../database');
 const controller = require('../controllers/db.controllers');
 
-describe('Default signups test', function () {
+describe('Default signups test', function () { // eslint-disable-line
     this.beforeAll(async () => {
         await db.sequelize.sync({ force: true });
     });
 
     it('create weekday default and assign to a user', async () => {
-        const person = await db.Person.create({
+        await db.Person.create({
             id: 1,
             slack_id: 'XYZ',
             real_name: 'Matti Meikalainen',
         });
-        const su1 = await db.Defaultsignup.create({
+        await db.Defaultsignup.create({
             weekday: 'Maanantai',
             at_office: true,
             PersonId: 1,
@@ -25,12 +24,12 @@ describe('Default signups test', function () {
         assert.equal(1, p1.defaultsignups.length);
     });
     it('find all default users for a weekday', async () => {
-        const p2 = await db.Person.create({
+        await db.Person.create({
             id: 2,
             slack_id: 'ZZZ',
             real_name: 'Maija Mehilainen',
         });
-        const su2 = await db.Defaultsignup.create({
+        await db.Defaultsignup.create({
             weekday: 'Maanantai',
             at_office: true,
             PersonId: 2,
@@ -41,7 +40,7 @@ describe('Default signups test', function () {
         assert.equal(2, persons.length);
     });
     it('addDefaultSignupForUser test', async () => {
-        const p2 = await db.Person.create({
+        await db.Person.create({
             id: 3,
             slack_id: 'ABC',
             real_name: 'Tyyppi Tyyppinen',
