@@ -1,10 +1,9 @@
-const { Sequelize, sequelize } = require('../database');
+const { sequelize } = require('../database');
 const db = require('../database');
 
 const { Person } = db;
 const { Signup } = db;
 const { Defaultsignup } = db;
-const { Op } = Sequelize;
 
 const getUser = async (userId, transaction) => {
     const userQuery = await Person.findOrCreate({
@@ -20,20 +19,18 @@ const getUser = async (userId, transaction) => {
     return userQuery[0].dataValues;
 };
 
-exports.findUserId = (slack_id) => Person.findOne({
+exports.findUserId = (slackId) => Person.findOne({
     attributes: ['id'],
     where: {
-        slack_id,
+        slack_id: slackId,
     },
 })
     .then((p) => p.id)
-    .catch((err) =>
-    // console.log('error while finding id ', err);
-        null);
+    .catch(() => {});
 
 exports.addSignupForUser = async (userId, date, atOffice) => {
     try {
-        const result = await sequelize.transaction(async (t) => {
+        await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t);
 
             const signup = await Signup.upsert({
@@ -70,13 +67,13 @@ exports.getAllOfficeSignupsForADate = (date, atOffice = true) => Signup.findAll(
 
 // hakee kaikki tietyn käyttäjän ilmoittautumiset, joiden at_office === atOffice
 // palauttaa arrayn päivämääristä
-exports.getAllOfficeSignupsForAUser = (user_id, atOffice = true) => Person.findByPk(user_id, {
+exports.getAllOfficeSignupsForAUser = (userId, atOffice = true) => Person.findByPk(userId, {
     include: ['signups'],
 })
     .then((person) => {
         const { signups } = person;
         const arr = [];
-        for (let i = 0; i < signups.length; i++) {
+        for (let i = 0; i < signups.length; i += 1) {
             if (signups[i].at_office === atOffice) {
                 arr.push(signups[i].office_date);
             }
@@ -117,6 +114,7 @@ exports.getOfficeSignupForUserAndDate = async (userId, date) => {
         return result;
     } catch (err) {
         console.log('Error while finding signups ', err);
+        return undefined;
     }
 };
 
@@ -137,7 +135,7 @@ exports.getSlackId = (id) => Person.findByPk(id)
 
 exports.removeSignup = async (userId, date) => {
     try {
-        const result = await sequelize.transaction(async (t) => {
+        await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t);
 
             await Signup.destroy({
@@ -154,7 +152,7 @@ exports.removeSignup = async (userId, date) => {
 
 exports.addDefaultSignupForUser = async (userId, weekday, atOffice) => {
     try {
-        const result = await sequelize.transaction(async (t) => {
+        await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t);
             const defaultsignup = await Defaultsignup.upsert({
                 weekday,
@@ -170,7 +168,7 @@ exports.addDefaultSignupForUser = async (userId, weekday, atOffice) => {
 
 exports.removeDefaultSignup = async (userId, weekday) => {
     try {
-        const result = await sequelize.transaction(async (t) => {
+        await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t);
 
             await Defaultsignup.destroy({
@@ -228,5 +226,6 @@ exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
         return result;
     } catch (err) {
         console.log('Error while finding default signups ', err);
+        return undefined;
     }
 };
