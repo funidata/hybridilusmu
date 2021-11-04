@@ -2,7 +2,7 @@ const assert = require('assert');
 const db = require('../database');
 const controller = require('../controllers/db.controllers');
 
-describe('Persons test', function () {
+describe('Persons test', function () { // eslint-disable-line
     this.beforeAll(async () => {
         await db.sequelize.sync({ force: true });
     });
@@ -24,7 +24,7 @@ describe('Persons test', function () {
         assert.equal(1, id);
     });
     it('find slack_id', async () => {
-        const slack_id = await controller.getSlackId(1);
-        assert.equal('XYZ', slack_id);
+        const slackId = await controller.getSlackId(1);
+        assert.equal('XYZ', slackId);
     });
 });
