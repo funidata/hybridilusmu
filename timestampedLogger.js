@@ -1,14 +1,14 @@
+const util = require('util');
+
 /**
  * Replaces all standard loggers with timestamped ones while retaining string formatting support.
  *
  * Yes, that's apparently a thing too. See https://developer.mozilla.org/en-US/docs/Web/API/console/log
  */
 const replaceLoggers = () => {
-  const util = require('util');
-
   ['log', 'info', 'error', 'warn', 'debug'].forEach((v) => {
-    const origLogger = console[v];
-    console[v] = (...args) => {
+    const origLogger = console[v]; //eslint-disable-line
+    console[v] = (...args) => { //eslint-disable-line
       // generate a timestamp prefix
       const ts = `[${new Date().toISOString().replace('T', ' ')}]`;
       // do some crazy format shenanigans
@@ -23,12 +23,12 @@ const replaceLoggers = () => {
         // see https://github.com/nodejs/node/blob/master/doc/api/util.md
         const formats = ['s', 'd', 'i', 'f', 'j', 'o', 'O', 'c'];
         let idx = -1;
-        while ((idx = inspect.indexOf('%')) >= 0) {
+        while ((idx = inspect.indexOf('%')) >= 0) { //eslint-disable-line
           inspect = inspect.slice(idx + 1);
           const chr = inspect.charAt(0);
           if (chr === '%') {
             isFmtStr = true;
-            continue;
+            continue; //eslint-disable-line
           }
           if (formats.includes(chr)) {
             isFmtStr = true;
@@ -67,7 +67,7 @@ const replaceLoggers = () => {
           //   util.format("%%%s", "foo") => "%foo"
           // Note that a console.log("%%") call would still output "%%", which is also what we want.
           // Confused yet? No big deal, so am I.
-          args[0] = args[0].replaceAll('%%', '%');
+          args[0] = args[0].replaceAll('%%', '%'); //eslint-disable-line
         }
       }
       origLogger.apply(console, [ts, ...args]);
