@@ -16,7 +16,7 @@ describe('List Next Week Test', () => {
         const date = DateTime.fromObject({ year: 2021, month: 12, day: 27 });
         const result = dfunc.listNextWeek(date);
         assert.equal(result.length, wantedResult.length);
-        for (let i = 0; i < result.length; i++) {
+        for (let i = 0; i < result.length; i += 1) {
             assert.equal(result[i], wantedResult[i]);
         }
     });
@@ -31,7 +31,7 @@ describe('List Next Week Test', () => {
         const date = DateTime.fromObject({ year: 2021, month: 9, day: 18 });
         const result = dfunc.listNextWeek(date);
         assert.equal(result.length, wantedResult.length);
-        for (let i = 0; i < result.length; i++) {
+        for (let i = 0; i < result.length; i += 1) {
             assert.equal(result[i], wantedResult[i]);
         }
     });
@@ -46,7 +46,7 @@ describe('List Next Week Test', () => {
         const date = DateTime.fromObject({ year: 2021, month: 10, day: 31 });
         const result = dfunc.listNextWeek(date);
         assert.equal(result.length, wantedResult.length);
-        for (let i = 0; i < result.length; i++) {
+        for (let i = 0; i < result.length; i += 1) {
             assert.equal(result[i], wantedResult[i]);
         }
     });
@@ -65,7 +65,7 @@ describe('List N Weekdays Test', () => {
         const date = DateTime.fromObject({ year: 2021, month: 10, day: 25 });
         const result = dfunc.listNWeekdays(date, 6);
         assert.equal(result.length, wantedResult.length);
-        for (let i = 0; i < result.length; i++) {
+        for (let i = 0; i < result.length; i += 1) {
             assert.equal(result[i], wantedResult[i]);
         }
     });
@@ -80,7 +80,7 @@ describe('List N Weekdays Test', () => {
         const date = DateTime.fromObject({ year: 2021, month: 10, day: 14 });
         const result = dfunc.listNWeekdays(date, 5);
         assert.equal(result.length, wantedResult.length);
-        for (let i = 0; i < result.length; i++) {
+        for (let i = 0; i < result.length; i += 1) {
             assert.equal(result[i], wantedResult[i]);
         }
     });
@@ -95,7 +95,7 @@ describe('List N Weekdays Test', () => {
         const date = DateTime.fromObject({ year: 2021, month: 10, day: 16 });
         const result = dfunc.listNWeekdays(date, 5);
         assert.equal(result.length, wantedResult.length);
-        for (let i = 0; i < result.length; i++) {
+        for (let i = 0; i < result.length; i += 1) {
             assert.equal(result[i], wantedResult[i]);
         }
     });
