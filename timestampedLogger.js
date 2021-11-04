@@ -65,7 +65,8 @@ const replaceLoggers = () => {
                     //   util.format("%%")          => "%%"
                     //   util.format("%%", '')      => "% "
                     //   util.format("%%%s", "foo") => "%foo"
-                    // Note that a console.log("%%") call would still output "%%", which is also what we want.
+                    // Note that a console.log("%%") call would still output "%%",
+                    // which is also what we want.
                     // Confused yet? No big deal, so am I.
           args[0] = args[0].replaceAll('%%', '%'); //eslint-disable-line
                 }
