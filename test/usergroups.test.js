@@ -253,3 +253,18 @@ describe('usergroups: String generation', () => {
         usergroups._clearData();
     });
 });
+
+describe('usergroups: String parsing', () => {
+    it('mention string for unlabeled usergroup', () => {
+        assert.equal(usergroups.parseMentionString('<!subteam^Solematon>'), 'Solematon');
+    });
+
+    it('mention string for labeled usergroup', () => {
+        assert.equal(usergroups.parseMentionString('<!subteam^Skahvi|@kahvi>'), 'Skahvi');
+    });
+
+    it('invalid mention string', () => {
+        assert.equal(usergroups.parseMentionString('<!subteam^Skahvi'), false);
+        assert.equal(usergroups.parseMentionString('Skahvi'), false);
+    });
+});

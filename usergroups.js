@@ -76,6 +76,7 @@ const parseMentionString = (str) => {
             if (label_at > 0) {
                 return inspect.substr(0, label_at);
             }
+            return inspect;
         }
     }
     return false;
