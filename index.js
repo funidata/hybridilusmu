@@ -16,13 +16,12 @@ const { DateTime } = require('luxon');
 const service = require('./databaseService');
 const dfunc = require('./dateFunctions');
 const home = require('./home');
-const db = require('./database');
-const controller = require('./controllers/db.controllers');
 
 /**
- * An optional prefix for our slash-commands. When set to e.g. 'h', '/listaa' becomes '/hlistaa'.
- * This requires manual command configuration on the Slack side of things, as in you must alter
- * the manifest for all the commands we have.
+ * An optional prefix for our slash-commands. When set to e.g. 'h',
+ * '/listaa' becomes '/hlistaa'.
+ * This requires manual command configuration on the Slack side of things,
+ * as in you must alter the manifest for all the commands we have.
  */
 const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX : '';
 
@@ -33,7 +32,26 @@ const app = new App({
     appToken: process.env.SLACK_APP_TOKEN,
 });
 
-// BUTTON ACTION FUNCTIONS
+/**
+ * Posts an ephemeral message to the given user at the given channel.
+ */
+async function postEphemeralMessage(channelId, userId, text) {
+    await app.client.chat.postEphemeral({
+        channel: channelId,
+        user: userId,
+        text,
+    });
+}
+
+/**
+ * Posts a message to the given channel.
+ */
+async function postMessage(channelId, text) {
+    await app.client.chat.postMessage({
+        channel: channelId,
+        text,
+    });
+}
 
 /**
  * Updates the App-Home page for the specified user.
@@ -54,7 +72,8 @@ app.action('office_click', async ({ body, ack, client }) => {
 });
 
 /**
- * Registers the user as not present at the office for the selected day and updates the App-Home page.
+ * Registers the user as not present at the office for the selected day
+ * and updates the App-Home page.
  */
 app.action('remote_click', async ({ body, ack, client }) => {
     const data = JSON.parse(body.actions[0].value);
@@ -64,7 +83,8 @@ app.action('remote_click', async ({ body, ack, client }) => {
 });
 
 /**
- * Registers the user as present at the office by default for the selected day and updates the App-Home page.
+ * Registers the user as present at the office by default for the selected day
+ * and updates the App-Home page.
  */
 app.action('default_office_click', async ({ body, ack, client }) => {
     const data = JSON.parse(body.actions[0].value);
@@ -74,16 +94,16 @@ app.action('default_office_click', async ({ body, ack, client }) => {
 });
 
 /**
- * Registers the user as not present at the office by default for the selected day and updates the App-Home page.
+ * Registers the user as not present at the office by default for the selected day
+ * and updates the App-Home page.
  */
 app.action('default_remote_click', async ({ body, ack, client }) => {
     const data = JSON.parse(body.actions[0].value);
-    await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultIsRemote, false);
+    await service.changeDefaultRegistration(body.user.id, data.weekday,
+        !data.defaultIsRemote, false);
     home.update(client, body.user.id);
     await ack();
 });
-
-// EVENT LISTENERS
 
 /**
  * Updates the App-Home page for the specified user when they click on the Home tab.
@@ -92,15 +112,13 @@ app.event('app_home_opened', async ({ event, client }) => {
     home.update(client, event.user);
 });
 
-// SLASH-COMMANDS
-
 /**
  * Listens to a slash-command and prints a list of people at the office on the given day.
  */
-app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack, client }) => {
+app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
     try {
         await ack();
-        const parameter = command.text; // Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen
+        const parameter = command.text; // Antaa käskyn parametrin
         const date = dfunc.parseDate(parameter, DateTime.now());
         if (date.isValid) {
             const registrations = await service.getRegistrationsFor(date.toISODate());
@@ -120,8 +138,6 @@ app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack, client }) => {
         console.log(error);
     }
 });
-
-// OTHER APP FUNCTIONS
 
 /**
  * Our user API object cache. Format is the following:
@@ -180,6 +196,15 @@ async function getUserRestriction(userId) {
 }
 
 /**
+ * Returns a list of all the channels the bot is a member of.
+ */
+async function getMemberChannelIds() {
+    return (await app.client.conversations.list()).channels
+        .filter((c) => c.is_member)
+        .map((c) => c.id);
+}
+
+/**
  * Bolt global middleware (runs before every request) that checks if the user
  * is a guest (restricted), and if so, stops further processing of the request,
  * displaying an error message instead.
@@ -202,16 +227,16 @@ async function guestHandler({
     }
     try {
         if (await getUserRestriction(userId)) {
-            throw 'User is restricted';
+            throw new Error('User is restricted');
         }
     } catch (error) {
     // This user is restricted. Show them an error message and don't continue processing the request
-        if (error === 'User is restricted') {
+        if (error.message === 'User is restricted') {
             if (event !== undefined && (event.channel_type === 'channel' || event.channel_type === 'group')) { // Don't send the error message in this case
                 return;
             }
             const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`;
-            if (payload.command !== undefined) { // Responds to a slash-command with an ephemeral message.
+            if (payload.command !== undefined) { // Responds to a slash-command
                 await ack();
                 await client.chat.postEphemeral({
                     channel: payload.channel_id,
@@ -250,8 +275,8 @@ async function startScheduling() {
     onceEverySunday.hour = 10;
     onceEverySunday.minute = 30;
     console.log('scheduling posts to every public channel the bot is a member of on dayOfWeek', onceEverySunday.dayOfWeek, 'at hour', onceEverySunday.hour, onceEverySunday.tz);
-    const job = schedule.scheduleJob(onceEverySunday, () => {
-        weekdays = dfunc.listNextWeek(DateTime.now());
+    schedule.scheduleJob(onceEverySunday, () => {
+        const weekdays = dfunc.listNextWeek(DateTime.now());
         getMemberChannelIds().then((result) => result.forEach((id) => {
             postMessage(id, weekdays[0])
                 .then(() => postMessage(id, weekdays[1]))
@@ -259,36 +284,6 @@ async function startScheduling() {
                 .then(() => postMessage(id, weekdays[3]))
                 .then(() => postMessage(id, weekdays[4]));
         }));
-    });
-}
-
-/**
- * Returns a list of all the channels the bot is a member of.
- */
-async function getMemberChannelIds() {
-    return (await app.client.conversations.list()).channels
-        .filter((c) => c.is_member)
-        .map((c) => c.id);
-}
-
-/**
- * Posts a message to the given channel.
- */
-async function postMessage(channelId, text) {
-    await app.client.chat.postMessage({
-        channel: channelId,
-        text,
-    });
-}
-
-/**
- * Posts an ephemeral message to the given user at the given channel.
- */
-async function postEphemeralMessage(channelId, userId, text) {
-    await app.client.chat.postEphemeral({
-        channel: channelId,
-        user: userId,
-        text,
     });
 }
 
@@ -302,7 +297,8 @@ async function postEphemeralMessage(channelId, userId, text) {
 })();
 
 /**
- * Workaround for Node 14.x not crashing if our WebSocket disconnects and Bolt doesn't reconnect nicely.
+ * Workaround for Node 14.x not crashing if our WebSocket disconnects
+ * and Bolt doesn't reconnect nicely.
  * See https://github.com/slackapi/node-slack-sdk/issues/1243.
  * We could specify node 16.x in our Dockerfile which would make that a crashing error.
 */
