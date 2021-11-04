@@ -289,25 +289,6 @@ async function startScheduling() {
 }
 
 /**
- * Returns a list of all the channels the bot is a member of.
- */
-async function getMemberChannelIds() {
-  return (await app.client.conversations.list()).channels
-    .filter(c => c.is_member)
-    .map(c => c.id)
-}
-
-/**
- * Posts a message to the given channel.
- */
-async function postMessage(channelId, text) {
-  await app.client.chat.postMessage({
-    channel: channelId,
-    text: text
-  })
-}
-
-/**
  * Starts the bot.
  */
 (async () => {
