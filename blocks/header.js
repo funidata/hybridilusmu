@@ -1,13 +1,11 @@
-const header = (text) => {
-  return(
-    {
-      type: "header",
-      text: {
-          type: "plain_text",
-          text: text
-        }
-    }
-  )
-}
+const header = (text) => (
+  {
+    type: 'header',
+    text: {
+      type: 'plain_text',
+      text,
+    },
+  }
+);
 
-module.exports = { header }
+module.exports = { header };
