@@ -21,16 +21,16 @@ const checkStr = (str) => {
  * Checks the given environment variables for unruly characters.
  *
  * @param {Array.<string>} varsToCheck The environment variables we're to check for problems
- * @returns {Object.<string, Array.<string>>} An object like { bad: ['FOO', 'BAR'], missing: ['ZOT'] }
+ * @returns {Object.<string, Array.<string>>} An object like { bad: ['FO', 'BA'], missing: ['ZO'] }
  */
 const checkEnvSilent = (varsToCheck) => {
     const bad = [];
     const missing = [];
-    for (let i = 0; i < varsToCheck.length; ++i) {
+    for (let i = 0; i < varsToCheck.length; i += 1) {
         const chk = process.env[varsToCheck[i]];
         if (!chk) {
             missing.push(varsToCheck[i]);
-            continue;
+            continue; // eslint-disable-line
         }
         if (!checkStr(chk)) {
             bad.push(varsToCheck[i]);
@@ -49,7 +49,7 @@ const checkEnvSilent = (varsToCheck) => {
 const checkEnv = (varsToCheck) => {
     const logAffected = (arr) => {
         console.log('  Affected environment variables:');
-        arr.forEach((v, k, a) => {
+        arr.forEach((v) => {
             console.log(`    ${v}`);
         });
     };
