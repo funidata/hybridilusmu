@@ -90,9 +90,9 @@ const userIsRemote = async (userId, date) => userAtOffice(userId, date, false);
  * @param {string} userId - Slack user ID.
  * @param {string} weekday - Weekday as in "Maanantai".
  */
-const userIsRemoteByDefault = async (userId, weekday) => {
-    userAtOfficeByDefault(userId, weekday, false);
-};
+const userIsRemoteByDefault = async (userId, weekday) => (
+    userAtOfficeByDefault(userId, weekday, false)
+);
 
 module.exports = {
     changeRegistration,
