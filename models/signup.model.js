@@ -1,5 +1,3 @@
-const { sequelize, Sequelize } = require('../database');
-
 module.exports = (sequelize, Sequelize) => {
     const Signups = sequelize.define('Signups', {
         office_date: {
