@@ -19,6 +19,13 @@ const db = require('./database');
 const controller = require('./controllers/db.controllers');
 const { DateTime } = require("luxon");
 
+/**
+ * An optional prefix for our slash-commands. When set to e.g. 'h', '/listaa' becomes '/hlistaa'.
+ * This requires manual command configuration on the Slack side of things, as in you must alter
+ * the manifest for all the commands we have.
+ */
+const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX : ''
+
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -83,43 +90,40 @@ app.action('default_remote_click', async ({ body, ack, client }) => {
 
 
 /**
- * Prints the Slack user ID of a user that reacts to a message on any channel, where the bot is.
- * Works also in private messages.
- */
-app.event('reaction_added', async ({ event, client }) => {
-  console.log(`User <${event.user}> reacted`)
-});
-
-/**
  * Updates the App-Home page for the specified user when they click on the Home tab.
  */
 app.event('app_home_opened', async ({ event, client }) => {
   home.update(client, event.user);
 });
 
+
+//SLASH-COMMANDS
+
+
 /**
- * Listens to a command in private messages and prints a list of people at the office on the given day.
+ * Listens to a slash-command and prints a list of people at the office on the given day.
  */
-app.event('message', async({ event, say }) => {
-  if (event.channel_type === "im" && event.text !== undefined) {
-    const date = dfunc.parseDate(event.text, DateTime.now())
-    if (dfunc.isWeekday(date)) {
+app.command("/" + COMMAND_PREFIX + "listaa", async ({ command, ack, client }) => {
+  try {
+    await ack();
+    let parameter = command.text //Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen
+    const date = dfunc.parseDate(parameter, DateTime.now())
+    if (date.isValid) {
       const registrations = await service.getRegistrationsFor(date.toISODate())
-      let response = ""
-      if (registrations.length === 0) {
-          response = "Kukaan ei ole toimistolla " + dfunc.weekdays[date.weekday - 1].toLowerCase() + "na " + date.day + "." + date.month + "."
-      } else {
-        response = dfunc.weekdays[date.weekday - 1] + "na " + date.day + "." + date.month + ". toimistolla "
-        if (registrations.length === 1) response += "on:\n"
-        else response += "ovat:\n"
-        registrations.forEach((user) => {
-           response += `<@${user}>\n`
-        })
-      }
-      await say(response)
+      let response = dfunc.atWeekday(date) + " toimistolla "
+      if (registrations.length === 0) response = "Kukaan ei ole toimistolla " + dfunc.atWeekday(date).toLowerCase()
+      else if (registrations.length === 1) response += "on:\n"
+      else response += "ovat:\n"
+      registrations.forEach((user) => {
+        response += `<@${user}>\n`
+      })
+      postEphemeralMessage(command.channel_id, command.user_id, response)
     } else {
-      await say("Anteeksi, en ymmärtänyt äskeistä.")
+      postEphemeralMessage(command.channel_id, command.user_id, "Anteeksi, en ymmärtänyt äskeistä.")
     }
+  } catch (error) {
+    console.log("Tapahtui virhe :(")
+    console.log(error)
   }
 });
 
@@ -165,7 +169,7 @@ async function getCachedUser(userId) {
     user: user.user,
     date: new Date().getTime()
   }
-  return user
+  return user.user
 }
 
 /**
@@ -176,7 +180,7 @@ async function getCachedUser(userId) {
 async function getUserRestriction(userId) {
   const user = await getCachedUser(userId)
   // if we don't have a successful api call, default to restriction
-  if (!user) {
+  if (!user || user.is_restricted === undefined) {
     return true
   }
   return user.is_restricted
@@ -187,19 +191,20 @@ async function getUserRestriction(userId) {
  * is a guest (restricted), and if so, stops further processing of the request, 
  * displaying an error message instead.
  */
-async function guestHandler({ payload, body, client, next, event }) {
+async function guestHandler({ payload, body, client, next, ack, event }) {
   // The user ID is found in many different places depending on the type of action taken
-  var userId // Undefined evaluates as false
+  let userId // Undefined evaluates as false
   if (!userId) try {userId = payload.user} catch (error) {} // tab
+  if (!userId) try {userId = payload.user_id} catch (error) {} // slash command
   if (!userId) try {userId = body.user.id} catch (error) {} // button
   if (!userId) try {userId = body.event.message.user} catch (error) {} // message edit
+  
   // Approve requests which don't include any of the above (couldn't find any)
   if (!userId) {
     console.log(`alert: guest check skipped!`)
     await next();
     return;
   }
-
   try {
     if (await getUserRestriction(userId)) {
       throw `User is restricted`;
@@ -207,13 +212,20 @@ async function guestHandler({ payload, body, client, next, event }) {
   } catch (error) {
     // This user is restricted. Show them an error message and don't continue processing the request
     if (error === 'User is restricted') {
-      if (event.channel_type === 'channel') { //Don't send the error message in this case
+      if (event !== undefined && (event.channel_type === 'channel' || event.channel_type === 'group')) { //Don't send the error message in this case
         return
       }
       const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`
-      if (payload.channel === undefined || payload.tab === 'home') {
-        home.error(client, userId, message); // Home tab requests show the message on the home tab
-      } else { // Otherwise send a private message
+      if (payload.command !== undefined) { // Responds to a slash-command with an ephemeral message.
+        await ack();
+        await client.chat.postEphemeral({
+          channel: payload.channel_id,
+          user: userId,
+          text: message
+        });
+      } else if (payload.channel === undefined || payload.tab === 'home') { // Shows an error message on the home tab.
+        home.error(client, userId, message);
+      } else { // Responds to a private message with an ephemeral message.
         await client.chat.postEphemeral({
           channel: payload.channel,
           user: userId,
@@ -272,6 +284,17 @@ async function postMessage(channelId, text) {
     channel: channelId,
     text: text
   })
+}
+
+/**
+ * Posts an ephemeral message to the given user at the given channel.
+ */
+async function postEphemeralMessage(channelId, userId, text) {
+  await app.client.chat.postEphemeral({
+    channel: channelId,
+    user: userId,
+    text: text
+  });
 }
 
 /**
