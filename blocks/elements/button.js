@@ -9,7 +9,7 @@ const button = (text, callback, value, style) => {
         value,
         action_id: callback,
     };
-    if (style === 'primary' || style === 'danger') { button.style = style; }
+    if (style === 'primary' || style === 'danger') { buttonElement.style = style; }
     return (buttonElement);
 };
 
