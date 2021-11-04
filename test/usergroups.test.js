@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const assert = require('assert');
 const usergroups = require('../usergroups');
 
@@ -198,7 +199,10 @@ describe('usergroups: Event based population', function () {
 
     it('created', () => {
         assert.equal(usergroups.processCreationEvent(createEventPayload), true);
-        assert.equal(usergroups._dumpState().usergroups.Skahvi.date_update, createEventPayload.subteam.date_update);
+        assert.equal(
+            usergroups._dumpState().usergroups.Skahvi.date_update,
+            createEventPayload.subteam.date_update,
+        );
         assert.equal(usergroups.isUserInUsergroup('Umeklu', 'Skahvi'), true);
         assert.equal(usergroups.isUserInUsergroup('Umcafee', 'Skahvi'), false);
         assert.equal(usergroups.isUserInUsergroup('Ukernighan', 'Skahvi'), false);
@@ -208,7 +212,10 @@ describe('usergroups: Event based population', function () {
     it('updated', () => {
         assert.equal(usergroups.processCreationEvent(createEventPayload), true);
         assert.equal(usergroups.processUpdateEvent(updateEventPayload), true);
-        assert.equal(usergroups._dumpState().usergroups.Skahvi.date_update, updateEventPayload.subteam.date_update);
+        assert.equal(
+            usergroups._dumpState().usergroups.Skahvi.date_update,
+            updateEventPayload.subteam.date_update,
+        );
         assert.equal(usergroups.isUserInUsergroup('Umeklu', 'Skahvi'), true);
         assert.equal(usergroups.isUserInUsergroup('Umcafee', 'Skahvi'), true);
         assert.equal(usergroups.isUserInUsergroup('Ukernighan', 'Skahvi'), false);
@@ -219,7 +226,10 @@ describe('usergroups: Event based population', function () {
         assert.equal(usergroups.processCreationEvent(createEventPayload), true);
         assert.equal(usergroups.processUpdateEvent(updateEventPayload), true);
         assert.equal(usergroups.processMembersChangedEvent(membersChangedEventPayload), true);
-        assert.equal(usergroups._dumpState().usergroups.Skahvi.date_update, membersChangedEventPayload.date_update);
+        assert.equal(
+            usergroups._dumpState().usergroups.Skahvi.date_update,
+            membersChangedEventPayload.date_update,
+        );
         assert.equal(usergroups.isUserInUsergroup('Umeklu', 'Skahvi'), true);
         assert.equal(usergroups.isUserInUsergroup('Umcafee', 'Skahvi'), false);
         assert.equal(usergroups.isUserInUsergroup('Ukernighan', 'Skahvi'), true);
