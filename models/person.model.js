@@ -1,5 +1,3 @@
-const { sequelize, Sequelize } = require('../database');
-
 module.exports = (sequelize, Sequelize) => {
     const Person = sequelize.define('Person', {
         slack_id: {
