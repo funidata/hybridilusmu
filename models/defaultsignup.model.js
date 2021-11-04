@@ -1,5 +1,3 @@
-const { sequelize, Sequelize } = require('../database');
-
 module.exports = (sequelize, Sequelize) => {
     const Defaultsignup = sequelize.define('Defaultsignup', {
         weekday: {
