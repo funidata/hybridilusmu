@@ -119,16 +119,31 @@ app.event('app_home_opened', async ({ event, client }) => {
 app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
     try {
         await ack();
+        let error = false;
         // Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin
         // jälkeen
         const parameter = command.text;
         const args = parameter.replaceAll('\t', ' ').split(' ').filter((str) => str.trim().length > 0);
+        if (args.length === 0) {
+            args.push('tänään');
+        } else if (args.length === 1) {
+            if (usergroups.parseMentionString(args[0]) !== false) {
+                args.push('tänään');
+                args.reverse();
+            }
+        } else if (args.length === 2) {
+            if (usergroups.parseMentionString(args[0]) !== false) {
+                args.reverse();
+            }
+        } else {
+            error = true;
+        }
         const date = dfunc.parseDate(args[0], DateTime.now());
         const usergroupId = args.length === 2 ? usergroups.parseMentionString(args[1]) : false;
         const usergroupFilter = !usergroupId
             ? () => true
             : (uid) => usergroups.isUserInUsergroup(uid, usergroupId);
-        if (date.isValid) {
+        if (!error && date.isValid) {
             const registrations = (
                 await service.getRegistrationsFor(date.toISODate())
             ).filter(usergroupFilter);

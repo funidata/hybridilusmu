@@ -19,6 +19,7 @@
  *       handle: "kahvi",
  *       date_create: 1234567890,
  *       date_update: 1500000000,
+ *       date_delete: 0, // if a usergroup is 'disabled', this field is non-zero
  *       users: [
  *         "UFFFFFF",
  *         "U111111"
