@@ -131,12 +131,11 @@ app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
                 args.push('tänään');
                 args.reverse();
             }
-        } else if (args.length === 2) {
-            if (usergroups.parseMentionString(args[0]) !== false) {
-                args.reverse();
-            }
-        } else {
+        } else if (args.length > 2) {
             error = true;
+        }
+        if (args.length === 2 && usergroups.parseMentionString(args[0]) !== false) {
+            args.reverse();
         }
         const date = dfunc.parseDate(args[0], DateTime.now());
         const usergroupId = args.length === 2 ? usergroups.parseMentionString(args[1]) : null;
