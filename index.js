@@ -139,7 +139,10 @@ app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
             error = true;
         }
         const date = dfunc.parseDate(args[0], DateTime.now());
-        const usergroupId = args.length === 2 ? usergroups.parseMentionString(args[1]) : false;
+        const usergroupId = args.length === 2 ? usergroups.parseMentionString(args[1]) : null;
+        if (usergroupId === false) {
+            error = true;
+        }
         const usergroupFilter = !usergroupId
             ? () => true
             : (uid) => usergroups.isUserInUsergroup(uid, usergroupId);
