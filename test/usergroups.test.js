@@ -113,6 +113,11 @@ const usergroupsListPayload = {
     ],
 };
 
+const usergroupsListFailedPayload = {
+    ok: false,
+    error: 'plan_upgrade_required',
+};
+
 const usergroupsListWithUsersPayload = {
     ok: true,
     usergroups: [
@@ -147,6 +152,38 @@ const usergroupsListWithUsersPayload = {
     ],
 };
 
+const usergroupsListWithUsersPayloadAlt = {
+    ok: true,
+    usergroups: [
+        {
+            id: 'Spannu',
+            team_id: 'Tdevausnurkka',
+            is_usergroup: true,
+            name: 'Pannunkantajat',
+            description: 'Kahvipannun varjelijat',
+            handle: 'pannu',
+            is_external: false,
+            date_create: 1635595867,
+            date_update: 1635595867,
+            date_delete: 0,
+            auto_type: 'admin',
+            created_by: 'Umeklu',
+            updated_by: 'Umeklu',
+            deleted_by: null,
+            prefs: {
+                channels: [
+                    'Ckahvinkeitin',
+                ],
+                groups: [],
+            },
+            users: [
+                'Umeklu',
+            ],
+            user_count: 1,
+        },
+    ],
+};
+
 const usergroupsUsersListPayload = {
     ok: true,
     users: [
@@ -156,9 +193,46 @@ const usergroupsUsersListPayload = {
     ],
 };
 
+const usergroupsUsersListFailedPayload = {
+    ok: false,
+    error: 'no_such_subteam',
+};
+
+describe('usergroups: Plumbing', function () {
+    this.beforeEach(() => {
+        usergroups._clearData();
+    });
+
+    it('no channels for unknown usergroup', () => {
+        assert.equal(usergroups.getChannelsForUsergroup('Solematon').length, 0);
+    });
+
+    it('no users for unknown usergroup', () => {
+        assert.equal(usergroups.getUsersForUsergroup('Solematon').length, 0);
+    });
+
+    it('no usergroups for unknown user', () => {
+        assert.equal(usergroups.getUsergroupsForUser('Uolematon').length, 0);
+    });
+});
+
 describe('usergroups: Populate from API call', function () {
     this.beforeEach(() => {
         usergroups._clearData();
+    });
+
+    it('failed usergroups.list works as expected', () => {
+        assert.equal(
+            usergroups.insertUsergroupsFromAPIListResponse(usergroupsListFailedPayload),
+            false,
+        );
+    });
+
+    it('failed usergroups.users.list works as expected', () => {
+        assert.equal(
+            usergroups.insertUsergroupUsersFromAPIListResponse(usergroupsUsersListFailedPayload),
+            false,
+        );
     });
 
     it('usergroups.list with users included', () => {
@@ -170,6 +244,25 @@ describe('usergroups: Populate from API call', function () {
         assert.equal(usergroups.isUserInUsergroup('Umcafee', 'Skahvi'), false);
         assert.equal(usergroups.isUserInUsergroup('Ukernighan', 'Skahvi'), true);
         assert.equal(usergroups.isUserInUsergroup('Uritchie', 'Skahvi'), true);
+        assert.equal(usergroups.getChannelsForUsergroup('Skahvi').length, 1);
+        assert.equal(usergroups.getChannelsForUsergroup('Skahvi')[0], 'Ckahvinkeitin');
+    });
+
+    it('usergroups.list with users included, where group disappears', () => {
+        assert.equal(
+            usergroups.insertUsergroupsFromAPIListResponse(usergroupsListWithUsersPayload),
+            true,
+        );
+        assert.equal(usergroups.getUsergroupsForUser('Umeklu').length, 1);
+        assert.equal(usergroups.getUsergroupsForUser('Umeklu')[0], 'Skahvi');
+        assert.equal(
+            usergroups.insertUsergroupsFromAPIListResponse(usergroupsListWithUsersPayloadAlt),
+            true,
+        );
+        assert.equal(usergroups.getUsergroupsForUser('Umeklu').length, 1);
+        assert.equal(usergroups.getUsergroupsForUser('Umeklu')[0], 'Spannu');
+        assert.equal(usergroups.getUsersForUsergroup('Spannu').length, 1);
+        assert.equal(usergroups.getUsersForUsergroup('Spannu')[0], 'Umeklu');
     });
 
     it('usergroups.list without providing users is falsy', () => {
@@ -222,6 +315,25 @@ describe('usergroups: Event based population', function () {
         assert.equal(usergroups.isUserInUsergroup('Uritchie', 'Skahvi'), false);
     });
 
+    it('updated: stale data not used', () => {
+        assert.equal(usergroups.processCreationEvent(createEventPayload), true);
+        assert.equal(usergroups.processUpdateEvent(updateEventPayload), true);
+        assert.equal(usergroups.processUpdateEvent({
+            ...updateEventPayload,
+            subteam: {
+                ...updateEventPayload.subteam,
+                date_update: updateEventPayload.subteam.date_update - 1,
+                users: [],
+                user_count: 0,
+            },
+        }), false);
+        assert.equal(
+            usergroups._dumpState().usergroups.Skahvi.date_update,
+            updateEventPayload.subteam.date_update,
+        );
+        assert.notEqual(usergroups.getUsersForUsergroup('Skahvi').length, 0);
+    });
+
     it('members_changed', () => {
         assert.equal(usergroups.processCreationEvent(createEventPayload), true);
         assert.equal(usergroups.processUpdateEvent(updateEventPayload), true);
@@ -235,6 +347,36 @@ describe('usergroups: Event based population', function () {
         assert.equal(usergroups.isUserInUsergroup('Ukernighan', 'Skahvi'), true);
         assert.equal(usergroups.isUserInUsergroup('Uritchie', 'Skahvi'), true);
     });
+
+    it('members_changed: event for unknown usergroup not processed', () => {
+        assert.equal(usergroups.processMembersChangedEvent({
+            ...membersChangedEventPayload,
+            subteam_id: 'Solematon',
+        }), false);
+    });
+
+    it('members_changed: event with mismatched update time not processed', () => {
+        assert.equal(usergroups.processCreationEvent(createEventPayload), true);
+        assert.equal(usergroups.processUpdateEvent(updateEventPayload), true);
+        assert.equal(usergroups.processMembersChangedEvent({
+            ...membersChangedEventPayload,
+            date_previous_update: membersChangedEventPayload.date_previous_update - 1,
+        }), false);
+        assert.equal(
+            usergroups._dumpState().usergroups.Skahvi.date_update,
+            updateEventPayload.subteam.date_update,
+        );
+        assert.equal(usergroups.isUserInUsergroup('Umeklu', 'Skahvi'), true);
+        assert.equal(usergroups.isUserInUsergroup('Umcafee', 'Skahvi'), true);
+        assert.equal(usergroups.isUserInUsergroup('Ukernighan', 'Skahvi'), false);
+        assert.equal(usergroups.isUserInUsergroup('Uritchie', 'Skahvi'), false);
+    });
+
+    it('wrong event types are not processed', () => {
+        assert.equal(usergroups.processCreationEvent(updateEventPayload), false);
+        assert.equal(usergroups.processUpdateEvent(membersChangedEventPayload), false);
+        assert.equal(usergroups.processMembersChangedEvent(createEventPayload), false);
+    });
 });
 
 describe('usergroups: String generation', () => {
@@ -247,7 +389,11 @@ describe('usergroups: String generation', () => {
         assert.equal(usergroups.generateMentionString('Skahvi'), '<!subteam^Skahvi|@kahvi>');
     });
 
-    it('plain text descriptor string', () => {
+    it('plain text descriptor string for unknown usergroup', () => {
+        assert.equal(usergroups.generatePlaintextString('Solematon'), '');
+    });
+
+    it('plain text descriptor string for known usergroup', () => {
         usergroups.processCreationEvent(createEventPayload);
         assert.equal(usergroups.generatePlaintextString('Skahvi'), 'Kahvinkittaajat (@kahvi)');
         usergroups._clearData();

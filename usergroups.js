@@ -217,13 +217,16 @@ const insertUsergroup = (usergroup) => {
             users: usergroups[usergroup.id].users,
             users_lkup: usergroups[usergroup.id].users_lkup,
             user_count: usergroups[usergroup.id].user_count,
-            _dirty_date: usergroups[usergroup.id].date_update,
         };
     }
     usergroups[usergroup.id] = usergroup;
     if (!usergroup.users && usergroup.user_count > 0) {
-        usergroup._dirty = true;
-        usergroups[usergroup.id] = { ...usergroup, ...oldState };
+        usergroups[usergroup.id] = {
+            ...usergroup,
+            ...oldState,
+            _dirty: true,
+            _dirty_date: usergroups[usergroup.id].date_update,
+        };
         return false;
     }
     return insertUsersForUsergroup(usergroup);
@@ -240,8 +243,18 @@ const insertUsergroupsFromAPIListResponse = (response) => {
         return false;
     }
     let result = true;
+    const oldGroupsToRemove = {};
+    Object.keys(usergroups).forEach((id) => {
+        oldGroupsToRemove[id] = true;
+    });
     response.usergroups.forEach((u) => {
         result = result && insertUsergroup(u);
+        if (u && u.id) {
+            delete oldGroupsToRemove[u.id];
+        }
+    });
+    Object.keys(oldGroupsToRemove).forEach((id) => {
+        dropSlackUsergroup(id);
     });
     return result;
 };
@@ -316,7 +329,13 @@ const processUpdateEvent = (response) => {
     if (!response || response.type !== 'subteam_updated') {
         return false;
     }
-    return insertUsergroup(response.subteam);
+    const newUg = response.subteam;
+    const oldUg = usergroups[newUg.id];
+    if (oldUg && newUg.date_update < oldUg.date_update) {
+        console.log(`subteam_updated: data is older than pre-existing data for usergroup ${newUg.id}, ignoring event`);
+        return false;
+    }
+    return insertUsergroup(newUg);
 };
 
 const processMembersChangedEvent = (response) => {
