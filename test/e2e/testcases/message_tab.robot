@@ -6,8 +6,8 @@ Library    ../resources/HelpFunc.py
 *** Variables ***
 ${LOGIN URL}    https://dev-hytuslain.slack.com
 ${BROWSER}    Chrome
-${EMAIL}    lindajokinenthai@gmail.com
-${PASSWORD}    testisalasana123
+${EMAIL}    ***
+${PASSWORD}    ***
 
 *** Test Cases ***
 
