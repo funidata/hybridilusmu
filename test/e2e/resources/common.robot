@@ -4,8 +4,8 @@ Library    Selenium2Library
 *** Variables ***
 ${LOGIN URL}    https://dev-hytuslain.slack.com
 ${BROWSER}    Chrome
-${EMAIL}    lindajokinenthai@gmail.com
-${PASSWORD}    testisalasana123
+${EMAIL}    ***
+${PASSWORD}    ***
 
 *** Keywords ***
 Open Slack In Browser And Login
