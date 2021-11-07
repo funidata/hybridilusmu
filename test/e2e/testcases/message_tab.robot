@@ -32,14 +32,27 @@ Can Go To Message Tab
     Wait Until Element Is Visible    //button[@data-qa='messages']
     Click Element    //button[@data-qa='messages']
     Wait Until Element Is Visible    //div[@data-qa='message_input']/div
- ##   Click Element    //div[@data-qa='message_input']/div
-    Input Text    //div[@data-qa='message_input']/div    /lindalistaa su
+
+List Saturday Command Gives Correct Respond
+    Input Text    //div[@data-qa='message_input']/div    /lindalistaa la
     Click Element    //button[@data-qa='texty_send_button']
-    Sleep    3s
+    Sleep    2s
     Click Element    //button[@class='c-button-unstyled p-message_pane__unread_banner__msg']
     Sleep    2s
     Scroll Element Into View    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]
-    Element Should Contain    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]    Kukaan ei ole toimistolla sunnuntaina 7.11.
+    ${date}=    Get Date For Message Tab    la
+    Element Should Contain    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]    Kukaan ei ole toimistolla ${date}   
+
+List Sunday Command Gives Correct Respond
+    Input Text    //div[@data-qa='message_input']/div    /lindalistaa su
+    Click Element    //button[@data-qa='texty_send_button']
+    Sleep    2s
+    Click Element    //button[@class='c-button-unstyled p-message_pane__unread_banner__msg']
+    Sleep    2s
+    Scroll Element Into View    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]
+    ${date}=    Get Date For Message Tab    su
+    Element Should Contain    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]    Kukaan ei ole toimistolla ${date}
+
 
 *** Keywords ***
 Open Browser To Login Page
