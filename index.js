@@ -23,7 +23,7 @@ const home = require('./home');
  * This requires manual command configuration on the Slack side of things,
  * as in you must alter the manifest for all the commands we have.
  */
-const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX : 'linda';
+const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX : '';
 
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
