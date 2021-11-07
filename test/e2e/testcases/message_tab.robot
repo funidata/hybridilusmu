@@ -2,24 +2,14 @@
 Library    Selenium2Library
 Library    Screenshot
 Library    ../resources/HelpFunc.py
+Resource    ../resources/common.robot
+
+Suite Setup    common.Open Slack In Browser And Login
+Suite Teardown    common.Close Test Browser
 
 *** Variables ***
-${LOGIN URL}    https://dev-hytuslain.slack.com
-${BROWSER}    Chrome
-${EMAIL}    ***
-${PASSWORD}    ***
 
 *** Test Cases ***
-
-Valid Login
-    Open Browser To Login Page
-    Input Text    //input[@data-qa='login_email']    ${EMAIL}
-    Input Password    //input[@data-qa='login_password']    ${PASSWORD}
-    Click Element    //button[@data-qa='signin_button']
-    Sleep    2s
-    cancelPopup
-    Go To    ${LOGIN URL}
-
 Can Open Home Tab
     Sleep    1s
     Maximize Browser Window
@@ -52,8 +42,3 @@ List Sunday Command Gives Correct Respond
     Scroll Element Into View    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]
     ${date}=    Get Date For Message Tab    su
     Element Should Contain    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]    Kukaan ei ole toimistolla ${date}
-
-
-*** Keywords ***
-Open Browser To Login Page
-    Open Browser    ${LOGIN URL}    ${BROWSER}
