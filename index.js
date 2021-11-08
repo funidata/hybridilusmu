@@ -36,13 +36,13 @@ const app = new App({
  * Posts an ephemeral message to the given user at the given channel.
  */
 async function postEphemeralMessage(channelId, userId, message) {
-    //Tarkistetaan, onko sovellus kutsuttu kanavalle tai onko kyseessä yksityisviesti
-    const conversation = await app.client.conversations.info({ channel: channelId })
+    // Tarkistetaan, onko sovellus kutsuttu kanavalle tai onko kyseessä yksityisviesti
+    const conversation = await app.client.conversations.info({ channel: channelId });
     if (conversation.channel.is_member || conversation.channel.is_im) {
         await app.client.chat.postEphemeral({
             channel: channelId,
             user: userId,
-            text: message
+            text: message,
         });
     }
 }
@@ -53,7 +53,7 @@ async function postEphemeralMessage(channelId, userId, message) {
 async function postMessage(channelId, message) {
     await app.client.chat.postMessage({
         channel: channelId,
-        text: message
+        text: message,
     });
 }
 
@@ -239,11 +239,11 @@ async function guestHandler({ payload, body, client, next, ack, event }) {
             const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`;
             if (payload.command !== undefined) { // Responds to a slash-command
                 await ack();
-                postEphemeralMessage(payload.channel_id, userId, message)
+                postEphemeralMessage(payload.channel_id, userId, message);
             } else if (payload.channel === undefined || payload.tab === 'home') { // Shows an error message on the home tab.
                 home.error(client, userId, message);
             } else { // Responds to a private message with an ephemeral message.
-                postEphemeralMessage(payload.channel, userId, message)
+                postEphemeralMessage(payload.channel, userId, message);
             }
             return;
         }
@@ -262,25 +262,25 @@ app.use(guestHandler);
  * Sends a scheduled message every Sunday to all the channels the bot is in.
  */
 async function startScheduling() {
-  const rule = new schedule.RecurrenceRule();
-  rule.tz = 'Etc/UTC';
-  rule.dayOfWeek = [1, 2, 3, 4, 5];
-  rule.hour = 4;
-  rule.minute = 0;
-  console.log("Scheduling posts to every public channel the bot is a member of every weekday at hour", rule.hour, rule.tz)
-  const job = schedule.scheduleJob(rule, async () => {
-    const registrations = await service.getRegistrationsFor(DateTime.now().toISODate())
-    let dailyMessage = ""
-    if (registrations.length === 0) dailyMessage = "Kukaan ei ole tänään toimistolla."
-    else if (registrations.length === 1) dailyMessage = "Tänään toimistolla on:\n"
-    else dailyMessage = "Tänään toimistolla ovat:\n"
-    registrations.forEach((user) => {
-      dailyMessage += `<@${user}>\n`
-    })
-    getMemberChannelIds().then((result) => result.forEach(id => {
-      postMessage(id, dailyMessage)
-    }))
-  });
+    const rule = new schedule.RecurrenceRule();
+    rule.tz = 'Etc/UTC';
+    rule.dayOfWeek = [1, 2, 3, 4, 5];
+    rule.hour = 4;
+    rule.minute = 0;
+    console.log('Scheduling posts to every public channel the bot is a member of every weekday at hour', rule.hour, rule.tz);
+    const job = schedule.scheduleJob(rule, async () => {
+        const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
+        let dailyMessage = '';
+        if (registrations.length === 0) dailyMessage = 'Kukaan ei ole tänään toimistolla.';
+        else if (registrations.length === 1) dailyMessage = 'Tänään toimistolla on:\n';
+        else dailyMessage = 'Tänään toimistolla ovat:\n';
+        registrations.forEach((user) => {
+            dailyMessage += `<@${user}>\n`;
+        });
+        getMemberChannelIds().then((result) => result.forEach((id) => {
+            postMessage(id, dailyMessage);
+        }));
+    });
 }
 
 /**
