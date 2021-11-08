@@ -313,6 +313,7 @@ const insertUsergroup = (usergroup) => {
                 channels: usergroups[normalisedUsergroup.id].prefs.channels,
             },
             channels_lkup: usergroups[normalisedUsergroup.id].channels_lkup,
+            date_update: usergroups[normalisedUsergroup.id].date_update,
         };
     }
     usergroups[normalisedUsergroup.id] = normalisedUsergroup;
@@ -331,14 +332,14 @@ const insertUsergroup = (usergroup) => {
         Object.keys(oldState.users_lkup).forEach((slack_user_id) => {
             dropSlackUserFromUsergroup(slack_user_id, normalisedUsergroup.id);
         });
-    } else if (!normalisedUsergroup && normalisedUsergroup.user_count > 0) {
+    } else if (!normalisedUsergroup.users && normalisedUsergroup.user_count > 0) {
         usergroups[normalisedUsergroup.id] = {
             ...normalisedUsergroup,
             users: oldState.users,
             users_lkup: oldState.users_lkup,
             user_count: oldState.user_count,
             _dirty: true,
-            _dirty_date: usergroups[normalisedUsergroup.id].date_update,
+            _dirty_date: oldState.date_update,
         };
         return false;
     }

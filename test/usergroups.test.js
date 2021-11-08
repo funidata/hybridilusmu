@@ -358,6 +358,27 @@ describe('usergroups: Event based population', function () {
         assert.equal(usergroups.getUsergroupsForChannel('Ckahvinkeitin').length, 0);
     });
 
+    it('updated: not listing users causes dirtiness', () => {
+        const userlessUpdate = {
+            ...updateEventPayload,
+            subteam: {
+                ...updateEventPayload.subteam,
+            },
+        };
+        delete userlessUpdate.subteam.users;
+        assert.equal(usergroups.processCreationEvent(createEventPayload), true);
+        assert.equal(usergroups.processUpdateEvent(userlessUpdate), false);
+        assert.equal(
+            usergroups._dumpState().usergroups.Skahvi.date_update,
+            userlessUpdate.subteam.date_update,
+        );
+        assert.equal(
+            usergroups._dumpState().usergroups.Skahvi._dirty_date,
+            createEventPayload.subteam.date_update,
+        );
+        assert.equal(usergroups.isDirty('Skahvi'), true);
+    });
+
     it('members_changed', () => {
         assert.equal(usergroups.processCreationEvent(createEventPayload), true);
         assert.equal(usergroups.processUpdateEvent(updateEventPayload), true);

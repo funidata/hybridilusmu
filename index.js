@@ -396,7 +396,7 @@ async function startScheduling() {
     rule.dayOfWeek = [1, 2, 3, 4, 5];
     rule.hour = 4;
     rule.minute = 0;
-    console.log('Scheduling posts to every public channel the bot is a member of every weekday at hour', rule.hour, rule.tz);
+    console.log(`Scheduling posts to every public channel the we're a member of, every weekday at hour ${rule.hour}h ${rule.minute}m (${rule.tz})`);
     const job = schedule.scheduleJob(rule, async () => {
         const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
         const channels = await getMemberChannelIds();
