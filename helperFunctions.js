@@ -1,4 +1,3 @@
-
 /**
 * Returns a list of all the channels the bot is a member of.
 */
@@ -35,6 +34,6 @@ async function postMessage(app, channelId, message) {
 
 module.exports = {
     getMemberChannelIds,
-    postEphemeralMessage, 
-    postMessage
+    postEphemeralMessage,
+    postMessage,
 };

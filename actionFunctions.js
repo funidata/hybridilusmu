@@ -2,7 +2,6 @@ const home = require('./home');
 const service = require('./databaseService');
 
 exports.enableActionFunctions = function (app) {
-    
     /**
     * Updates the App-Home page for the specified user.
     */
@@ -10,9 +9,9 @@ exports.enableActionFunctions = function (app) {
         home.update(client, body.user.id);
         await ack();
     });
-    
+
     /**
-    * Registers the user as present at the office for the selected day and updates the App-Home page.
+    * Registers the user as present at the office for the selected day and updates App-Home page.
     */
     app.action('office_click', async ({ body, ack, client }) => {
         const data = JSON.parse(body.actions[0].value);
@@ -54,5 +53,4 @@ exports.enableActionFunctions = function (app) {
         home.update(client, body.user.id);
         await ack();
     });
-    
 };

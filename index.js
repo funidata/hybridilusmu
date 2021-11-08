@@ -12,7 +12,6 @@ require('./quotenv').checkEnv([
 ]);
 const { App } = require('@slack/bolt');
 const scheduler = require('./scheduleMessage');
-
 const { enableActionFunctions } = require('./actionFunctions');
 const { enableEventListeners } = require('./eventListeners');
 const { enableMiddleware } = require('./middleware');
@@ -40,8 +39,7 @@ enableSlashCommands(app);
 })();
 
 /**
- * Workaround for Node 14.x not crashing if our WebSocket disconnects
- * and Bolt doesn't reconnect nicely.
+ * Workaround so Node 14.x doesn't crash if our WebSocket disconnects and Bolt doesn't reconnect.
  * See https://github.com/slackapi/node-slack-sdk/issues/1243.
  * We could specify node 16.x in our Dockerfile which would make that a crashing error.
  */

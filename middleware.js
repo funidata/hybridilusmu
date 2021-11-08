@@ -2,7 +2,6 @@ const helper = require('./helperFunctions');
 const home = require('./home');
 
 exports.enableMiddleware = function (app) {
-    
     /**
     * Our user API object cache. Format is the following:
     * {
@@ -82,7 +81,7 @@ exports.enableMiddleware = function (app) {
                 throw new Error('User is restricted');
             }
         } catch (error) {
-        // This user is restricted. Show them an error message and don't continue processing the request
+        // This user is restricted. Show them an error message and stop processing the request
             if (error.message === 'User is restricted') {
                 if (event !== undefined && (event.channel_type === 'channel' || event.channel_type === 'group')) { // Don't send the error message in this case
                     return;
@@ -106,7 +105,6 @@ exports.enableMiddleware = function (app) {
         // after this one that throws will be caught by it.
         await next();
     }
-    
+
     app.use(guestHandler);
-    
 };

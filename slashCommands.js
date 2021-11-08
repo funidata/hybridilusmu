@@ -1,7 +1,8 @@
+const { DateTime } = require('luxon');
+
 const service = require('./databaseService');
 const dateFunctions = require('./dateFunctions');
 const helper = require('./helperFunctions');
-const { DateTime } = require('luxon');
 
 /**
  * An optional prefix for our slash-commands. When set to e.g. 'h',
@@ -12,7 +13,6 @@ const { DateTime } = require('luxon');
 const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX : '';
 
 exports.enableSlashCommands = function (app) {
-    
     /**
     * Listens to a slash-command and prints a list of people at the office on the given day.
     */
@@ -39,7 +39,6 @@ exports.enableSlashCommands = function (app) {
             console.log(error);
         }
     });
-    
+
     // Tänne tulisi sitten lisää slash-komentoja jatkoksi
-    
 };
