@@ -114,6 +114,41 @@ app.event('app_home_opened', async ({ event, client }) => {
 });
 
 /**
+ * Generates a listing message for a given date
+ * @param {string} date An ISO-8601 date string. If null:
+ *  - please provide data via fetchedRegistrations
+ *  - we'll also use a "today" string for rendering
+ * @param {string} slackUsergroupId A Slack usergroup id, if any.
+ * @param {*} fetchedRegistrations A ready set of registration data for perfomance reasons
+ * @return {string} A message ready to post
+ */
+const generateListMessage = async (date, slackUsergroupId = null, fetchedRegistrations = null) => {
+    const usergroupFilter = !slackUsergroupId
+        ? () => true
+        : (uid) => usergroups.isUserInUsergroup(uid, slackUsergroupId);
+    const registrations = fetchedRegistrations || (
+        await service.getRegistrationsFor(date)
+    ).filter(usergroupFilter);
+    const specifier = !slackUsergroupId
+        ? ''
+        : ` tiimistä ${usergroups.generateMentionString(slackUsergroupId)}`;
+    const predicate = registrations.length === 1 ? 'on' : 'ovat';
+    const dateInResponse = date
+        ? dfunc.atWeekday(DateTime.fromISO(date))
+        : 'Tänään';
+    let response = !slackUsergroupId
+        ? `${dateInResponse} toimistolla ${predicate}:`
+        : `${dateInResponse}${specifier} ${predicate} toimistolla:`;
+    if (registrations.length === 0) response = `Kukaan${specifier} ei ole toimistolla ${dateInResponse.toLowerCase()}`;
+    response += '\n';
+    registrations.forEach((user) => {
+        response += `<@${user}>\n`;
+    });
+    console.log(response);
+    return response;
+};
+
+/**
  * Listens to a slash-command and prints a list of people at the office on the given day.
  */
 app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
@@ -142,25 +177,8 @@ app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
         if (usergroupId === false) {
             error = true;
         }
-        const usergroupFilter = !usergroupId
-            ? () => true
-            : (uid) => usergroups.isUserInUsergroup(uid, usergroupId);
         if (!error && date.isValid) {
-            const registrations = (
-                await service.getRegistrationsFor(date.toISODate())
-            ).filter(usergroupFilter);
-            const specifier = !usergroupId
-                ? ''
-                : ` tiimistä ${usergroups.generateMentionString(usergroupId)}`;
-            const predicate = registrations.length === 1 ? 'on' : 'ovat';
-            let response = !usergroupId
-                ? `${dfunc.atWeekday(date)} toimistolla ${predicate}:`
-                : `${dfunc.atWeekday(date)}${specifier} ${predicate} toimistolla:`;
-            if (registrations.length === 0) response = `Kukaan${specifier} ei ole toimistolla ${dfunc.atWeekday(date).toLowerCase()}`;
-            response += '\n';
-            registrations.forEach((user) => {
-                response += `<@${user}>\n`;
-            });
+            const response = await generateListMessage(date.toISODate(), usergroupId);
             postEphemeralMessage(command.channel_id, command.user_id, response);
         } else {
             postEphemeralMessage(command.channel_id, command.user_id, 'Anteeksi, en ymmärtänyt äskeistä.');
@@ -382,16 +400,18 @@ async function startScheduling() {
     console.log('Scheduling posts to every public channel the bot is a member of every weekday at hour', rule.hour, rule.tz);
     const job = schedule.scheduleJob(rule, async () => {
         const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
-        let dailyMessage = '';
-        if (registrations.length === 0) dailyMessage = 'Kukaan ei ole tänään toimistolla.';
-        else if (registrations.length === 1) dailyMessage = 'Tänään toimistolla on:\n';
-        else dailyMessage = 'Tänään toimistolla ovat:\n';
-        registrations.forEach((user) => {
-            dailyMessage += `<@${user}>\n`;
+        const channels = await getMemberChannelIds();
+        usergroups.getUsergroupsForChannels(channels).forEach(async (obj) => {
+            if (obj.usergroup_ids.length === 0) {
+                const message = await generateListMessage(null, null, registrations);
+                postMessage(obj.channel_id, message);
+            } else {
+                obj.usergroup_ids.forEach(async (usergroupId) => {
+                    const message = await generateListMessage(null, usergroupId, registrations);
+                    postMessage(obj.channel_id, message);
+                });
+            }
         });
-        getMemberChannelIds().then((result) => result.forEach((id) => {
-            postMessage(id, dailyMessage);
-        }));
     });
 }
 

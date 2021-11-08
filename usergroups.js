@@ -42,6 +42,18 @@ let usergroups = {};
  */
 let usersLookup = {};
 
+/**
+  * A lookup table of channels.
+  * Format is roughly the following:
+  *   {
+  *     // channel is set as a default for two usergroups
+  *     "CFFFFFF": {"SFFFFFF": true, "S000000": true},
+  *     // channel is set as a default for one usergroup
+  *     "C111111": {"SFFFFFF": true}
+  *   }
+ */
+let channelsLookup = {};
+
 /** Leading part of mention string */
 const mentionLead = '<!subteam^';
 /** Ending part of mention string */
@@ -103,11 +115,13 @@ const generatePlaintextString = (slack_usergroup_id) => {
 const _clearData = () => {
     usergroups = {};
     usersLookup = {};
+    channelsLookup = {};
 };
 
 const _dumpState = () => ({
     usergroups,
     usersLookup,
+    channelsLookup,
 });
 
 const initSlackUser = (slack_user_id) => {
@@ -149,6 +163,9 @@ const initSlackUsergroup = (slack_usergroup_id) => {
     if (!usergroups[slack_usergroup_id].users_lkup) {
         usergroups[slack_usergroup_id].users_lkup = {};
     }
+    if (!usergroups[slack_usergroup_id].channels_lkup) {
+        usergroups[slack_usergroup_id].channels_lkup = {};
+    }
 };
 
 /**
@@ -173,6 +190,12 @@ const dropSlackUsergroup = (slack_usergroup_id) => {
         delete usersLookup[slack_user_id][slack_usergroup_id];
         if (Object.keys(usersLookup[slack_user_id]).length === 0) {
             dropSlackUser(slack_user_id);
+        }
+    });
+    Object.keys(channelsLookup).forEach((slack_channel_id) => {
+        delete channelsLookup[slack_channel_id][slack_usergroup_id];
+        if (Object.keys(channelsLookup[slack_channel_id]).length === 0) {
+            delete channelsLookup[slack_channel_id];
         }
     });
     delete usergroups[slack_usergroup_id];
@@ -206,24 +229,111 @@ const insertUsersForUsergroup = (usergroup) => {
     return true;
 };
 
+const initSlackChannel = (slack_channel_id) => {
+    if (!channelsLookup[slack_channel_id]) {
+        channelsLookup[slack_channel_id] = {};
+    }
+};
+
+const dropSlackChannelFromUsergroup = (slack_channel_id, slack_usergroup_id) => {
+    delete usergroups[slack_usergroup_id].channels_lkup[slack_channel_id];
+    delete channelsLookup[slack_channel_id][slack_usergroup_id];
+};
+
+const dropSlackChannel = (slack_channel_id) => {
+    Object.keys(channelsLookup[slack_channel_id]).forEach((slack_usergroup_id) => {
+        dropSlackChannelFromUsergroup(slack_channel_id, slack_usergroup_id);
+    });
+    delete channelsLookup[slack_channel_id];
+};
+
+const insertChannelForUsergroup = (slack_channel_id, slack_usergroup_id) => {
+    initSlackChannel(slack_channel_id);
+    initSlackUsergroup(slack_usergroup_id);
+    channelsLookup[slack_channel_id][slack_usergroup_id] = true;
+    usergroups[slack_usergroup_id].channels_lkup[slack_channel_id] = true;
+};
+
+const insertChannelsForUsergroup = (usergroup) => {
+    if (!usergroup || !usergroup.is_usergroup) {
+        return false;
+    }
+    if (!usergroup.prefs || !usergroup.prefs.channels) {
+        return false;
+    }
+    usergroup.prefs.channels.forEach((slack_channel_id) => {
+        insertChannelForUsergroup(slack_channel_id, usergroup.id);
+    });
+    return true;
+};
+
+const getUsergroupsForChannel = (slack_channel_id) => {
+    if (!channelsLookup[slack_channel_id]) {
+        return [];
+    }
+    return Object.keys(channelsLookup[slack_channel_id]);
+};
+
+/**
+ * Get the associated usergroups for a set of channels
+ * @param {Array.<string>} channel_ids The channels to look things up for
+ * @return {Array} An array of objects of roughly the following form
+ *   {
+ *     channel_id: 'C000000',
+ *     usergroup_ids: [
+ *       'S000',
+ *       'SFFF'
+ *     ]
+ *   }
+ */
+const getUsergroupsForChannels = (channel_ids) => channel_ids.map(
+    (slack_channel_id) => ({
+        channel_id: slack_channel_id,
+        usergroup_ids: getUsergroupsForChannel(slack_channel_id),
+    }),
+);
+
 const insertUsergroup = (usergroup) => {
     normaliseUsergroup(usergroup);
     if (!usergroup || !usergroup.is_usergroup) {
         return false;
     }
     let oldState = {};
-    if (usergroups[usergroup.id]) {
+    const extant = !!(usergroups[usergroup.id]);
+    if (extant) {
         oldState = {
+            // save a few fields for dirty stuff
             users: usergroups[usergroup.id].users,
             users_lkup: usergroups[usergroup.id].users_lkup,
             user_count: usergroups[usergroup.id].user_count,
+            // these we discard later, because channels are always passed in full
+            prefs: {
+                channels: usergroups[usergroup.id].prefs.channels,
+            },
+            channels_lkup: usergroups[usergroup.id].channels_lkup,
         };
     }
     usergroups[usergroup.id] = usergroup;
-    if (!usergroup.users && usergroup.user_count > 0) {
+    // generate usergroup.channels_lkup for the new usergroup object
+    insertChannelsForUsergroup(usergroup);
+    // drop the old channels that weren't in the new data, if any
+    if (extant && oldState.prefs && oldState.prefs.channels) {
+        oldState.prefs.channels.forEach((slack_channel_id) => {
+            if (!usergroup.channels_lkup[slack_channel_id]) {
+                dropSlackChannelFromUsergroup(slack_channel_id, usergroup.id);
+            }
+        });
+    }
+    if (extant && usergroup.users_count === 0) {
+        Object.keys(oldState.users_lkup).forEach((slack_user_id) => {
+            dropSlackUserFromUsergroup(slack_user_id, usergroup.id);
+        });
+    } else if (!usergroup.users && usergroup.user_count > 0) {
         usergroups[usergroup.id] = {
             ...usergroup,
-            ...oldState,
+            users: oldState.users,
+            users_lkup: oldState.users_lkup,
+            user_count: oldState.user_count,
             _dirty: true,
             _dirty_date: usergroups[usergroup.id].date_update,
         };
@@ -377,6 +487,8 @@ module.exports = {
     getUsergroupsForUser,
     getUsersForUsergroup,
     getChannelsForUsergroup,
+    getUsergroupsForChannel,
+    getUsergroupsForChannels,
     isUserInUsergroup,
     isDirty,
     // data manipulation functions
