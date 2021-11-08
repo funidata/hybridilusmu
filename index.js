@@ -36,21 +36,25 @@ const app = new App({
 /**
  * Posts an ephemeral message to the given user at the given channel.
  */
-async function postEphemeralMessage(channelId, userId, text) {
-    await app.client.chat.postEphemeral({
-        channel: channelId,
-        user: userId,
-        text,
-    });
+async function postEphemeralMessage(channelId, userId, message) {
+    // Tarkistetaan, onko sovellus kutsuttu kanavalle tai onko kyseessä yksityisviesti
+    const conversation = await app.client.conversations.info({ channel: channelId });
+    if (conversation.channel.is_member || conversation.channel.is_im) {
+        await app.client.chat.postEphemeral({
+            channel: channelId,
+            user: userId,
+            text: message,
+        });
+    }
 }
 
 /**
  * Posts a message to the given channel.
  */
-async function postMessage(channelId, text) {
+async function postMessage(channelId, message) {
     await app.client.chat.postMessage({
         channel: channelId,
-        text,
+        text: message,
     });
 }
 
@@ -263,11 +267,10 @@ async function guestHandler({
 }) {
     // The user ID is found in many different places depending on the type of action taken
     let userId; // Undefined evaluates as false
-    if (!userId) try { userId = payload.user; } catch (error) { } // tab
-    if (!userId) try { userId = payload.user_id; } catch (error) { } // slash command
-    if (!userId) try { userId = body.user.id; } catch (error) { } // button
-    if (!userId) try { userId = body.event.message.user; } catch (error) { } // message edit
-
+    if (!userId) try { userId = payload.user; } catch (error) {} // tab
+    if (!userId) try { userId = payload.user_id; } catch (error) {} // slash command
+    if (!userId) try { userId = body.user.id; } catch (error) {} // button
+    if (!userId) try { userId = body.event.message.user; } catch (error) {} // message edit
     // Approve requests which don't include any of the above (couldn't find any)
     if (!userId) {
         console.log('alert: guest check skipped!');
@@ -288,19 +291,11 @@ async function guestHandler({
             const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`;
             if (payload.command !== undefined) { // Responds to a slash-command
                 await ack();
-                await client.chat.postEphemeral({
-                    channel: payload.channel_id,
-                    user: userId,
-                    text: message,
-                });
+                postEphemeralMessage(payload.channel_id, userId, message);
             } else if (payload.channel === undefined || payload.tab === 'home') { // Shows an error message on the home tab.
                 home.error(client, userId, message);
             } else { // Responds to a private message with an ephemeral message.
-                await client.chat.postEphemeral({
-                    channel: payload.channel,
-                    user: userId,
-                    text: message,
-                });
+                postEphemeralMessage(payload.channel, userId, message);
             }
             return;
         }
