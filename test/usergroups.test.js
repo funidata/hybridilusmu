@@ -334,6 +334,30 @@ describe('usergroups: Event based population', function () {
         assert.notEqual(usergroups.getUsersForUsergroup('Skahvi').length, 0);
     });
 
+    it('updated: channel dropping drops channels', () => {
+        const channellessUpdate = {
+            ...updateEventPayload,
+            subteam: {
+                ...updateEventPayload.subteam,
+                date_previous_update: updateEventPayload.subteam.date_update,
+                date_update: updateEventPayload.subteam.date_update + 1,
+                prefs: {
+                    ...updateEventPayload.subteam.prefs,
+                    channels: [],
+                },
+            },
+        };
+        assert.equal(usergroups.processCreationEvent(createEventPayload), true);
+        assert.equal(usergroups.processUpdateEvent(updateEventPayload), true);
+        assert.equal(usergroups.processUpdateEvent(channellessUpdate), true);
+        assert.equal(
+            usergroups._dumpState().usergroups.Skahvi.date_update,
+            channellessUpdate.subteam.date_update,
+        );
+        assert.equal(usergroups.getChannelsForUsergroup('Skahvi').length, 0);
+        assert.equal(usergroups.getUsergroupsForChannel('Ckahvinkeitin').length, 0);
+    });
+
     it('members_changed', () => {
         assert.equal(usergroups.processCreationEvent(createEventPayload), true);
         assert.equal(usergroups.processUpdateEvent(updateEventPayload), true);
