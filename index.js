@@ -144,7 +144,6 @@ const generateListMessage = async (date, slackUsergroupId = null, fetchedRegistr
     registrations.forEach((user) => {
         response += `<@${user}>\n`;
     });
-    console.log(response);
     return response;
 };
 
