@@ -37,7 +37,10 @@ const getUpdateBlock = async () => {
     const updateBlock = [];
     updateBlock.push(
         plainText(`Tiedot päivitetty ${DateTime.now().setZone('Europe/Helsinki').setLocale('fi').toLocaleString(format)}`),
-        actions([button('Päivitä', 'update_click', 'updated')]),
+        actions([
+            button('Päivitä', 'update_click', 'updated'),
+            button('Asetukset', 'asetukset_click', 'updated'),
+        ]),
         divider(),
     );
     return updateBlock;
@@ -72,13 +75,25 @@ const getRegistrationsBlock = async (userId) => {
     return registrationsBlock;
 };
 
+const modalView = {
+    "type": "modal",
+    "external_id" : "default_modal",
+    "title": {
+        "type": "plain_text",
+        "text": "Asetukset"
+    },
+    "close": {
+        "type": "plain_text",
+        "text": "Sulje"
+    },
+};
+
 /**
  * Updates the App-Home page.
  */
 const update = async (client, userId) => {
     let blocks = [];
     blocks = blocks.concat(
-        await getDefaultSettingsBlock(userId),
         await getUpdateBlock(),
         await getRegistrationsBlock(userId),
     );
@@ -88,6 +103,24 @@ const update = async (client, userId) => {
             type: 'home',
             blocks,
         },
+    });
+};
+
+const openView = async (client, userId, triggerId) => {
+    const block = await getDefaultSettingsBlock(userId)
+    modalView["blocks"] = block;
+    const result = await client.views.open({
+      trigger_id: triggerId,
+      view: modalView
+    });
+};
+
+const updateView = async (client, userId) => {
+    const block = await getDefaultSettingsBlock(userId)
+    modalView["blocks"] = block;
+    const result = await client.views.update({
+      external_id: "default_modal",
+      view: modalView
     });
 };
 
@@ -101,4 +134,4 @@ const error = async (client, userId, message) => {
     });
 };
 
-module.exports = { update, error };
+module.exports = { update, error, getDefaultSettingsBlock, openView, updateView };

@@ -32,6 +32,7 @@ const app = new App({
     appToken: process.env.SLACK_APP_TOKEN,
 });
 
+
 /**
  * Posts an ephemeral message to the given user at the given channel.
  */
@@ -58,6 +59,14 @@ async function postMessage(channelId, text) {
  */
 app.action('update_click', async ({ body, ack, client }) => {
     home.update(client, body.user.id);
+    await ack();
+});
+
+/**
+ * Opens a modal view for the default settings
+ */
+app.action('asetukset_click', async ({ body, ack, client }) => {
+    home.openView(client, body.user.id, body.trigger_id)
     await ack();
 });
 
@@ -90,6 +99,7 @@ app.action('default_office_click', async ({ body, ack, client }) => {
     const data = JSON.parse(body.actions[0].value);
     await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultAtOffice);
     home.update(client, body.user.id);
+    home.updateView(client, body.user.id);
     await ack();
 });
 
@@ -99,9 +109,9 @@ app.action('default_office_click', async ({ body, ack, client }) => {
  */
 app.action('default_remote_click', async ({ body, ack, client }) => {
     const data = JSON.parse(body.actions[0].value);
-    await service.changeDefaultRegistration(body.user.id, data.weekday,
-        !data.defaultIsRemote, false);
+    await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultIsRemote, false);
     home.update(client, body.user.id);
+    home.updateView(client, body.user.id);
     await ack();
 });
 
