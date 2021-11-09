@@ -103,8 +103,7 @@ app.action('default_office_click', async ({ body, ack, client }) => {
  */
 app.action('default_remote_click', async ({ body, ack, client }) => {
     const data = JSON.parse(body.actions[0].value);
-    await service.changeDefaultRegistration(body.user.id, data.weekday,
-        !data.defaultIsRemote, false);
+    await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultIsRemote, false);
     home.update(client, body.user.id);
     await ack();
 });
@@ -119,36 +118,55 @@ app.event('app_home_opened', async ({ event, client }) => {
 /**
  * Listens to a slash-command and signs user up for given day.
  */
-app.command("/ilmo", async ({ command, ack }) => {
-  try {
-    await ack();
-    const userId = command.user_id
-    let parameters = command.text //Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen
-    const pieces = parameters.split(" ")
-    let response = "Anna parametrina päivä ja status."
-    if (pieces.length === 2) {
-      const dateString = pieces[0]
-      const status = pieces[1]
-      const date = dfunc.parseDate(dateString, DateTime.now())
-      if (dfunc.isWeekday(date) && (status === "toimisto" || status === "etä")) {
-        await service.changeRegistration(userId, date.toISODate(), true, status === "toimisto" ? true : false)
-        response = "Ilmoittautuminen onnistui - " + dfunc.atWeekday(date).toLowerCase()
-        if (status === "toimisto") {
-          response += " toimistolla."
-        } else {
-          response += " etänä."
-        }
-      } else if (dfunc.isWeekend(date)) {
-        response = "Et voi lisätä ilmoittautumista viikonlopulle."
-      } else if (!date.isValid) {
-        response = "Anna parametrina jokin päivä."
-      } else if (status !== "toimisto" && status !== "etä") response = "Anna statuksena joko \"toimisto\" tai \"etä\"."
+app.command(`/${COMMAND_PREFIX}poista`, async ({ command, ack }) => {
+    try {
+        await ack();
+        const userId = command.user_id;
+        const parameter = command.text; // Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen.
+        console.log(parameter);
+        const response = 'Et ole ilmoittautunut tälle päivälle.';
+        postEphemeralMessage(command.channel_id, userId, response);
+    } catch (error) {
+        console.log('Tapahtui virhe :(');
+        console.log(error);
     }
-    postEphemeralMessage(command.channel_id, userId, response)
-  } catch (error) {
-    console.log("Tapahtui virhe :(")
-    console.log(error)
-  }
+});
+
+/**
+ * Listens to a slash-command and signs user up for given day.
+ */
+app.command(`/${COMMAND_PREFIX}ilmoita`, async ({ command, ack }) => {
+    try {
+        await ack();
+        const userId = command.user_id;
+        const parameters = command.text; // Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen.
+        const pieces = parameters.split(' ');
+        let response = 'Anna parametrina päivä ja status.';
+        if (pieces.length === 2) {
+            const dateString = pieces[0];
+            const status = pieces[1];
+            const date = dfunc.parseDate(dateString, DateTime.now());
+            if (dfunc.isWeekday(date) && (status === 'toimisto' || status === 'etä')) {
+                await service.changeRegistration(userId, date.toISODate(), true, status === 'toimisto');
+                response = 'Ilmoittautuminen onnistui - ' + dfunc.atWeekday(date).toLowerCase();
+                if (status === 'toimisto') {
+                    response += ' toimistolla.';
+                } else {
+                    response += ' etänä.';
+                }
+            } else if (dfunc.isWeekend(date)) {
+                response = 'Et voi lisätä ilmoittautumista viikonlopulle.';
+            } else if (!date.isValid) {
+                response = 'Anna parametrina jokin päivä.';
+            } else if (status !== 'toimisto' && status !== 'etä') {
+                response = 'Anna statuksena joko "toimisto" tai "etä".';
+            }
+        }
+        postEphemeralMessage(command.channel_id, userId, response);
+    } catch (error) {
+        console.log('Tapahtui virhe :(');
+        console.log(error);
+    }
 });
 
 app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
@@ -167,7 +185,7 @@ app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
             });
             postEphemeralMessage(command.channel_id, command.user_id, response);
         } else {
-            postEphemeralMessage(command.channel_id, command.user_id, 'Anteeksi, en ymmärtänyt äskeistä.');
+            postEphemeralMessage(command.channel_id, command.user_id, 'Anna parametrina päivä.');
         }
     } catch (error) {
         console.log('Tapahtui virhe :(');
@@ -263,7 +281,7 @@ async function guestHandler({ payload, body, client, next, ack, event }) {
             throw new Error('User is restricted');
         }
     } catch (error) {
-    // This user is restricted. Show them an error message and don't continue processing the request
+        // This user is restricted. Show them an error message and don't continue processing the request
         if (error.message === 'User is restricted') {
             if (event !== undefined && (event.channel_type === 'channel' || event.channel_type === 'group')) { // Don't send the error message in this case
                 return;

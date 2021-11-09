@@ -99,14 +99,14 @@ const isTomorrow = (input) => {
 };
 
 const isWeekday = (date) => {
-  if (!date.isValid || date.weekday >= 6) return false
-  return true
-}
+    if (!date.isValid || date.weekday >= 6) return false;
+    return true;
+};
 
 const isWeekend = (date) => {
-  if (!date.isValid || date.weekday < 6) return false
-  return true
-}
+    if (!date.isValid || date.weekday < 6) return false;
+    return true;
+};
 
 /**
  * Checks if the string represents a weekday.
