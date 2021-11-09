@@ -1,6 +1,6 @@
-require('./timestampedLogger').replaceLoggers();
+require('./app_files/meta/timestampedLogger').replaceLoggers();
 require('dotenv').config();
-require('./quotenv').checkEnv([
+require('./app_files/meta/quotenv').checkEnv([
     'SLACK_BOT_TOKEN',
     'SLACK_APP_TOKEN',
     'SLACK_SIGNING_SECRET',
