@@ -1,67 +1,61 @@
-const db = require("../database");
 const assert = require('assert');
-const controller = require("../controllers/db.controllers");
-const { publicEncrypt, sign } = require("crypto");
+const db = require('../database');
+const controller = require('../controllers/db.controllers');
 
-describe('Default signups test', function() {
-
-    this.beforeAll(async function() {
+describe('Default signups test', function () { // eslint-disable-line
+    this.beforeAll(async () => {
         await db.sequelize.sync({ force: true });
     });
-            
 
-    it('create weekday default and assign to a user', async function() {
-        const person = await db.Person.create({
+    it('create weekday default and assign to a user', async () => {
+        await db.Person.create({
             id: 1,
             slack_id: 'XYZ',
-            real_name: 'Matti Meikalainen'
+            real_name: 'Matti Meikalainen',
         });
-        const su1 = await db.Defaultsignup.create({
+        await db.Defaultsignup.create({
             weekday: 'Maanantai',
             at_office: true,
-            PersonId: 1
+            PersonId: 1,
         });
         const p1 = await db.Person.findByPk(1, {
-            include: ["defaultsignups"]
+            include: ['defaultsignups'],
         });
         assert.equal(1, p1.defaultsignups.length);
     });
-    it('find all default users for a weekday', async function() {
-        const p2 = await db.Person.create({
+    it('find all default users for a weekday', async () => {
+        await db.Person.create({
             id: 2,
             slack_id: 'ZZZ',
-            real_name: 'Maija Mehilainen'
+            real_name: 'Maija Mehilainen',
         });
-        const su2 = await db.Defaultsignup.create({
+        await db.Defaultsignup.create({
             weekday: 'Maanantai',
             at_office: true,
-            PersonId: 2
+            PersonId: 2,
         });
 
         const persons = await controller.getAllOfficeDefaultSignupsForAWeekday('Maanantai');
-        
-        assert.equal(2, persons.length);
 
+        assert.equal(2, persons.length);
     });
-    it('addDefaultSignupForUser test', async function() {
-        const p2 = await db.Person.create({
+    it('addDefaultSignupForUser test', async () => {
+        await db.Person.create({
             id: 3,
             slack_id: 'ABC',
-            real_name: 'Tyyppi Tyyppinen'
+            real_name: 'Tyyppi Tyyppinen',
         });
         await controller.addDefaultSignupForUser('ABC', 'Tiistai', true);
         const person = await db.Person.findByPk(1, {
-            include: ["defaultsignups"]
+            include: ['defaultsignups'],
         });
-        assert.equal(1, person.defaultsignups.length); 
+        assert.equal(1, person.defaultsignups.length);
     });
-    it('removeDefaultSignup test', async function() {
+    it('removeDefaultSignup test', async () => {
         let signup = await controller.getOfficeDefaultSignupForUserAndWeekday('ABC', 'Tiistai');
         assert.notEqual(undefined, signup);
         await controller.removeDefaultSignup('ABC', 'Tiistai');
         signup = await controller.getOfficeDefaultSignupForUserAndWeekday('ABC', 'Tiistai');
         assert.equal(undefined, signup);
-    })
-    
-
+    });
 });

@@ -24,6 +24,7 @@ services:
       SLACK_APP_TOKEN:
       SLACK_BOT_TOKEN:
       SLACK_SIGNING_SECRET:
+      COMMAND_PREFIX:
     depends_on:
       - postgres
     ports:

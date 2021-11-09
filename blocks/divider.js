@@ -1,9 +1,7 @@
-const divider = () => {
-  return(
+const divider = () => (
     {
-      type: "divider"
+        type: 'divider',
     }
-  )
-}
+);
 
-module.exports = { divider }
+module.exports = { divider };

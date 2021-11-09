@@ -1,16 +1,16 @@
 const button = (text, callback, value, style) => {
-  const button = {
-    type: "button",
-      text: {
-        type: "plain_text",
-        emoji: true,
-        text: text
-      },
-      value: value,
-      action_id: callback
-  }
-  if (style === 'primary' || style === 'danger') { button.style = style }
-  return (button)
-}
+    const buttonElement = {
+        type: 'button',
+        text: {
+            type: 'plain_text',
+            emoji: true,
+            text,
+        },
+        value,
+        action_id: callback,
+    };
+    if (style === 'primary' || style === 'danger') { buttonElement.style = style; }
+    return (buttonElement);
+};
 
-module.exports = { button }
+module.exports = { button };
