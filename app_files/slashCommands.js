@@ -1,7 +1,7 @@
 const { DateTime } = require('luxon');
 
 const service = require('./databaseService');
-const dateFunctions = require('./dateFunctions');
+const dfunc = require('./dateFunctions');
 const helper = require('./helperFunctions');
 
 /**
@@ -20,11 +20,11 @@ exports.enableSlashCommands = function (app) {
         try {
             await ack();
             const parameter = command.text; // Antaa käskyn parametrin
-            const date = dateFunctions.parseDate(parameter, DateTime.now());
+            const date = dfunc.parseDate(parameter, DateTime.now());
             if (date.isValid) {
                 const registrations = await service.getRegistrationsFor(date.toISODate());
-                let response = `${dateFunctions.atWeekday(date)} toimistolla `;
-                if (registrations.length === 0) response = `Kukaan ei ole toimistolla ${dateFunctions.atWeekday(date).toLowerCase()}`;
+                let response = `${dfunc.atWeekday(date)} toimistolla `;
+                if (registrations.length === 0) response = `Kukaan ei ole toimistolla ${dfunc.atWeekday(date).toLowerCase()}`;
                 else if (registrations.length === 1) response += 'on:\n';
                 else response += 'ovat:\n';
                 registrations.forEach((user) => {
