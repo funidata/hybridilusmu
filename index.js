@@ -11,11 +11,11 @@ require('./quotenv').checkEnv([
     'DB_PORT',
 ]);
 const { App } = require('@slack/bolt');
-const scheduler = require('./scheduleMessage');
-const { enableActionFunctions } = require('./actionFunctions');
-const { enableEventListeners } = require('./eventListeners');
-const { enableMiddleware } = require('./middleware');
-const { enableSlashCommands } = require('./slashCommands');
+const scheduler = require('./app_files/scheduleMessage');
+const { enableActionFunctions } = require('./app_files/actionFunctions');
+const { enableEventListeners } = require('./app_files/eventListeners');
+const { enableMiddleware } = require('./app_files/middleware');
+const { enableSlashCommands } = require('./app_files/slashCommands');
 
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
