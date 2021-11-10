@@ -61,8 +61,8 @@ const mentionTail = '>';
 
 /**
  * Generates a mention string for the given usergroup.
- * @param {String} slack_usergroup_id The Slack id of the usergroup in question
- * @returns {String} A string that Slack will turn into a mention
+ * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @returns {string} A string that Slack will turn into a mention
  */
 const generateMentionString = (slack_usergroup_id) => {
     const label = !usergroups[slack_usergroup_id]
@@ -73,8 +73,8 @@ const generateMentionString = (slack_usergroup_id) => {
 
 /**
  * Reads a usergroup id from a mention string.
- * @param {String} str String to extract usergroup id from
- * @returns {String} A Slack usergroup id
+ * @param {string} str String to extract usergroup id from
+ * @returns {string} A Slack usergroup id
  */
 const parseMentionString = (str) => {
     // a mention string looks roughly like <!subteam^SXYZZY>
@@ -97,8 +97,8 @@ const parseMentionString = (str) => {
 
 /**
  * Generates a plaintext string describing a usergroup.
- * @param {String} slack_usergroup_id The Slack id of the usergroup in question
- * @returns {String} A plain text representation of the usergroup's identity, like
+ * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @returns {string} A plain text representation of the usergroup's identity, like
  *                   "Kahvinkittaajat (@kahvi)"
  */
 const generatePlaintextString = (slack_usergroup_id) => {
@@ -205,8 +205,8 @@ const dropSlackUsergroup = (slack_usergroup_id) => {
 
 /**
  * Inserts a user to a usergroup
- * @param {String} slack_user_id      Slack id of user to add              (like "UFFFFFF")
- * @param {String} slack_usergroup_id Slack id of usergroup being added to (like "SFFFFFF")
+ * @param {string} slack_user_id      Slack id of user to add              (like "UFFFFFF")
+ * @param {string} slack_usergroup_id Slack id of usergroup being added to (like "SFFFFFF")
  */
 const insertUserForUsergroup = (slack_user_id, slack_usergroup_id) => {
     initSlackUser(slack_user_id);
@@ -376,7 +376,7 @@ const insertUsergroupsFromAPIListResponse = (response) => {
 /**
  * Inserts users for a usergroup as fetched by app.client.usergroups.users.list()
  * @param {Object} response API response fetched via app.client.usergroups.users.list
- * @param {String} slack_usergroup_id The Slack id of the relevant usergroup
+ * @param {string} slack_usergroup_id The Slack id of the relevant usergroup
  * @returns {boolean} Whether the operation was successful or not
  */
 const insertUsergroupUsersFromAPIListResponse = (response, slack_usergroup_id) => {
