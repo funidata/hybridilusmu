@@ -15,6 +15,12 @@ features:
     - command: /listaa
       description: Listaa paikallaolijat
       usage_hint: päivä
+    - command: /ilmoita
+      description: Lisää ilmoittautumisen
+      usage_hint: [def] päivä status
+    - command: /poista
+      description: Poistaa ilmoittautumisen
+      usage_hint: [def] päivä
 oauth_config:
   scopes:
     bot:
