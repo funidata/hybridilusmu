@@ -122,9 +122,23 @@ app.command(`/${COMMAND_PREFIX}poista`, async ({ command, ack }) => {
     try {
         await ack();
         const userId = command.user_id;
-        const parameter = command.text; // Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen.
-        console.log(parameter);
-        const response = 'Et ole ilmoittautunut tälle päivälle.';
+        let parameter = command.text; // Antaa käskyn parametrin
+        const pieces = parameter.split(' ');
+        let response = 'Anna parametrina päivä.';
+        if (pieces.length === 2 && pieces[0] === 'def') { // Oletusilmoittautumisen poistaminen
+            parameter = pieces[1];
+            const date = dfunc.parseDate(parameter, DateTime.now());
+            if (date.isValid) {
+                await service.changeDefaultRegistration(userId, dfunc.getWeekday(date), false);
+                response = 'Oletusilmoittautuminen poistettu päivältä ' + dfunc.getWeekday(date).toLowerCase() + '.';
+            }
+        } else { // Tavallisen ilmoittautumisen poistaminen
+            const date = dfunc.parseDate(parameter, DateTime.now());
+            if (date.isValid) {
+                await service.changeRegistration(userId, date.toISODate(), false);
+                response = 'Ilmoittautuminen poistettu päivältä ' + dfunc.atWeekday(date).toLowerCase();
+            }
+        }
         postEphemeralMessage(command.channel_id, userId, response);
     } catch (error) {
         console.log('Tapahtui virhe :(');
@@ -139,27 +153,34 @@ app.command(`/${COMMAND_PREFIX}ilmoita`, async ({ command, ack }) => {
     try {
         await ack();
         const userId = command.user_id;
-        const parameters = command.text; // Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen välilyönnin jälkeen.
+        const parameters = command.text; // Antaa käskyn parametrin
         const pieces = parameters.split(' ');
         let response = 'Anna parametrina päivä ja status.';
-        if (pieces.length === 2) {
+        if (pieces.length === 3 && pieces[0] === 'def') { // Oletusilmoittautuminen
+            const dateString = pieces[1];
+            const status = pieces[2];
+            const date = dfunc.parseDate(dateString, DateTime.now());
+            if (dfunc.isWeekday(date) && (status === 'toimisto' || status === 'etä')) {
+                await service.changeDefaultRegistration(userId, dfunc.getWeekday(date), true, status === 'toimisto');
+                response = 'Oletusilmoittautuminen lisätty - ';
+                if (date.weekday == 3) response += dfunc.getWeekday(date).toLowerCase() + 'isin';
+                else response += dfunc.getWeekday(date).toLowerCase() + 'sin';
+                const tail = status === 'toimisto' ? ' toimistolla.' : ' etänä.';
+                response += tail;
+            } else if (dfunc.isWeekend(date)) {
+                response = 'Et voi lisätä oletusilmoittautumista viikonlopulle.';
+            }
+        } else if (pieces.length === 2) { // Tavallinen ilmoittautuminen
             const dateString = pieces[0];
             const status = pieces[1];
             const date = dfunc.parseDate(dateString, DateTime.now());
             if (dfunc.isWeekday(date) && (status === 'toimisto' || status === 'etä')) {
                 await service.changeRegistration(userId, date.toISODate(), true, status === 'toimisto');
                 response = 'Ilmoittautuminen onnistui - ' + dfunc.atWeekday(date).toLowerCase();
-                if (status === 'toimisto') {
-                    response += ' toimistolla.';
-                } else {
-                    response += ' etänä.';
-                }
+                const tail = status === 'toimisto' ? ' toimistolla.' : ' etänä.';
+                response += tail;
             } else if (dfunc.isWeekend(date)) {
                 response = 'Et voi lisätä ilmoittautumista viikonlopulle.';
-            } else if (!date.isValid) {
-                response = 'Anna parametrina jokin päivä.';
-            } else if (status !== 'toimisto' && status !== 'etä') {
-                response = 'Anna statuksena joko "toimisto" tai "etä".';
             }
         }
         postEphemeralMessage(command.channel_id, userId, response);

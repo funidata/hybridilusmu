@@ -23,15 +23,27 @@ const RECORD_LIMIT = 180;
 const MAX_DIFFERENCE = 2;
 
 /**
+ * Returns weekday of given date as a string.
+ * @param {Luxon date}
+ */
+const getWeekday = (date) => weekdays[date.weekday - 1];
+
+/**
  * Transforms a string from YYYY-MM-DD format to "Weekday day.month." -format
  * @param {string} datestring - String in the format YYYY-MM-DD.
  */
 const toPrettyFormat = (datestring) => {
     const parts = datestring.split('-');
-    const newDate = DateTime.fromObject({ year: parts[0], month: parts[1], day: parts[2] });
-    const res = `${weekdays[newDate.weekday - 1]} ${newDate.day}.${newDate.month}.`;
-    return res;
+    const date = DateTime.fromObject({ year: parts[0], month: parts[1], day: parts[2] });
+    return dateToString(date);
 };
+
+/**
+ * Transforms a Luxon Date object to "Maanantai 1.11." -format.
+ * This is a helper function used in creating answers to slash commands.
+ * @param {Luxon Date} date - Luxon Date object
+ */
+const dateToString = (date) => `${weekdays[date.weekday - 1]} ${date.day}.${date.month}.`;
 
 /**
  * Lists n weekdays from given day onwards.
@@ -165,6 +177,8 @@ const atWeekday = (date) => `${weekdays[date.weekday - 1]}na ${date.day}.${date.
 
 module.exports = {
     atWeekday,
+    dateToString,
+    getWeekday,
     isWeekday,
     isWeekend,
     listNWeekdays,
