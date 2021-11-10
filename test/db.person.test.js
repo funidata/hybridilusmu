@@ -9,7 +9,6 @@ describe('Persons test', function () { // eslint-disable-line
 
     it('create user', async () => {
         const person = await db.Person.create({
-            id: 1,
             slack_id: 'XYZ',
             real_name: 'Matti Meikalainen',
         });
