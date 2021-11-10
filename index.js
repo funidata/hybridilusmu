@@ -16,6 +16,7 @@ const { DateTime } = require('luxon');
 const service = require('./databaseService');
 const dfunc = require('./dateFunctions');
 const home = require('./home');
+const library = require('./responses');
 
 /**
  * An optional prefix for our slash-commands. When set to e.g. 'h',
@@ -116,27 +117,32 @@ app.event('app_home_opened', async ({ event, client }) => {
 });
 
 /**
- * Listens to a slash-command and signs user up for given day.
+ * Listens to a slash-command and signs user up for given day. Handles both normal and default registrations.
  */
 app.command(`/${COMMAND_PREFIX}poista`, async ({ command, ack }) => {
     try {
         await ack();
         const userId = command.user_id;
-        let parameter = command.text; // Antaa käskyn parametrin
-        const pieces = parameter.split(' ');
-        let response = 'Anna parametrina päivä.';
-        if (pieces.length === 2 && pieces[0] === 'def') { // Oletusilmoittautumisen poistaminen
-            parameter = pieces[1];
-            const date = dfunc.parseDate(parameter, DateTime.now());
-            if (date.isValid) {
+        let response = library.demandDate();
+        const parameters = command.text.split(' ');
+        if (parameters.length === 0) {
+            postEphemeralMessage(command.channel_id, userId, response);
+            return;
+        }
+        let dateString = parameters[0];
+        let devault = false;
+        if (parameters.length === 2 && parameters[0] === 'def') {
+            devault = true;
+            dateString = parameters[1];
+        }
+        const date = dfunc.parseDate(dateString, DateTime.now());
+        if (date.isValid) {
+            if (devault) {
                 await service.changeDefaultRegistration(userId, dfunc.getWeekday(date), false);
-                response = 'Oletusilmoittautuminen poistettu päivältä ' + dfunc.getWeekday(date).toLowerCase() + '.';
-            }
-        } else { // Tavallisen ilmoittautumisen poistaminen
-            const date = dfunc.parseDate(parameter, DateTime.now());
-            if (date.isValid) {
+                response = library.defaultRegistrationRemoved(date);
+            } else {
                 await service.changeRegistration(userId, date.toISODate(), false);
-                response = 'Ilmoittautuminen poistettu päivältä ' + dfunc.atWeekday(date).toLowerCase();
+                response = library.normalRegistrationRemoved(date);
             }
         }
         postEphemeralMessage(command.channel_id, userId, response);
@@ -153,35 +159,32 @@ app.command(`/${COMMAND_PREFIX}ilmoita`, async ({ command, ack }) => {
     try {
         await ack();
         const userId = command.user_id;
-        const parameters = command.text; // Antaa käskyn parametrin
-        const pieces = parameters.split(' ');
-        let response = 'Anna parametrina päivä ja status.';
-        if (pieces.length === 3 && pieces[0] === 'def') { // Oletusilmoittautuminen
-            const dateString = pieces[1];
-            const status = pieces[2];
-            const date = dfunc.parseDate(dateString, DateTime.now());
-            if (dfunc.isWeekday(date) && (status === 'toimisto' || status === 'etä')) {
+        let response = library.demandDateAndStatus();
+        const parameters = command.text.split(' ');
+        if (parameters.length < 2) {
+            postEphemeralMessage(command.channel_id, userId, response);
+            return;
+        }
+        let dateString = parameters[0];
+        let status = parameters[1];
+        let devault = false;
+        if (parameters.length === 3 && parameters[0] === 'def') {
+            dateString = parameters[1];
+            status = parameters[2];
+            devault = true;
+        }
+        const date = dfunc.parseDate(dateString, DateTime.now());
+        if (dfunc.isWeekday(date) && (status === 'toimisto' || status === 'etä')) {
+            if (devault) {
                 await service.changeDefaultRegistration(userId, dfunc.getWeekday(date), true, status === 'toimisto');
-                response = 'Oletusilmoittautuminen lisätty - ';
-                if (date.weekday == 3) response += dfunc.getWeekday(date).toLowerCase() + 'isin';
-                else response += dfunc.getWeekday(date).toLowerCase() + 'sin';
-                const tail = status === 'toimisto' ? ' toimistolla.' : ' etänä.';
-                response += tail;
-            } else if (dfunc.isWeekend(date)) {
-                response = 'Et voi lisätä oletusilmoittautumista viikonlopulle.';
-            }
-        } else if (pieces.length === 2) { // Tavallinen ilmoittautuminen
-            const dateString = pieces[0];
-            const status = pieces[1];
-            const date = dfunc.parseDate(dateString, DateTime.now());
-            if (dfunc.isWeekday(date) && (status === 'toimisto' || status === 'etä')) {
+                response = library.defaultRegistrationAdded(date, status);
+            } else {
                 await service.changeRegistration(userId, date.toISODate(), true, status === 'toimisto');
-                response = 'Ilmoittautuminen onnistui - ' + dfunc.atWeekday(date).toLowerCase();
-                const tail = status === 'toimisto' ? ' toimistolla.' : ' etänä.';
-                response += tail;
-            } else if (dfunc.isWeekend(date)) {
-                response = 'Et voi lisätä ilmoittautumista viikonlopulle.';
+                response = library.normalRegistrationAdded(date, status);
             }
+        } else if (dfunc.isWeekend(date)) {
+            if (devault) response = library.denyDefaultRegistrationForWeekend();
+            else response = library.denyNormalRegistrationForWeekend();
         }
         postEphemeralMessage(command.channel_id, userId, response);
     } catch (error) {
@@ -197,16 +200,10 @@ app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
         const date = dfunc.parseDate(parameter, DateTime.now());
         if (date.isValid) {
             const registrations = await service.getRegistrationsFor(date.toISODate());
-            let response = `${dfunc.atWeekday(date)} toimistolla `;
-            if (registrations.length === 0) response = `Kukaan ei ole toimistolla ${dfunc.atWeekday(date).toLowerCase()}`;
-            else if (registrations.length === 1) response += 'on:\n';
-            else response += 'ovat:\n';
-            registrations.forEach((user) => {
-                response += `<@${user}>\n`;
-            });
+            let response = library.registrationList(date, registrations);
             postEphemeralMessage(command.channel_id, command.user_id, response);
         } else {
-            postEphemeralMessage(command.channel_id, command.user_id, 'Anna parametrina päivä.');
+            postEphemeralMessage(command.channel_id, command.user_id, library.demandDate());
         }
     } catch (error) {
         console.log('Tapahtui virhe :(');
