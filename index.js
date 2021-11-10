@@ -117,7 +117,8 @@ app.event('app_home_opened', async ({ event, client }) => {
 });
 
 /**
- * Listens to a slash-command and signs user up for given day. Handles both normal and default registrations.
+ * Listens to a slash-command and signs user up for given day. 
+ * Handles both normal and default registrations.
  */
 app.command(`/${COMMAND_PREFIX}poista`, async ({ command, ack }) => {
     try {
@@ -200,7 +201,7 @@ app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
         const date = dfunc.parseDate(parameter, DateTime.now());
         if (date.isValid) {
             const registrations = await service.getRegistrationsFor(date.toISODate());
-            let response = library.registrationList(date, registrations);
+            const response = library.registrationList(date, registrations);
             postEphemeralMessage(command.channel_id, command.user_id, response);
         } else {
             postEphemeralMessage(command.channel_id, command.user_id, library.demandDate());

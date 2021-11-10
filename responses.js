@@ -119,7 +119,7 @@ const lta = (date) => {
  * @param {Luxon Date}
  */
 const sin = (date) => {
-    if (date.weekday == 3) return 'keskiviikkoisin';
+    if (date.weekday === 3) return 'keskiviikkoisin';
     return weekdays[date.weekday - 1] + 'sin';
 };
 
