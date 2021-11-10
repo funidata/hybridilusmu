@@ -35,15 +35,8 @@ const getWeekday = (date) => weekdays[date.weekday - 1];
 const toPrettyFormat = (datestring) => {
     const parts = datestring.split('-');
     const date = DateTime.fromObject({ year: parts[0], month: parts[1], day: parts[2] });
-    return dateToString(date);
+    return `${weekdays[date.weekday - 1]} ${date.day}.${date.month}.`;
 };
-
-/**
- * Transforms a Luxon Date object to "Maanantai 1.11." -format.
- * This is a helper function used in creating answers to slash commands.
- * @param {Luxon Date} date - Luxon Date object
- */
-const dateToString = (date) => `${weekdays[date.weekday - 1]} ${date.day}.${date.month}.`;
 
 /**
  * Lists n weekdays from given day onwards.
@@ -58,21 +51,6 @@ const listNWeekdays = (day, n) => {
         while (day.weekday >= 6) day = day.plus({ days: 1 }); // eslint-disable-line
         res.push(day.toISODate());
         day = day.plus({ days: 1 }); // eslint-disable-line
-    }
-    return res;
-};
-
-/**
- * Returns a list of strings representing one week,
- * starting from next monday calculated from the given day.
- * Strings are of format "Maanantai 11.10."
- * @param {Luxon Date} day - Starting day as a Luxon Date object.
- */
-const listNextWeek = (day) => {
-    const nextMonday = day.plus({ days: (8 - day.weekday) });
-    const res = [];
-    for (const line of listNWeekdays(nextMonday, 5)) {  // eslint-disable-line
-        res.push(toPrettyFormat(line));
     }
     return res;
 };
@@ -168,21 +146,11 @@ const parseDate = (input, today) => {
     return date;
 };
 
-/**
- * Transforms a Luxon Date object to "Maanantaina 1.11." -format.
- * This is a helper function used in creating answers to slash commands.
- * @param {Luxon Date} date - Luxon Date object
- */
-const atWeekday = (date) => `${weekdays[date.weekday - 1]}na ${date.day}.${date.month}.`;
-
 module.exports = {
-    atWeekday,
-    dateToString,
     getWeekday,
     isWeekday,
     isWeekend,
     listNWeekdays,
-    listNextWeek,
     matchWeekday,
     parseDate,
     toPrettyFormat,
