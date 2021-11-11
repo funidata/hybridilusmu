@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 const assert = require('assert');
-const usergroups = require('../usergroups');
+const usergroups = require('../src/usergroups');
 
 const createEventPayload = {
     type: 'subteam_created',

@@ -12,7 +12,7 @@ require('./tools/quotenv').checkEnv([
 ]);
 const { App } = require('@slack/bolt');
 const scheduler = require('./scheduleMessage');
-const usergroups = require('../usergroups');
+const usergroups = require('./usergroups');
 const { enableActionFunctions } = require('./actionFunctions');
 const { enableEventListeners } = require('./eventListeners');
 const { enableMiddleware } = require('./middleware');
