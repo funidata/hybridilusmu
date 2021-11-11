@@ -1,6 +1,6 @@
 const assert = require('assert');
-const db = require('../app_files/database');
-const controller = require('../app_files/controllers/db.controllers');
+const db = require('../src/database');
+const controller = require('../src/controllers/db.controllers');
 
 describe('Signups Tests', function () { // eslint-disable-line
     this.beforeAll(async () => {
