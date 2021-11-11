@@ -285,7 +285,7 @@ const getUsergroupsForChannel = (slack_channel_id) => {
     if (!channelsLookup[slack_channel_id]) {
         return [];
     }
-    return Object.keys(channelsLookup[slack_channel_id]);
+    return Object.keys(channelsLookup[slack_channel_id]).filter(isEnabled);
 };
 
 /**
@@ -420,21 +420,21 @@ const getUsergroupsForUser = (slack_user_id) => {
     if (!uo) {
         return [];
     }
-    return Object.keys(uo);
+    return Object.keys(uo).filter(isEnabled);
 };
 
 const getUsersForUsergroup = (slack_usergroup_id) => {
     if (!usergroups[slack_usergroup_id]) {
         return [];
     }
-    return usergroups[slack_usergroup_id].users;
+    return [...usergroups[slack_usergroup_id].users];
 };
 
 const getChannelsForUsergroup = (slack_usergroup_id) => {
     if (!usergroups[slack_usergroup_id]) {
         return [];
     }
-    return usergroups[slack_usergroup_id].prefs.channels;
+    return [...usergroups[slack_usergroup_id].prefs.channels];
 };
 
 const isUserInUsergroup = (slack_user_id, slack_usergroup_id) => {
