@@ -6,4 +6,4 @@ RUN npm install
 USER node
 COPY --chown=node:node . .
 USER node
-CMD [ "node", "index.js" ]
+CMD [ "npm", "start" ]
