@@ -29,8 +29,8 @@ const app = new App({
 const userCache = enableUserCache({ app });
 enableMiddleware({ app, userCache });
 enableActionFunctions(app);
-enableEventListeners({ app, usergroups });
-enableSlashCommands({ app, usergroups, userCache });
+enableEventListeners({ app, usergroups, userCache });
+enableSlashCommands({ app, usergroups });
 
 /**
  * Starts the bot.
