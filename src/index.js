@@ -1,6 +1,6 @@
-require('./app_files/meta/timestampedLogger').replaceLoggers();
+require('./tools/timestampedLogger').replaceLoggers();
 require('dotenv').config();
-require('./app_files/meta/quotenv').checkEnv([
+require('./tools/quotenv').checkEnv([
     'SLACK_BOT_TOKEN',
     'SLACK_APP_TOKEN',
     'SLACK_SIGNING_SECRET',
@@ -11,11 +11,11 @@ require('./app_files/meta/quotenv').checkEnv([
     'DB_PORT',
 ]);
 const { App } = require('@slack/bolt');
-const scheduler = require('./app_files/scheduleMessage');
-const { enableActionFunctions } = require('./app_files/actionFunctions');
-const { enableEventListeners } = require('./app_files/eventListeners');
-const { enableMiddleware } = require('./app_files/middleware');
-const { enableSlashCommands } = require('./app_files/slashCommands');
+const scheduler = require('./scheduleMessage');
+const { enableActionFunctions } = require('./actionFunctions');
+const { enableEventListeners } = require('./eventListeners');
+const { enableMiddleware } = require('./middleware');
+const { enableSlashCommands } = require('./slashCommands');
 
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
