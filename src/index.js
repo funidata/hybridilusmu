@@ -26,11 +26,18 @@ const app = new App({
     appToken: process.env.SLACK_APP_TOKEN,
 });
 
-const userCache = enableUserCache({ app });
-enableMiddleware({ app, userCache });
-enableActionFunctions(app);
-enableEventListeners({ app, usergroups, userCache });
-enableSlashCommands({ app, usergroups });
+const state = {
+    app,
+    usergroups,
+};
+
+const userCache = enableUserCache(state);
+state.userCache = userCache;
+
+enableMiddleware(state);
+enableActionFunctions(state);
+enableEventListeners(state);
+enableSlashCommands(state);
 
 /**
  * Starts the bot.
