@@ -7,7 +7,7 @@ Botti ei ole saatavilla slackin lisäosavalikoimasta, vaan se tulee ottaa käytt
 - [Luo uusi Slack app](https://api.slack.com/apps?new_app=1&ref=bolt_start_hub)
 - Valitse "From an app manifest"
 - Valitse workspace johon haluat botin lisätä
-- Kopioi ja liitä [manifestin sisältö](<https://github.com/hytuslain/hytuslain/blob/master/Files for Humans/manifest.yml>) sitä kysyttäessä. Formaatti on YAML.
+- Kopioi ja liitä [manifestin sisältö](<https://github.com/hytuslain/hytuslain/blob/master/docs/manifest.yml>) sitä kysyttäessä. Formaatti on YAML.
 - Klikkaa lopuksi Create
 
 Siirryt Botin hallintapaneelin sivulle "Basic Information":
