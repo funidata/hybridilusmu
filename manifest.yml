@@ -15,7 +15,7 @@ features:
   slash_commands:
     - command: /listaa
       description: Listaa paikallaolijat
-      usage_hint: päivä
+      usage_hint: <päivä> [<tiimi>]
 oauth_config:
   scopes:
     bot:
