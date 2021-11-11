@@ -15,6 +15,7 @@ const scheduler = require('./scheduleMessage');
 const usergroups = require('./usergroups');
 const { enableActionFunctions } = require('./actionFunctions');
 const { enableEventListeners } = require('./eventListeners');
+const { enableUserCache } = require('./userCache');
 const { enableMiddleware } = require('./middleware');
 const { enableSlashCommands } = require('./slashCommands');
 
@@ -25,10 +26,11 @@ const app = new App({
     appToken: process.env.SLACK_APP_TOKEN,
 });
 
+const userCache = enableUserCache({ app });
+enableMiddleware({ app, userCache });
 enableActionFunctions(app);
 enableEventListeners({ app, usergroups });
-enableMiddleware(app);
-enableSlashCommands({ app, usergroups });
+enableSlashCommands({ app, usergroups, userCache });
 
 /**
  * Starts the bot.
