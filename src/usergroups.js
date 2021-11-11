@@ -269,6 +269,18 @@ const insertChannelsForUsergroup = (usergroup) => {
     return true;
 };
 
+const isEnabled = (slack_usergroup_id) => {
+    if (!usergroups[slack_usergroup_id]) {
+        return false;
+    }
+    if (usergroups[slack_usergroup_id].date_delete !== 0) {
+        return false;
+    }
+    return true;
+};
+
+const getUsergroups = () => Object.keys(usergroups).filter(isEnabled);
+
 const getUsergroupsForChannel = (slack_channel_id) => {
     if (!channelsLookup[slack_channel_id]) {
         return [];
@@ -362,7 +374,8 @@ const insertUsergroupsFromAPIListResponse = (response) => {
         oldGroupsToRemove[id] = true;
     });
     response.usergroups.forEach((u) => {
-        result = result && insertUsergroup(u);
+        const insertionOkay = insertUsergroup(u);
+        result = result && insertionOkay;
         if (u && u.id) {
             delete oldGroupsToRemove[u.id];
         }
@@ -488,6 +501,7 @@ module.exports = {
     generatePlaintextString,
     parseMentionString,
     // lookup functions
+    getUsergroups,
     getUsergroupsForUser,
     getUsersForUsergroup,
     getChannelsForUsergroup,

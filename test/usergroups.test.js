@@ -152,6 +152,67 @@ const usergroupsListWithUsersPayload = {
     ],
 };
 
+const usergroupsListWithUsersMultiPayload = {
+    ok: true,
+    usergroups: [
+        {
+            id: 'Skahvi',
+            team_id: 'Tdevausnurkka',
+            is_usergroup: true,
+            name: 'Kahvinkittaajat',
+            description: 'Kofeiiniaddiktit jne.',
+            handle: 'kahvi',
+            is_external: false,
+            date_create: 1635594853,
+            date_update: 1635595867,
+            date_delete: 0,
+            auto_type: 'admin',
+            created_by: 'Umeklu',
+            updated_by: 'Umeklu',
+            deleted_by: null,
+            prefs: {
+                channels: [
+                    'Ckahvinkeitin',
+                ],
+                groups: [],
+            },
+            users: [
+                'Umeklu',
+                'Ukernighan',
+                'Uritchie',
+            ],
+            user_count: 3,
+        },
+        {
+            id: 'Spannu',
+            team_id: 'Tdevausnurkka',
+            is_usergroup: true,
+            name: 'Pannunkantajat',
+            description: 'Kahvipannun huoltohenkilöstö',
+            handle: 'pannu',
+            is_external: false,
+            date_create: 1234567890,
+            date_update: 1234567890,
+            date_delete: 0,
+            auto_type: 'admin',
+            created_by: 'Umeklu',
+            updated_by: 'Umeklu',
+            deleted_by: null,
+            prefs: {
+                channels: [
+                    'Ckahvinkeitin',
+                    'Cpannuhuone',
+                ],
+                groups: [],
+            },
+            users: [
+                'Umeklu',
+            ],
+            user_count: 1,
+        },
+    ],
+};
+
 const usergroupsListWithUsersPayloadAlt = {
     ok: true,
     usergroups: [
@@ -246,6 +307,17 @@ describe('usergroups: Populate from API call', function () {
         assert.equal(usergroups.isUserInUsergroup('Uritchie', 'Skahvi'), true);
         assert.equal(usergroups.getChannelsForUsergroup('Skahvi').length, 1);
         assert.equal(usergroups.getChannelsForUsergroup('Skahvi')[0], 'Ckahvinkeitin');
+    });
+
+    it('usergroups.list with users included, multigroup', () => {
+        assert.equal(
+            usergroups.insertUsergroupsFromAPIListResponse(usergroupsListWithUsersMultiPayload),
+            true,
+        );
+        assert.equal(usergroups.isUserInUsergroup('Umeklu', 'Skahvi'), true);
+        assert.equal(usergroups.isUserInUsergroup('Umeklu', 'Spannu'), true);
+        assert.equal(usergroups.getUsergroups().length, 2);
+        assert.equal(usergroups.getUsergroupsForUser('Umeklu').length, 2);
     });
 
     it('usergroups.list with users included, where group disappears', () => {
