@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-/* eslint-disable no-underscore-dangle */
 
 /**
  * This is an implementation of usergroup functionality.
@@ -112,13 +111,13 @@ const generatePlaintextString = (slack_usergroup_id) => {
 /**
  * You probably shouldn't be calling this from outside of the library
  */
-const _clearData = () => {
+const clearData = () => {
     usergroups = {};
     usersLookup = {};
     channelsLookup = {};
 };
 
-const _dumpState = () => ({
+const dumpState = () => ({
     usergroups,
     usersLookup,
     channelsLookup,
@@ -133,7 +132,7 @@ const initSlackUser = (slack_user_id) => {
 const dropSlackUserFromUsergroup = (slack_user_id, slack_usergroup_id) => {
     const ug = usergroups[slack_usergroup_id];
     if (!ug) { return; }
-    delete ug.users_lkup[slack_user_id];
+    delete ug._.users_lkup[slack_user_id];
     ug.users.filter((u) => u !== slack_user_id);
     ug.user_count = ug.users.length;
     if (usersLookup[slack_user_id]) {
@@ -160,11 +159,14 @@ const initSlackUsergroup = (slack_usergroup_id) => {
             id: `${slack_usergroup_id}`,
         };
     }
-    if (!usergroups[slack_usergroup_id].users_lkup) {
-        usergroups[slack_usergroup_id].users_lkup = {};
+    if (!usergroups[slack_usergroup_id]._) {
+        usergroups[slack_usergroup_id]._ = {};
     }
-    if (!usergroups[slack_usergroup_id].channels_lkup) {
-        usergroups[slack_usergroup_id].channels_lkup = {};
+    if (!usergroups[slack_usergroup_id]._.users_lkup) {
+        usergroups[slack_usergroup_id]._.users_lkup = {};
+    }
+    if (!usergroups[slack_usergroup_id]._.channels_lkup) {
+        usergroups[slack_usergroup_id]._.channels_lkup = {};
     }
 };
 
@@ -212,7 +214,7 @@ const insertUserForUsergroup = (slack_user_id, slack_usergroup_id) => {
     initSlackUser(slack_user_id);
     initSlackUsergroup(slack_usergroup_id);
     usersLookup[slack_user_id][slack_usergroup_id] = true;
-    usergroups[slack_usergroup_id].users_lkup[slack_user_id] = true;
+    usergroups[slack_usergroup_id]._.users_lkup[slack_user_id] = true;
 };
 
 const insertUsersForUsergroup = (usergroup) => {
@@ -220,14 +222,14 @@ const insertUsersForUsergroup = (usergroup) => {
         return false;
     }
     if (!usergroup.users || usergroup.users.length !== usergroup.user_count) {
-        usergroups[usergroup.id]._dirty = true;
+        usergroups[usergroup.id]._.dirty = true;
         return false;
     }
     for (let i = 0; i < usergroup.users.length; i += 1) {
         insertUserForUsergroup(usergroup.users[i], usergroup.id);
     }
-    delete usergroups[usergroup.id]._dirty;
-    delete usergroups[usergroup.id]._dirty_date;
+    delete usergroups[usergroup.id]._.dirty;
+    delete usergroups[usergroup.id]._.dirty_date;
     return true;
 };
 
@@ -238,7 +240,7 @@ const initSlackChannel = (slack_channel_id) => {
 };
 
 const dropSlackChannelFromUsergroup = (slack_channel_id, slack_usergroup_id) => {
-    delete usergroups[slack_usergroup_id].channels_lkup[slack_channel_id];
+    delete usergroups[slack_usergroup_id]._.channels_lkup[slack_channel_id];
     delete channelsLookup[slack_channel_id][slack_usergroup_id];
 };
 
@@ -253,7 +255,7 @@ const insertChannelForUsergroup = (slack_channel_id, slack_usergroup_id) => {
     initSlackChannel(slack_channel_id);
     initSlackUsergroup(slack_usergroup_id);
     channelsLookup[slack_channel_id][slack_usergroup_id] = true;
-    usergroups[slack_usergroup_id].channels_lkup[slack_channel_id] = true;
+    usergroups[slack_usergroup_id]._.channels_lkup[slack_channel_id] = true;
 };
 
 const insertChannelsForUsergroup = (usergroup) => {
@@ -312,46 +314,50 @@ const insertUsergroup = (usergroup) => {
     if (!normalisedUsergroup || !normalisedUsergroup.is_usergroup) {
         return false;
     }
-    let oldState = {};
+    let oldState = { _: {} };
     const extant = !!(usergroups[normalisedUsergroup.id]);
     if (extant) {
         oldState = {
             // save a few fields for dirty stuff
             users: usergroups[normalisedUsergroup.id].users,
-            users_lkup: usergroups[normalisedUsergroup.id].users_lkup,
             user_count: usergroups[normalisedUsergroup.id].user_count,
             // these we discard later, because channels are always passed in full
             prefs: {
                 channels: usergroups[normalisedUsergroup.id].prefs.channels,
             },
-            channels_lkup: usergroups[normalisedUsergroup.id].channels_lkup,
+            _: {
+                users_lkup: usergroups[normalisedUsergroup.id]._.users_lkup,
+                channels_lkup: usergroups[normalisedUsergroup.id]._.channels_lkup,
+            },
             date_update: usergroups[normalisedUsergroup.id].date_update,
         };
     }
     usergroups[normalisedUsergroup.id] = normalisedUsergroup;
     initSlackUsergroup(normalisedUsergroup.id);
-    // generate usergroup.channels_lkup for the new usergroup object
+    // generate usergroup._.channels_lkup for the new usergroup object
     insertChannelsForUsergroup(normalisedUsergroup);
     // drop the old channels that weren't in the new data, if any
     if (extant && oldState.prefs && oldState.prefs.channels) {
         oldState.prefs.channels.forEach((slack_channel_id) => {
-            if (!normalisedUsergroup.channels_lkup[slack_channel_id]) {
+            if (!normalisedUsergroup._.channels_lkup[slack_channel_id]) {
                 dropSlackChannelFromUsergroup(slack_channel_id, normalisedUsergroup.id);
             }
         });
     }
     if (extant && normalisedUsergroup.users_count === 0) {
-        Object.keys(oldState.users_lkup).forEach((slack_user_id) => {
+        Object.keys(oldState._.users_lkup).forEach((slack_user_id) => {
             dropSlackUserFromUsergroup(slack_user_id, normalisedUsergroup.id);
         });
     } else if (!normalisedUsergroup.users && normalisedUsergroup.user_count > 0) {
         usergroups[normalisedUsergroup.id] = {
             ...normalisedUsergroup,
             users: oldState.users,
-            users_lkup: oldState.users_lkup,
             user_count: oldState.user_count,
-            _dirty: true,
-            _dirty_date: oldState.date_update,
+            _: {
+                users_lkup: oldState._.users_lkup,
+                dirty: true,
+                dirty_date: oldState.date_update,
+            },
         };
         return false;
     }
@@ -399,8 +405,8 @@ const insertUsergroupUsersFromAPIListResponse = (response, slack_usergroup_id) =
     for (let i = 0; i < response.users.length; i += 1) {
         insertUserForUsergroup(response.users[i], slack_usergroup_id);
     }
-    delete usergroups[slack_usergroup_id]._dirty;
-    delete usergroups[slack_usergroup_id]._dirty_date;
+    delete usergroups[slack_usergroup_id]._.dirty;
+    delete usergroups[slack_usergroup_id]._.dirty_date;
     return true;
 };
 
@@ -409,7 +415,7 @@ const isDirty = (slack_usergroup_id) => {
     if (!usergroups[slack_usergroup_id]) {
         return false;
     }
-    if (usergroups[slack_usergroup_id]._dirty) {
+    if (usergroups[slack_usergroup_id]._.dirty) {
         return true;
     }
     return false;
@@ -493,9 +499,11 @@ const processMembersChangedEvent = (response) => {
 };
 
 module.exports = {
-    // internal functions are denoted with an underscore here
-    _clearData,
-    _dumpState,
+    // internal functions
+    _: {
+        clearData,
+        dumpState,
+    },
     // helpers for UI stuff
     generateMentionString,
     generatePlaintextString,

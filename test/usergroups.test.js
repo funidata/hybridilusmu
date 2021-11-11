@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const assert = require('assert');
 const usergroups = require('../src/usergroups');
 
@@ -261,7 +260,7 @@ const usergroupsUsersListFailedPayload = {
 
 describe('usergroups: Plumbing', function () {
     this.beforeEach(() => {
-        usergroups._clearData();
+        usergroups._.clearData();
     });
 
     it('no channels for unknown usergroup', () => {
@@ -279,7 +278,7 @@ describe('usergroups: Plumbing', function () {
 
 describe('usergroups: Populate from API call', function () {
     this.beforeEach(() => {
-        usergroups._clearData();
+        usergroups._.clearData();
     });
 
     it('failed usergroups.list works as expected', () => {
@@ -359,13 +358,13 @@ describe('usergroups: Populate from API call', function () {
 
 describe('usergroups: Event based population', function () {
     this.beforeEach(() => {
-        usergroups._clearData();
+        usergroups._.clearData();
     });
 
     it('created', () => {
         assert.equal(usergroups.processCreationEvent(createEventPayload), true);
         assert.equal(
-            usergroups._dumpState().usergroups.Skahvi.date_update,
+            usergroups._.dumpState().usergroups.Skahvi.date_update,
             createEventPayload.subteam.date_update,
         );
         assert.equal(usergroups.isUserInUsergroup('Umeklu', 'Skahvi'), true);
@@ -378,7 +377,7 @@ describe('usergroups: Event based population', function () {
         assert.equal(usergroups.processCreationEvent(createEventPayload), true);
         assert.equal(usergroups.processUpdateEvent(updateEventPayload), true);
         assert.equal(
-            usergroups._dumpState().usergroups.Skahvi.date_update,
+            usergroups._.dumpState().usergroups.Skahvi.date_update,
             updateEventPayload.subteam.date_update,
         );
         assert.equal(usergroups.isUserInUsergroup('Umeklu', 'Skahvi'), true);
@@ -400,7 +399,7 @@ describe('usergroups: Event based population', function () {
             },
         }), false);
         assert.equal(
-            usergroups._dumpState().usergroups.Skahvi.date_update,
+            usergroups._.dumpState().usergroups.Skahvi.date_update,
             updateEventPayload.subteam.date_update,
         );
         assert.notEqual(usergroups.getUsersForUsergroup('Skahvi').length, 0);
@@ -423,7 +422,7 @@ describe('usergroups: Event based population', function () {
         assert.equal(usergroups.processUpdateEvent(updateEventPayload), true);
         assert.equal(usergroups.processUpdateEvent(channellessUpdate), true);
         assert.equal(
-            usergroups._dumpState().usergroups.Skahvi.date_update,
+            usergroups._.dumpState().usergroups.Skahvi.date_update,
             channellessUpdate.subteam.date_update,
         );
         assert.equal(usergroups.getChannelsForUsergroup('Skahvi').length, 0);
@@ -441,11 +440,11 @@ describe('usergroups: Event based population', function () {
         assert.equal(usergroups.processCreationEvent(createEventPayload), true);
         assert.equal(usergroups.processUpdateEvent(userlessUpdate), false);
         assert.equal(
-            usergroups._dumpState().usergroups.Skahvi.date_update,
+            usergroups._.dumpState().usergroups.Skahvi.date_update,
             userlessUpdate.subteam.date_update,
         );
         assert.equal(
-            usergroups._dumpState().usergroups.Skahvi._dirty_date,
+            usergroups._.dumpState().usergroups.Skahvi._.dirty_date,
             createEventPayload.subteam.date_update,
         );
         assert.equal(usergroups.isDirty('Skahvi'), true);
@@ -456,7 +455,7 @@ describe('usergroups: Event based population', function () {
         assert.equal(usergroups.processUpdateEvent(updateEventPayload), true);
         assert.equal(usergroups.processMembersChangedEvent(membersChangedEventPayload), true);
         assert.equal(
-            usergroups._dumpState().usergroups.Skahvi.date_update,
+            usergroups._.dumpState().usergroups.Skahvi.date_update,
             membersChangedEventPayload.date_update,
         );
         assert.equal(usergroups.isUserInUsergroup('Umeklu', 'Skahvi'), true);
@@ -480,7 +479,7 @@ describe('usergroups: Event based population', function () {
             date_previous_update: membersChangedEventPayload.date_previous_update - 1,
         }), false);
         assert.equal(
-            usergroups._dumpState().usergroups.Skahvi.date_update,
+            usergroups._.dumpState().usergroups.Skahvi.date_update,
             updateEventPayload.subteam.date_update,
         );
         assert.equal(usergroups.isUserInUsergroup('Umeklu', 'Skahvi'), true);
@@ -513,7 +512,7 @@ describe('usergroups: String generation', () => {
     it('plain text descriptor string for known usergroup', () => {
         usergroups.processCreationEvent(createEventPayload);
         assert.equal(usergroups.generatePlaintextString('Skahvi'), 'Kahvinkittaajat (@kahvi)');
-        usergroups._clearData();
+        usergroups._.clearData();
     });
 });
 
