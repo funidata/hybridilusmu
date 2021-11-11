@@ -4,54 +4,6 @@ const dfunc = require('../app_files/dateFunctions');
 
 const RECORD_LIMIT = 180;
 
-describe('List Next Week Test', () => {
-    it('Asked on Monday', () => {
-        const wantedResult = [
-            'Maanantai 3.1.',
-            'Tiistai 4.1.',
-            'Keskiviikko 5.1.',
-            'Torstai 6.1.',
-            'Perjantai 7.1.',
-        ];
-        const date = DateTime.fromObject({ year: 2021, month: 12, day: 27 });
-        const result = dfunc.listNextWeek(date);
-        assert.equal(result.length, wantedResult.length);
-        for (let i = 0; i < result.length; i += 1) {
-            assert.equal(result[i], wantedResult[i]);
-        }
-    });
-    it('Asked on Saturday', () => {
-        const wantedResult = [
-            'Maanantai 20.9.',
-            'Tiistai 21.9.',
-            'Keskiviikko 22.9.',
-            'Torstai 23.9.',
-            'Perjantai 24.9.',
-        ];
-        const date = DateTime.fromObject({ year: 2021, month: 9, day: 18 });
-        const result = dfunc.listNextWeek(date);
-        assert.equal(result.length, wantedResult.length);
-        for (let i = 0; i < result.length; i += 1) {
-            assert.equal(result[i], wantedResult[i]);
-        }
-    });
-    it('Asked on Sunday', () => {
-        const wantedResult = [
-            'Maanantai 1.11.',
-            'Tiistai 2.11.',
-            'Keskiviikko 3.11.',
-            'Torstai 4.11.',
-            'Perjantai 5.11.',
-        ];
-        const date = DateTime.fromObject({ year: 2021, month: 10, day: 31 });
-        const result = dfunc.listNextWeek(date);
-        assert.equal(result.length, wantedResult.length);
-        for (let i = 0; i < result.length; i += 1) {
-            assert.equal(result[i], wantedResult[i]);
-        }
-    });
-});
-
 describe('List N Weekdays Test', () => {
     it('Calculate starting from Monday, 6 days', () => {
         const wantedResult = [
