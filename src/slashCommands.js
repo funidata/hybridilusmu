@@ -14,46 +14,6 @@ const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX :
 
 exports.enableSlashCommands = function ({ app, usergroups }) {
     /**
-     * Generates a listing message for a given date
-     * @param {string} date An ISO-8601 date string. If null:
-     *  - please provide data via fetchedRegistrations
-     *  - we'll also use a "today" string for rendering
-     * @param {string} slackUsergroupId A Slack usergroup id, if any.
-     * @param {*} fetchedRegistrations A ready set of registration data for perfomance reasons
-     * @return {string} A message ready to post
-     */
-    const generateListMessage = async (
-        date,
-        slackUsergroupId = null,
-        fetchedRegistrations = null,
-    ) => {
-        const usergroupFilter = !slackUsergroupId
-            ? () => true
-            : (uid) => usergroups.isUserInUsergroup(uid, slackUsergroupId);
-        const registrations = fetchedRegistrations || (
-            await service.getRegistrationsFor(date)
-        ).filter(usergroupFilter);
-        const specifier = !slackUsergroupId
-            ? ''
-            : ` tiimistä ${usergroups.generateMentionString(slackUsergroupId)}`;
-        const predicate = registrations.length === 1 ? 'on' : 'ovat';
-        const dateInResponse = date
-            ? dfunc.atWeekday(DateTime.fromISO(date))
-            : 'Tänään';
-        let response = !slackUsergroupId
-            ? `${dateInResponse} toimistolla ${predicate}:`
-            : `${dateInResponse}${specifier} ${predicate} toimistolla:`;
-        if (registrations.length === 0) {
-            response = `Kukaan${specifier} ei ole toimistolla ${dateInResponse.toLowerCase()}`;
-        }
-        response += '\n';
-        registrations.forEach((user) => {
-            response += `<@${user}>\n`;
-        });
-        return response;
-    };
-
-    /**
      * Listens to a slash-command and prints a list of people at the office on the given day.
      */
     app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
@@ -83,7 +43,11 @@ exports.enableSlashCommands = function ({ app, usergroups }) {
                 error = true;
             }
             if (!error && date.isValid) {
-                const response = await generateListMessage(date.toISODate(), usergroupId);
+                const response = await helper.generateListMessage(
+                    app,
+                    date.toISODate(),
+                    usergroupId,
+                );
                 helper.postEphemeralMessage(app, command.channel_id, command.user_id, response);
             } else {
                 helper.postEphemeralMessage(app, command.channel_id, command.user_id, 'Anteeksi, en ymmärtänyt äskeistä.');

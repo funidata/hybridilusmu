@@ -44,8 +44,8 @@ enableSlashCommands(state);
  */
 (async () => {
     await app.start(process.env.PORT || 3000);
-    scheduler.startScheduling(app);
-    scheduler.scheduleUsergroupReadings(app, usergroups);
+    scheduler.startScheduling(state);
+    scheduler.scheduleUsergroupReadings(state);
     console.log('⚡️ Bolt app is running!');
 })();
 
