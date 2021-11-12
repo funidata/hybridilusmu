@@ -1,3 +1,8 @@
+const { DateTime } = require('luxon');
+
+const service = require('./databaseService');
+const dfunc = require('./dateFunctions');
+
 /**
 * Returns a list of all the channels the bot is a member of.
 */
@@ -42,7 +47,7 @@ async function postMessage(app, channelId, message) {
  * @return {string} A message ready to post
  */
 const generateListMessage = async (
-    app,
+    { app, usergroups },
     date,
     slackUsergroupId = null,
     fetchedRegistrations = null,
@@ -76,7 +81,7 @@ const generateListMessage = async (
 /**
  * Reads usergroups from Slack to our local cache
  */
-const readUsergroupsFromCleanSlate = async (app, usergroups) => {
+const readUsergroupsFromCleanSlate = async ({ app, usergroups }) => {
     const ugs = await app.client.usergroups.list();
     if (!ugs.ok) {
         console.log('Failed fetching usergroups');

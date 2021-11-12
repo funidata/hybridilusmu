@@ -43,7 +43,7 @@ async function startScheduling({ app, usergroups }) {
  */
 const scheduleUsergroupReadings = async ({ app, usergroups }) => {
     const procedure = async () => {
-        helper.readUsergroupsFromCleanSlate(app, usergroups);
+        helper.readUsergroupsFromCleanSlate({ app, usergroups });
     };
     const everyNight = new schedule.RecurrenceRule();
     everyNight.tz = 'Etc/UTC';
