@@ -47,7 +47,7 @@ async function postMessage(app, channelId, message) {
  * @return {string} A message ready to post
  */
 const generateListMessage = async (
-    { app, usergroups },
+    { usergroups },
     date,
     slackUsergroupId = null,
     fetchedRegistrations = null,
