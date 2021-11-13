@@ -13,7 +13,7 @@ async function getMemberChannelIds(app) {
 }
 
 /**
-* Posts an ephemeral message to tschedulerhe given user at the given channel.
+* Posts an ephemeral message to the given user at the given channel.
 */
 async function postEphemeralMessage(app, channelId, userId, message) {
     // Tarkistetaan, onko sovellus kutsuttu kanavalle tai onko kyseessä yksityisviesti
