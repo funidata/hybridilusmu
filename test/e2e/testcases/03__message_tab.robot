@@ -7,8 +7,6 @@ Resource    ../resources/common.robot
 Suite Setup    common.Open Slack In Browser And Login As User
 Suite Teardown    common.Close Test Browser
 
-*** Variables ***
-
 *** Test Cases ***
 Can Open Home Tab
     Sleep    1s
@@ -24,7 +22,9 @@ Can Go To Message Tab
     Wait Until Element Is Visible    //div[@data-qa='message_input']/div
 
 List Saturday Command Gives Correct Respond
-    Input Text    //div[@data-qa='message_input']/div    /lindalistaa la
+    ${LIST_COMMAND}=    Get List Command
+    Set Global Variable    ${LIST_COMMAND}    ${LIST_COMMAND}
+    Input Text    //div[@data-qa='message_input']/div    ${LIST_COMMAND} la
     Click Element    //button[@data-qa='texty_send_button']
     Sleep    2s
     ${present}=    Run Keyword And Return Status    Element Should Be Visible   //button[@class='c-button-unstyled p-message_pane__unread_banner__msg']
@@ -35,7 +35,7 @@ List Saturday Command Gives Correct Respond
     Element Should Contain    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]    Kukaan ei ole toimistolla ${date}   
 
 List Sunday Command Gives Correct Respond
-    Input Text    //div[@data-qa='message_input']/div    /lindalistaa su
+    Input Text    //div[@data-qa='message_input']/div    ${LIST_COMMAND} su
     Click Element    //button[@data-qa='texty_send_button']
     Sleep    2s
     ${present}=    Run Keyword And Return Status    Element Should Be Visible   //button[@class='c-button-unstyled p-message_pane__unread_banner__msg']
