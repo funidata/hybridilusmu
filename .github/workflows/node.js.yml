@@ -12,8 +12,6 @@ on:
 
 jobs:
   build:
-    environment: Slack E2E
-
     runs-on: ubuntu-latest
 
     services:
