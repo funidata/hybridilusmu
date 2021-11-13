@@ -1,230 +1,615 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 4.1.1 (Python 3.8.3 on linux)" generated="20211113 10:36:05.253" rpa="false" schemaversion="2">
-<suite id="s1" name="Guest Suite" source="/home/linjokin/Documents/ohtu-projekti/hytuslain/test/e2e/testcases/01__guest_suite.robot">
+<robot generator="Robot 4.1.1 (Python 3.8.3 on linux)" generated="20211113 13:34:09.158" rpa="false" schemaversion="2">
+<suite id="s1" name="Testcases" source="/home/linjokin/Documents/ohtu-projekti/hytuslain/test/e2e/testcases">
+<suite id="s1-s1" name="Guest Suite" source="/home/linjokin/Documents/ohtu-projekti/hytuslain/test/e2e/testcases/01__guest_suite.robot">
 <kw name="Open Slack In Browser And Login As Guest" library="common" type="SETUP">
 <kw name="Open Browser" library="Selenium2Library">
 <arg>${LOGIN URL}</arg>
 <arg>${BROWSER}</arg>
 <doc>Opens a new browser instance to the optional ``url``.</doc>
-<msg timestamp="20211113 10:36:05.408" level="INFO">Opening browser 'Chrome' to base url 'https://dev-hytuslain.slack.com'.</msg>
-<status status="PASS" starttime="20211113 10:36:05.408" endtime="20211113 10:36:07.492"/>
+<msg timestamp="20211113 13:34:09.320" level="INFO">Opening browser 'Chrome' to base url 'https://dev-hytuslain.slack.com'.</msg>
+<status status="PASS" starttime="20211113 13:34:09.320" endtime="20211113 13:34:11.786"/>
 </kw>
 <kw name="Wait Until Element Is Visible" library="Selenium2Library">
 <arg>//input[@data-qa='login_email']</arg>
 <doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" starttime="20211113 10:36:07.492" endtime="20211113 10:36:07.527"/>
+<status status="PASS" starttime="20211113 13:34:11.787" endtime="20211113 13:34:11.841"/>
 </kw>
 <kw name="Input Text" library="Selenium2Library">
 <arg>//input[@data-qa='login_email']</arg>
 <arg>${GUEST_EMAIL}</arg>
 <doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<msg timestamp="20211113 10:36:07.527" level="INFO">Typing text 'batoh25883@fretice.com' into text field '//input[@data-qa='login_email']'.</msg>
-<status status="PASS" starttime="20211113 10:36:07.527" endtime="20211113 10:36:07.765"/>
+<msg timestamp="20211113 13:34:11.842" level="INFO">Typing text 'batoh25883@fretice.com' into text field '//input[@data-qa='login_email']'.</msg>
+<status status="PASS" starttime="20211113 13:34:11.841" endtime="20211113 13:34:12.083"/>
 </kw>
 <kw name="Input Password" library="Selenium2Library">
 <arg>//input[@data-qa='login_password']</arg>
 <arg>${GUEST_PASSWORD}</arg>
 <doc>Types the given password into the text field identified by ``locator``.</doc>
-<msg timestamp="20211113 10:36:07.766" level="INFO">Typing password into text field '//input[@data-qa='login_password']'.</msg>
-<msg timestamp="20211113 10:36:07.802" level="INFO">Temporally setting log level to: NONE</msg>
-<msg timestamp="20211113 10:36:07.899" level="INFO">Log level changed from NONE to INFO.</msg>
-<status status="PASS" starttime="20211113 10:36:07.765" endtime="20211113 10:36:07.899"/>
+<msg timestamp="20211113 13:34:12.083" level="INFO">Typing password into text field '//input[@data-qa='login_password']'.</msg>
+<msg timestamp="20211113 13:34:12.119" level="INFO">Temporally setting log level to: NONE</msg>
+<msg timestamp="20211113 13:34:12.213" level="INFO">Log level changed from NONE to INFO.</msg>
+<status status="PASS" starttime="20211113 13:34:12.083" endtime="20211113 13:34:12.213"/>
 </kw>
 <kw name="Click Element" library="Selenium2Library">
 <arg>//button[@data-qa='signin_button']</arg>
 <doc>Click the element identified by ``locator``.</doc>
-<msg timestamp="20211113 10:36:07.899" level="INFO">Clicking element '//button[@data-qa='signin_button']'.</msg>
-<status status="PASS" starttime="20211113 10:36:07.899" endtime="20211113 10:36:09.338"/>
+<msg timestamp="20211113 13:34:12.213" level="INFO">Clicking element '//button[@data-qa='signin_button']'.</msg>
+<status status="PASS" starttime="20211113 13:34:12.213" endtime="20211113 13:34:13.533"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>2s</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20211113 10:36:11.339" level="INFO">Slept 2 seconds</msg>
-<status status="PASS" starttime="20211113 10:36:09.338" endtime="20211113 10:36:11.340"/>
+<msg timestamp="20211113 13:34:15.535" level="INFO">Slept 2 seconds</msg>
+<status status="PASS" starttime="20211113 13:34:13.534" endtime="20211113 13:34:15.535"/>
 </kw>
 <kw name="Cancel Popup" library="HelpFunc">
-<status status="PASS" starttime="20211113 10:36:11.340" endtime="20211113 10:36:11.374"/>
+<status status="PASS" starttime="20211113 13:34:15.536" endtime="20211113 13:34:15.571"/>
 </kw>
 <kw name="Go To" library="Selenium2Library">
 <arg>${LOGIN URL}</arg>
 <doc>Navigates the current browser window to the provided ``url``.</doc>
-<msg timestamp="20211113 10:36:11.375" level="INFO">Opening url 'https://dev-hytuslain.slack.com'</msg>
-<status status="PASS" starttime="20211113 10:36:11.374" endtime="20211113 10:36:15.371"/>
+<msg timestamp="20211113 13:34:15.572" level="INFO">Opening url 'https://dev-hytuslain.slack.com'</msg>
+<status status="PASS" starttime="20211113 13:34:15.571" endtime="20211113 13:34:20.556"/>
 </kw>
-<status status="PASS" starttime="20211113 10:36:05.408" endtime="20211113 10:36:15.371"/>
+<status status="PASS" starttime="20211113 13:34:09.320" endtime="20211113 13:34:20.556"/>
 </kw>
-<test id="s1-t1" name="Can Go To Guest Channel">
+<test id="s1-s1-t1" name="Can Go To Guest Channel">
 <kw name="Maximize Browser Window" library="Selenium2Library">
 <doc>Maximizes current browser window.</doc>
-<status status="PASS" starttime="20211113 10:36:15.372" endtime="20211113 10:36:15.758"/>
+<status status="PASS" starttime="20211113 13:34:20.557" endtime="20211113 13:34:20.859"/>
 </kw>
 <kw name="Wait Until Element Is Visible" library="Selenium2Library">
 <arg>//div[@data-qa='channel_name']</arg>
 <doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" starttime="20211113 10:36:15.758" endtime="20211113 10:36:16.740"/>
+<status status="PASS" starttime="20211113 13:34:20.860" endtime="20211113 13:34:21.390"/>
 </kw>
 <kw name="Element Should Contain" library="Selenium2Library">
 <arg>//div[@data-qa='channel_name']</arg>
 <arg>vieraskanava</arg>
 <doc>Verifies that element ``locator`` contains text ``expected``.</doc>
-<msg timestamp="20211113 10:36:17.072" level="INFO">Element '//div[@data-qa='channel_name']' contains text 'vieraskanava'.</msg>
-<status status="PASS" starttime="20211113 10:36:16.740" endtime="20211113 10:36:17.072"/>
+<msg timestamp="20211113 13:34:21.410" level="INFO">Element '//div[@data-qa='channel_name']' contains text 'vieraskanava'.</msg>
+<status status="PASS" starttime="20211113 13:34:21.390" endtime="20211113 13:34:21.410"/>
 </kw>
-<status status="PASS" starttime="20211113 10:36:15.371" endtime="20211113 10:36:17.073"/>
+<status status="PASS" starttime="20211113 13:34:20.556" endtime="20211113 13:34:21.410"/>
 </test>
-<test id="s1-t2" name="Use Slash Command In Guest Channel">
+<test id="s1-s1-t2" name="Use Slash Command In Guest Channel">
 <kw name="Input Text" library="Selenium2Library">
 <arg>//div[@data-qa='message_input']/div</arg>
 <arg>/lindalistaa tänään</arg>
 <doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<msg timestamp="20211113 10:36:17.076" level="INFO">Typing text '/lindalistaa tänään' into text field '//div[@data-qa='message_input']/div'.</msg>
-<status status="PASS" starttime="20211113 10:36:17.075" endtime="20211113 10:36:17.669"/>
+<msg timestamp="20211113 13:34:21.411" level="INFO">Typing text '/lindalistaa tänään' into text field '//div[@data-qa='message_input']/div'.</msg>
+<status status="PASS" starttime="20211113 13:34:21.411" endtime="20211113 13:34:21.837"/>
 </kw>
 <kw name="Click Element" library="Selenium2Library">
 <arg>//button[@data-qa='texty_send_button']</arg>
 <doc>Click the element identified by ``locator``.</doc>
-<msg timestamp="20211113 10:36:17.669" level="INFO">Clicking element '//button[@data-qa='texty_send_button']'.</msg>
-<status status="PASS" starttime="20211113 10:36:17.669" endtime="20211113 10:36:18.109"/>
+<msg timestamp="20211113 13:34:21.838" level="INFO">Clicking element '//button[@data-qa='texty_send_button']'.</msg>
+<status status="PASS" starttime="20211113 13:34:21.838" endtime="20211113 13:34:22.247"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>1s</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20211113 10:36:19.110" level="INFO">Slept 1 second</msg>
-<status status="PASS" starttime="20211113 10:36:18.109" endtime="20211113 10:36:19.110"/>
+<msg timestamp="20211113 13:34:23.248" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20211113 13:34:22.247" endtime="20211113 13:34:23.248"/>
 </kw>
 <kw name="Scroll Element Into View" library="Selenium2Library">
 <arg>(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]</arg>
 <doc>Scrolls the element identified by ``locator`` into view.</doc>
-<status status="PASS" starttime="20211113 10:36:19.110" endtime="20211113 10:36:19.397"/>
+<status status="PASS" starttime="20211113 13:34:23.249" endtime="20211113 13:34:23.552"/>
 </kw>
 <kw name="Element Should Contain" library="Selenium2Library">
 <arg>(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]</arg>
 <arg>This command can't be used by guests in this workspace.</arg>
 <doc>Verifies that element ``locator`` contains text ``expected``.</doc>
-<msg timestamp="20211113 10:36:19.449" level="INFO">Element '(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]' contains text 'This command can't be used by guests in this workspace.'.</msg>
-<status status="PASS" starttime="20211113 10:36:19.398" endtime="20211113 10:36:19.449"/>
+<msg timestamp="20211113 13:34:23.613" level="INFO">Element '(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]' contains text 'This command can't be used by guests in this workspace.'.</msg>
+<status status="PASS" starttime="20211113 13:34:23.553" endtime="20211113 13:34:23.613"/>
 </kw>
-<status status="PASS" starttime="20211113 10:36:17.074" endtime="20211113 10:36:19.449"/>
+<status status="PASS" starttime="20211113 13:34:21.410" endtime="20211113 13:34:23.613"/>
 </test>
-<test id="s1-t3" name="Cannot See App Content">
+<test id="s1-s1-t3" name="Cannot See App Content">
 <kw name="Wait Until Element Is Visible" library="Selenium2Library">
 <arg>//span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']</arg>
 <doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" starttime="20211113 10:36:19.450" endtime="20211113 10:36:19.469"/>
+<status status="PASS" starttime="20211113 13:34:23.614" endtime="20211113 13:34:23.637"/>
 </kw>
 <kw name="Click Element" library="Selenium2Library">
 <arg>//span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']</arg>
 <doc>Click the element identified by ``locator``.</doc>
-<msg timestamp="20211113 10:36:19.470" level="INFO">Clicking element '//span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']'.</msg>
-<status status="PASS" starttime="20211113 10:36:19.470" endtime="20211113 10:36:19.636"/>
+<msg timestamp="20211113 13:34:23.637" level="INFO">Clicking element '//span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']'.</msg>
+<status status="PASS" starttime="20211113 13:34:23.637" endtime="20211113 13:34:23.794"/>
 </kw>
 <kw name="Wait Until Element Is Visible" library="Selenium2Library">
 <arg>//div[@data-qa='app_home_bk_app_view']</arg>
 <doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" starttime="20211113 10:36:19.637" endtime="20211113 10:36:19.917"/>
+<status status="PASS" starttime="20211113 13:34:23.795" endtime="20211113 13:34:24.056"/>
 </kw>
 <kw name="Element Should Contain" library="Selenium2Library">
 <arg>//div[@data-qa='app_home_bk_app_view']/*</arg>
 <arg>Pahoittelut, @Vieras Testikäyttäjä. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.</arg>
 <doc>Verifies that element ``locator`` contains text ``expected``.</doc>
-<msg timestamp="20211113 10:36:19.956" level="INFO">Element '//div[@data-qa='app_home_bk_app_view']/*' contains text 'Pahoittelut, @Vieras Testikäyttäjä. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.'.</msg>
-<status status="PASS" starttime="20211113 10:36:19.918" endtime="20211113 10:36:19.957"/>
+<msg timestamp="20211113 13:34:24.090" level="INFO">Element '//div[@data-qa='app_home_bk_app_view']/*' contains text 'Pahoittelut, @Vieras Testikäyttäjä. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.'.</msg>
+<status status="PASS" starttime="20211113 13:34:24.056" endtime="20211113 13:34:24.090"/>
 </kw>
 <kw name="Element Should Not Contain" library="Selenium2Library">
 <arg>//div[@data-qa='app_home_bk_app_view']/*</arg>
 <arg>Tiedot päivitetty</arg>
 <doc>Verifies that element ``locator`` does not contain text ``expected``.</doc>
-<msg timestamp="20211113 10:36:19.979" level="INFO">Element '//div[@data-qa='app_home_bk_app_view']/*' does not contain text 'Tiedot päivitetty'.</msg>
-<status status="PASS" starttime="20211113 10:36:19.957" endtime="20211113 10:36:19.979"/>
+<msg timestamp="20211113 13:34:24.109" level="INFO">Element '//div[@data-qa='app_home_bk_app_view']/*' does not contain text 'Tiedot päivitetty'.</msg>
+<status status="PASS" starttime="20211113 13:34:24.090" endtime="20211113 13:34:24.109"/>
 </kw>
 <kw name="Page Should Not Contain Element" library="Selenium2Library">
 <arg>//div[@data-qa='app_home_bk_app_view']//button</arg>
 <doc>Verifies that element ``locator`` is not found on the current page.</doc>
-<msg timestamp="20211113 10:36:19.993" level="INFO">Current page does not contain element '//div[@data-qa='app_home_bk_app_view']//button'.</msg>
-<status status="PASS" starttime="20211113 10:36:19.980" endtime="20211113 10:36:19.993"/>
+<msg timestamp="20211113 13:34:24.119" level="INFO">Current page does not contain element '//div[@data-qa='app_home_bk_app_view']//button'.</msg>
+<status status="PASS" starttime="20211113 13:34:24.109" endtime="20211113 13:34:24.119"/>
 </kw>
-<status status="PASS" starttime="20211113 10:36:19.449" endtime="20211113 10:36:19.993"/>
+<status status="PASS" starttime="20211113 13:34:23.614" endtime="20211113 13:34:24.119"/>
 </test>
-<test id="s1-t4" name="Error Message In Message Tab">
+<test id="s1-s1-t4" name="Error Message In Message Tab">
 <kw name="Wait Until Element Is Visible" library="Selenium2Library">
 <arg>//button[@data-qa='messages']</arg>
 <doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" starttime="20211113 10:36:19.994" endtime="20211113 10:36:20.016"/>
+<status status="PASS" starttime="20211113 13:34:24.120" endtime="20211113 13:34:24.138"/>
 </kw>
 <kw name="Click Element" library="Selenium2Library">
 <arg>//button[@data-qa='messages']</arg>
 <doc>Click the element identified by ``locator``.</doc>
-<msg timestamp="20211113 10:36:20.016" level="INFO">Clicking element '//button[@data-qa='messages']'.</msg>
-<status status="PASS" starttime="20211113 10:36:20.016" endtime="20211113 10:36:20.140"/>
+<msg timestamp="20211113 13:34:24.138" level="INFO">Clicking element '//button[@data-qa='messages']'.</msg>
+<status status="PASS" starttime="20211113 13:34:24.138" endtime="20211113 13:34:24.258"/>
 </kw>
 <kw name="Wait Until Element Is Visible" library="Selenium2Library">
 <arg>//div[@data-qa='message_input']/div</arg>
 <doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" starttime="20211113 10:36:20.140" endtime="20211113 10:36:20.182"/>
+<status status="PASS" starttime="20211113 13:34:24.258" endtime="20211113 13:34:24.298"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>1s</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20211113 10:36:21.183" level="INFO">Slept 1 second</msg>
-<status status="PASS" starttime="20211113 10:36:20.183" endtime="20211113 10:36:21.183"/>
+<msg timestamp="20211113 13:34:25.299" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20211113 13:34:24.298" endtime="20211113 13:34:25.299"/>
 </kw>
 <kw name="Element Should Contain" library="Selenium2Library">
 <arg>(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]</arg>
 <arg>Pahoittelut, @Vieras Testikäyttäjä. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.</arg>
 <doc>Verifies that element ``locator`` contains text ``expected``.</doc>
-<msg timestamp="20211113 10:36:21.231" level="INFO">Element '(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]' contains text 'Pahoittelut, @Vieras Testikäyttäjä. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.'.</msg>
-<status status="PASS" starttime="20211113 10:36:21.184" endtime="20211113 10:36:21.231"/>
+<msg timestamp="20211113 13:34:25.357" level="INFO">Element '(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]' contains text 'Pahoittelut, @Vieras Testikäyttäjä. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.'.</msg>
+<status status="PASS" starttime="20211113 13:34:25.299" endtime="20211113 13:34:25.357"/>
 </kw>
 <kw name="Input Text" library="Selenium2Library">
 <arg>//div[@data-qa='message_input']/div</arg>
 <arg>/lindalistaa tänään</arg>
 <doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<msg timestamp="20211113 10:36:21.232" level="INFO">Typing text '/lindalistaa tänään' into text field '//div[@data-qa='message_input']/div'.</msg>
-<status status="PASS" starttime="20211113 10:36:21.232" endtime="20211113 10:36:21.521"/>
+<msg timestamp="20211113 13:34:25.358" level="INFO">Typing text '/lindalistaa tänään' into text field '//div[@data-qa='message_input']/div'.</msg>
+<status status="PASS" starttime="20211113 13:34:25.358" endtime="20211113 13:34:25.661"/>
 </kw>
 <kw name="Click Element" library="Selenium2Library">
 <arg>//button[@data-qa='texty_send_button']</arg>
 <doc>Click the element identified by ``locator``.</doc>
-<msg timestamp="20211113 10:36:21.521" level="INFO">Clicking element '//button[@data-qa='texty_send_button']'.</msg>
-<status status="PASS" starttime="20211113 10:36:21.521" endtime="20211113 10:36:21.718"/>
+<msg timestamp="20211113 13:34:25.662" level="INFO">Clicking element '//button[@data-qa='texty_send_button']'.</msg>
+<status status="PASS" starttime="20211113 13:34:25.661" endtime="20211113 13:34:25.872"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>1s</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20211113 10:36:22.719" level="INFO">Slept 1 second</msg>
-<status status="PASS" starttime="20211113 10:36:21.718" endtime="20211113 10:36:22.719"/>
+<msg timestamp="20211113 13:34:26.873" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20211113 13:34:25.872" endtime="20211113 13:34:26.873"/>
 </kw>
 <kw name="Scroll Element Into View" library="Selenium2Library">
 <arg>(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]</arg>
 <doc>Scrolls the element identified by ``locator`` into view.</doc>
-<status status="PASS" starttime="20211113 10:36:22.719" endtime="20211113 10:36:23.017"/>
+<status status="PASS" starttime="20211113 13:34:26.873" endtime="20211113 13:34:27.171"/>
 </kw>
 <kw name="Element Should Contain" library="Selenium2Library">
 <arg>(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]</arg>
 <arg>This command can't be used by guests in this workspace.</arg>
 <doc>Verifies that element ``locator`` contains text ``expected``.</doc>
-<msg timestamp="20211113 10:36:23.088" level="INFO">Element '(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]' contains text 'This command can't be used by guests in this workspace.'.</msg>
-<status status="PASS" starttime="20211113 10:36:23.017" endtime="20211113 10:36:23.088"/>
+<msg timestamp="20211113 13:34:27.222" level="INFO">Element '(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]' contains text 'This command can't be used by guests in this workspace.'.</msg>
+<status status="PASS" starttime="20211113 13:34:27.172" endtime="20211113 13:34:27.223"/>
 </kw>
-<status status="PASS" starttime="20211113 10:36:19.994" endtime="20211113 10:36:23.088"/>
+<status status="PASS" starttime="20211113 13:34:24.119" endtime="20211113 13:34:27.223"/>
 </test>
 <kw name="Close Test Browser" library="common" type="TEARDOWN">
 <kw name="Close All Browsers" library="Selenium2Library">
 <doc>Closes all open browsers and resets the browser cache.</doc>
-<status status="PASS" starttime="20211113 10:36:23.089" endtime="20211113 10:36:23.189"/>
+<status status="PASS" starttime="20211113 13:34:27.224" endtime="20211113 13:34:27.329"/>
 </kw>
-<status status="PASS" starttime="20211113 10:36:23.089" endtime="20211113 10:36:23.189"/>
+<status status="PASS" starttime="20211113 13:34:27.224" endtime="20211113 13:34:27.329"/>
 </kw>
-<status status="PASS" starttime="20211113 10:36:05.254" endtime="20211113 10:36:23.189"/>
+<status status="PASS" starttime="20211113 13:34:09.176" endtime="20211113 13:34:27.329"/>
+</suite>
+<suite id="s1-s2" name="Home Tab Signups" source="/home/linjokin/Documents/ohtu-projekti/hytuslain/test/e2e/testcases/02__home_tab_signups.robot">
+<kw name="Open Slack In Browser And Login As User" library="common" type="SETUP">
+<kw name="Open Browser" library="Selenium2Library">
+<arg>${LOGIN URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<msg timestamp="20211113 13:34:27.334" level="INFO">Opening browser 'Chrome' to base url 'https://dev-hytuslain.slack.com'.</msg>
+<status status="PASS" starttime="20211113 13:34:27.334" endtime="20211113 13:34:29.619"/>
+</kw>
+<kw name="Wait Until Element Is Visible" library="Selenium2Library">
+<arg>//input[@data-qa='login_email']</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" starttime="20211113 13:34:29.620" endtime="20211113 13:34:29.643"/>
+</kw>
+<kw name="Input Text" library="Selenium2Library">
+<arg>//input[@data-qa='login_email']</arg>
+<arg>${USER_EMAIL}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20211113 13:34:29.644" level="INFO">Typing text '508ef628-b957-4779-98bf-80c0963fb4f2@mailslurp.com' into text field '//input[@data-qa='login_email']'.</msg>
+<status status="PASS" starttime="20211113 13:34:29.643" endtime="20211113 13:34:30.128"/>
+</kw>
+<kw name="Input Password" library="Selenium2Library">
+<arg>//input[@data-qa='login_password']</arg>
+<arg>${USER_PASSWORD}</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<msg timestamp="20211113 13:34:30.129" level="INFO">Typing password into text field '//input[@data-qa='login_password']'.</msg>
+<msg timestamp="20211113 13:34:30.162" level="INFO">Temporally setting log level to: NONE</msg>
+<msg timestamp="20211113 13:34:30.257" level="INFO">Log level changed from NONE to INFO.</msg>
+<status status="PASS" starttime="20211113 13:34:30.128" endtime="20211113 13:34:30.257"/>
+</kw>
+<kw name="Click Element" library="Selenium2Library">
+<arg>//button[@data-qa='signin_button']</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20211113 13:34:30.257" level="INFO">Clicking element '//button[@data-qa='signin_button']'.</msg>
+<status status="PASS" starttime="20211113 13:34:30.257" endtime="20211113 13:34:31.481"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20211113 13:34:33.482" level="INFO">Slept 2 seconds</msg>
+<status status="PASS" starttime="20211113 13:34:31.481" endtime="20211113 13:34:33.483"/>
+</kw>
+<kw name="Cancel Popup" library="HelpFunc">
+<status status="PASS" starttime="20211113 13:34:33.483" endtime="20211113 13:34:33.514"/>
+</kw>
+<kw name="Go To" library="Selenium2Library">
+<arg>${LOGIN URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<msg timestamp="20211113 13:34:33.515" level="INFO">Opening url 'https://dev-hytuslain.slack.com'</msg>
+<status status="PASS" starttime="20211113 13:34:33.514" endtime="20211113 13:34:38.163"/>
+</kw>
+<status status="PASS" starttime="20211113 13:34:27.334" endtime="20211113 13:34:38.163"/>
+</kw>
+<test id="s1-s2-t1" name="Can Open Home Tab">
+<kw name="Sleep" library="BuiltIn">
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20211113 13:34:39.164" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20211113 13:34:38.164" endtime="20211113 13:34:39.164"/>
+</kw>
+<kw name="Maximize Browser Window" library="Selenium2Library">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" starttime="20211113 13:34:39.165" endtime="20211113 13:34:39.463"/>
+</kw>
+<kw name="Scroll Element Into View" library="Selenium2Library">
+<arg>//span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']</arg>
+<doc>Scrolls the element identified by ``locator`` into view.</doc>
+<status status="PASS" starttime="20211113 13:34:39.463" endtime="20211113 13:34:40.122"/>
+</kw>
+<kw name="Wait Until Element Is Visible" library="Selenium2Library">
+<arg>//span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" starttime="20211113 13:34:40.123" endtime="20211113 13:34:40.162"/>
+</kw>
+<kw name="Click Element" library="Selenium2Library">
+<arg>//span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20211113 13:34:40.163" level="INFO">Clicking element '//span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']'.</msg>
+<status status="PASS" starttime="20211113 13:34:40.162" endtime="20211113 13:34:40.381"/>
+</kw>
+<kw name="Element Should Contain" library="Selenium2Library">
+<arg>//div[@data-qa='channel_name']</arg>
+<arg>Lindan-hybridilusmu</arg>
+<doc>Verifies that element ``locator`` contains text ``expected``.</doc>
+<msg timestamp="20211113 13:34:40.508" level="INFO">Element '//div[@data-qa='channel_name']' contains text 'Lindan-hybridilusmu'.</msg>
+<status status="PASS" starttime="20211113 13:34:40.381" endtime="20211113 13:34:40.509"/>
+</kw>
+<status status="PASS" starttime="20211113 13:34:38.163" endtime="20211113 13:34:40.509"/>
+</test>
+<test id="s1-s2-t2" name="Correct Dates">
+<kw name="Sleep" library="BuiltIn">
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20211113 13:34:41.511" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20211113 13:34:40.511" endtime="20211113 13:34:41.512"/>
+</kw>
+<kw name="Get Date For Home Tab Signups" library="HelpFunc">
+<var>${date}</var>
+<msg timestamp="20211113 13:34:41.513" level="INFO">${date} = None</msg>
+<status status="PASS" starttime="20211113 13:34:41.512" endtime="20211113 13:34:41.513"/>
+</kw>
+<kw name="Element Should Be Visible" library="Selenium2Library">
+<arg>//div[@data-qa='block-kit-renderer']//div[contains(h3, $date)]</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<msg timestamp="20211113 13:34:41.746" level="INFO">Element '//div[@data-qa='block-kit-renderer']//div[contains(h3, $date)]' is displayed.</msg>
+<status status="PASS" starttime="20211113 13:34:41.513" endtime="20211113 13:34:41.747"/>
+</kw>
+<status status="PASS" starttime="20211113 13:34:40.510" endtime="20211113 13:34:41.747"/>
+</test>
+<kw name="Close Test Browser" library="common" type="TEARDOWN">
+<kw name="Close All Browsers" library="Selenium2Library">
+<doc>Closes all open browsers and resets the browser cache.</doc>
+<status status="PASS" starttime="20211113 13:34:41.748" endtime="20211113 13:34:41.836"/>
+</kw>
+<status status="PASS" starttime="20211113 13:34:41.747" endtime="20211113 13:34:41.836"/>
+</kw>
+<status status="PASS" starttime="20211113 13:34:27.330" endtime="20211113 13:34:41.836"/>
+</suite>
+<suite id="s1-s3" name="Message Tab" source="/home/linjokin/Documents/ohtu-projekti/hytuslain/test/e2e/testcases/03__message_tab.robot">
+<kw name="Open Slack In Browser And Login As User" library="common" type="SETUP">
+<kw name="Open Browser" library="Selenium2Library">
+<arg>${LOGIN URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<msg timestamp="20211113 13:34:41.841" level="INFO">Opening browser 'Chrome' to base url 'https://dev-hytuslain.slack.com'.</msg>
+<status status="PASS" starttime="20211113 13:34:41.841" endtime="20211113 13:34:44.133"/>
+</kw>
+<kw name="Wait Until Element Is Visible" library="Selenium2Library">
+<arg>//input[@data-qa='login_email']</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" starttime="20211113 13:34:44.133" endtime="20211113 13:34:44.166"/>
+</kw>
+<kw name="Input Text" library="Selenium2Library">
+<arg>//input[@data-qa='login_email']</arg>
+<arg>${USER_EMAIL}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20211113 13:34:44.167" level="INFO">Typing text '508ef628-b957-4779-98bf-80c0963fb4f2@mailslurp.com' into text field '//input[@data-qa='login_email']'.</msg>
+<status status="PASS" starttime="20211113 13:34:44.167" endtime="20211113 13:34:44.559"/>
+</kw>
+<kw name="Input Password" library="Selenium2Library">
+<arg>//input[@data-qa='login_password']</arg>
+<arg>${USER_PASSWORD}</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<msg timestamp="20211113 13:34:44.560" level="INFO">Typing password into text field '//input[@data-qa='login_password']'.</msg>
+<msg timestamp="20211113 13:34:44.593" level="INFO">Temporally setting log level to: NONE</msg>
+<msg timestamp="20211113 13:34:44.689" level="INFO">Log level changed from NONE to INFO.</msg>
+<status status="PASS" starttime="20211113 13:34:44.559" endtime="20211113 13:34:44.689"/>
+</kw>
+<kw name="Click Element" library="Selenium2Library">
+<arg>//button[@data-qa='signin_button']</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20211113 13:34:44.690" level="INFO">Clicking element '//button[@data-qa='signin_button']'.</msg>
+<status status="PASS" starttime="20211113 13:34:44.690" endtime="20211113 13:34:46.019"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20211113 13:34:48.020" level="INFO">Slept 2 seconds</msg>
+<status status="PASS" starttime="20211113 13:34:46.019" endtime="20211113 13:34:48.020"/>
+</kw>
+<kw name="Cancel Popup" library="HelpFunc">
+<status status="PASS" starttime="20211113 13:34:48.021" endtime="20211113 13:34:48.042"/>
+</kw>
+<kw name="Go To" library="Selenium2Library">
+<arg>${LOGIN URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<msg timestamp="20211113 13:34:48.043" level="INFO">Opening url 'https://dev-hytuslain.slack.com'</msg>
+<status status="PASS" starttime="20211113 13:34:48.042" endtime="20211113 13:34:51.565"/>
+</kw>
+<status status="PASS" starttime="20211113 13:34:41.841" endtime="20211113 13:34:51.565"/>
+</kw>
+<test id="s1-s3-t1" name="Can Open Home Tab">
+<kw name="Sleep" library="BuiltIn">
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20211113 13:34:52.566" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20211113 13:34:51.566" endtime="20211113 13:34:52.566"/>
+</kw>
+<kw name="Maximize Browser Window" library="Selenium2Library">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" starttime="20211113 13:34:52.567" endtime="20211113 13:34:52.854"/>
+</kw>
+<kw name="Scroll Element Into View" library="Selenium2Library">
+<arg>//span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']</arg>
+<doc>Scrolls the element identified by ``locator`` into view.</doc>
+<status status="PASS" starttime="20211113 13:34:52.854" endtime="20211113 13:34:53.465"/>
+</kw>
+<kw name="Wait Until Element Is Visible" library="Selenium2Library">
+<arg>//span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" starttime="20211113 13:34:53.466" endtime="20211113 13:34:53.508"/>
+</kw>
+<kw name="Click Element" library="Selenium2Library">
+<arg>//span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20211113 13:34:53.509" level="INFO">Clicking element '//span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']'.</msg>
+<status status="PASS" starttime="20211113 13:34:53.508" endtime="20211113 13:34:53.726"/>
+</kw>
+<kw name="Element Should Contain" library="Selenium2Library">
+<arg>//div[@data-qa='channel_name']</arg>
+<arg>Lindan-hybridilusmu</arg>
+<doc>Verifies that element ``locator`` contains text ``expected``.</doc>
+<msg timestamp="20211113 13:34:53.861" level="INFO">Element '//div[@data-qa='channel_name']' contains text 'Lindan-hybridilusmu'.</msg>
+<status status="PASS" starttime="20211113 13:34:53.727" endtime="20211113 13:34:53.861"/>
+</kw>
+<status status="PASS" starttime="20211113 13:34:51.565" endtime="20211113 13:34:53.862"/>
+</test>
+<test id="s1-s3-t2" name="Can Go To Message Tab">
+<kw name="Wait Until Element Is Visible" library="Selenium2Library">
+<arg>//button[@data-qa='messages']</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" starttime="20211113 13:34:53.864" endtime="20211113 13:34:53.890"/>
+</kw>
+<kw name="Click Element" library="Selenium2Library">
+<arg>//button[@data-qa='messages']</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20211113 13:34:53.891" level="INFO">Clicking element '//button[@data-qa='messages']'.</msg>
+<status status="PASS" starttime="20211113 13:34:53.890" endtime="20211113 13:34:54.613"/>
+</kw>
+<kw name="Wait Until Element Is Visible" library="Selenium2Library">
+<arg>//div[@data-qa='message_input']/div</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" starttime="20211113 13:34:54.613" endtime="20211113 13:34:54.689"/>
+</kw>
+<status status="PASS" starttime="20211113 13:34:53.862" endtime="20211113 13:34:54.689"/>
+</test>
+<test id="s1-s3-t3" name="List Saturday Command Gives Correct Respond">
+<kw name="Input Text" library="Selenium2Library">
+<arg>//div[@data-qa='message_input']/div</arg>
+<arg>/lindalistaa la</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20211113 13:34:54.691" level="INFO">Typing text '/lindalistaa la' into text field '//div[@data-qa='message_input']/div'.</msg>
+<status status="PASS" starttime="20211113 13:34:54.691" endtime="20211113 13:34:55.203"/>
+</kw>
+<kw name="Click Element" library="Selenium2Library">
+<arg>//button[@data-qa='texty_send_button']</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20211113 13:34:55.204" level="INFO">Clicking element '//button[@data-qa='texty_send_button']'.</msg>
+<status status="PASS" starttime="20211113 13:34:55.204" endtime="20211113 13:34:55.542"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20211113 13:34:57.543" level="INFO">Slept 2 seconds</msg>
+<status status="PASS" starttime="20211113 13:34:55.542" endtime="20211113 13:34:57.543"/>
+</kw>
+<kw name="Run Keyword And Return Status" library="BuiltIn">
+<var>${present}</var>
+<arg>Element Should Be Visible</arg>
+<arg>//button[@class='c-button-unstyled p-message_pane__unread_banner__msg']</arg>
+<doc>Runs the given keyword with given arguments and returns the status as a Boolean value.</doc>
+<kw name="Element Should Be Visible" library="Selenium2Library">
+<arg>//button[@class='c-button-unstyled p-message_pane__unread_banner__msg']</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<kw name="Capture Page Screenshot" library="Selenium2Library">
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<msg timestamp="20211113 13:34:57.755" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-1.png"&gt;&lt;img src="selenium-screenshot-1.png" width="800px"&gt;&lt;/a&gt;</msg>
+<status status="PASS" starttime="20211113 13:34:57.580" endtime="20211113 13:34:57.756"/>
+</kw>
+<msg timestamp="20211113 13:34:57.758" level="FAIL">Element with locator '//button[@class='c-button-unstyled p-message_pane__unread_banner__msg']' not found.</msg>
+<status status="FAIL" starttime="20211113 13:34:57.544" endtime="20211113 13:34:57.758"/>
+</kw>
+<msg timestamp="20211113 13:34:57.758" level="INFO">${present} = False</msg>
+<status status="PASS" starttime="20211113 13:34:57.544" endtime="20211113 13:34:57.758"/>
+</kw>
+<kw name="Run Keyword If" library="BuiltIn">
+<arg>${present}</arg>
+<arg>Click Element</arg>
+<arg>//button[@class='c-button-unstyled p-message_pane__unread_banner__msg']</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" starttime="20211113 13:34:57.758" endtime="20211113 13:34:57.759"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20211113 13:34:59.760" level="INFO">Slept 2 seconds</msg>
+<status status="PASS" starttime="20211113 13:34:57.759" endtime="20211113 13:34:59.760"/>
+</kw>
+<kw name="Scroll Element Into View" library="Selenium2Library">
+<arg>(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]</arg>
+<doc>Scrolls the element identified by ``locator`` into view.</doc>
+<status status="PASS" starttime="20211113 13:34:59.761" endtime="20211113 13:35:00.085"/>
+</kw>
+<kw name="Get Date For Message Tab" library="HelpFunc">
+<var>${date}</var>
+<arg>la</arg>
+<msg timestamp="20211113 13:35:00.086" level="INFO">${date} = lauantaina 13.11</msg>
+<status status="PASS" starttime="20211113 13:35:00.085" endtime="20211113 13:35:00.086"/>
+</kw>
+<kw name="Element Should Contain" library="Selenium2Library">
+<arg>(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]</arg>
+<arg>Kukaan ei ole toimistolla ${date}</arg>
+<doc>Verifies that element ``locator`` contains text ``expected``.</doc>
+<msg timestamp="20211113 13:35:00.169" level="INFO">Element '(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]' contains text 'Kukaan ei ole toimistolla lauantaina 13.11'.</msg>
+<status status="PASS" starttime="20211113 13:35:00.087" endtime="20211113 13:35:00.169"/>
+</kw>
+<status status="PASS" starttime="20211113 13:34:54.690" endtime="20211113 13:35:00.170"/>
+</test>
+<test id="s1-s3-t4" name="List Sunday Command Gives Correct Respond">
+<kw name="Input Text" library="Selenium2Library">
+<arg>//div[@data-qa='message_input']/div</arg>
+<arg>/lindalistaa su</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20211113 13:35:00.171" level="INFO">Typing text '/lindalistaa su' into text field '//div[@data-qa='message_input']/div'.</msg>
+<status status="PASS" starttime="20211113 13:35:00.170" endtime="20211113 13:35:00.398"/>
+</kw>
+<kw name="Click Element" library="Selenium2Library">
+<arg>//button[@data-qa='texty_send_button']</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20211113 13:35:00.399" level="INFO">Clicking element '//button[@data-qa='texty_send_button']'.</msg>
+<status status="PASS" starttime="20211113 13:35:00.399" endtime="20211113 13:35:00.561"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20211113 13:35:02.562" level="INFO">Slept 2 seconds</msg>
+<status status="PASS" starttime="20211113 13:35:00.562" endtime="20211113 13:35:02.563"/>
+</kw>
+<kw name="Run Keyword And Return Status" library="BuiltIn">
+<var>${present}</var>
+<arg>Element Should Be Visible</arg>
+<arg>//button[@class='c-button-unstyled p-message_pane__unread_banner__msg']</arg>
+<doc>Runs the given keyword with given arguments and returns the status as a Boolean value.</doc>
+<kw name="Element Should Be Visible" library="Selenium2Library">
+<arg>//button[@class='c-button-unstyled p-message_pane__unread_banner__msg']</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<kw name="Capture Page Screenshot" library="Selenium2Library">
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<msg timestamp="20211113 13:35:02.757" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-2.png"&gt;&lt;img src="selenium-screenshot-2.png" width="800px"&gt;&lt;/a&gt;</msg>
+<status status="PASS" starttime="20211113 13:35:02.580" endtime="20211113 13:35:02.757"/>
+</kw>
+<msg timestamp="20211113 13:35:02.757" level="FAIL">Element with locator '//button[@class='c-button-unstyled p-message_pane__unread_banner__msg']' not found.</msg>
+<status status="FAIL" starttime="20211113 13:35:02.566" endtime="20211113 13:35:02.757"/>
+</kw>
+<msg timestamp="20211113 13:35:02.757" level="INFO">${present} = False</msg>
+<status status="PASS" starttime="20211113 13:35:02.564" endtime="20211113 13:35:02.757"/>
+</kw>
+<kw name="Run Keyword If" library="BuiltIn">
+<arg>${present}</arg>
+<arg>Click Element</arg>
+<arg>//button[@class='c-button-unstyled p-message_pane__unread_banner__msg']</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" starttime="20211113 13:35:02.758" endtime="20211113 13:35:02.758"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20211113 13:35:04.758" level="INFO">Slept 2 seconds</msg>
+<status status="PASS" starttime="20211113 13:35:02.758" endtime="20211113 13:35:04.759"/>
+</kw>
+<kw name="Scroll Element Into View" library="Selenium2Library">
+<arg>(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]</arg>
+<doc>Scrolls the element identified by ``locator`` into view.</doc>
+<status status="PASS" starttime="20211113 13:35:04.759" endtime="20211113 13:35:05.079"/>
+</kw>
+<kw name="Get Date For Message Tab" library="HelpFunc">
+<var>${date}</var>
+<arg>su</arg>
+<msg timestamp="20211113 13:35:05.081" level="INFO">${date} = sunnuntaina 14.11</msg>
+<status status="PASS" starttime="20211113 13:35:05.080" endtime="20211113 13:35:05.081"/>
+</kw>
+<kw name="Element Should Contain" library="Selenium2Library">
+<arg>(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]</arg>
+<arg>Kukaan ei ole toimistolla ${date}</arg>
+<doc>Verifies that element ``locator`` contains text ``expected``.</doc>
+<msg timestamp="20211113 13:35:05.170" level="INFO">Element '(//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]' contains text 'Kukaan ei ole toimistolla sunnuntaina 14.11'.</msg>
+<status status="PASS" starttime="20211113 13:35:05.082" endtime="20211113 13:35:05.170"/>
+</kw>
+<status status="PASS" starttime="20211113 13:35:00.170" endtime="20211113 13:35:05.170"/>
+</test>
+<kw name="Close Test Browser" library="common" type="TEARDOWN">
+<kw name="Close All Browsers" library="Selenium2Library">
+<doc>Closes all open browsers and resets the browser cache.</doc>
+<status status="PASS" starttime="20211113 13:35:05.172" endtime="20211113 13:35:05.264"/>
+</kw>
+<status status="PASS" starttime="20211113 13:35:05.171" endtime="20211113 13:35:05.264"/>
+</kw>
+<status status="PASS" starttime="20211113 13:34:41.837" endtime="20211113 13:35:05.264"/>
+</suite>
+<status status="PASS" starttime="20211113 13:34:09.159" endtime="20211113 13:35:05.266"/>
 </suite>
 <statistics>
 <total>
-<stat pass="4" fail="0" skip="0">All Tests</stat>
+<stat pass="10" fail="0" skip="0">All Tests</stat>
 </total>
 <tag>
 </tag>
 <suite>
-<stat pass="4" fail="0" skip="0" id="s1" name="Guest Suite">Guest Suite</stat>
+<stat pass="10" fail="0" skip="0" id="s1" name="Testcases">Testcases</stat>
+<stat pass="4" fail="0" skip="0" id="s1-s1" name="Guest Suite">Testcases.Guest Suite</stat>
+<stat pass="2" fail="0" skip="0" id="s1-s2" name="Home Tab Signups">Testcases.Home Tab Signups</stat>
+<stat pass="4" fail="0" skip="0" id="s1-s3" name="Message Tab">Testcases.Message Tab</stat>
 </suite>
 </statistics>
 <errors>

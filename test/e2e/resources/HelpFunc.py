@@ -1,6 +1,10 @@
 from pynput.keyboard import Key, Controller
 from datetime import datetime, timedelta
 
+months = ['tammikuuta', 'helmikuuta', 'maaliskuuta', 'huhtikuuta', 'toukokuuta',
+    'kesäkuuta', 'heinäkuuta', 'elokuuta', 'syyskuuta', 'lokakuuta', 'marraskuuta', 'joulukuuta']
+weekdays = ['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai']
+short_weekdays = ['ma', 'ti', 'ke', 'to', 'pe', 'la', 'su']
 
 class HelpFunc(object):
 
@@ -9,16 +13,12 @@ class HelpFunc(object):
         keyboard.press(Key.space)
         keyboard.release(Key.space)
 
-    def get_current_date_for_home_tab(self):
-        months = ['tammikuuta', 'helmikuuta', 'maaliskuuta', 'huhtikuuta', 'toukokuuta',
-    'kesäkuuta', 'heinäkuuta', 'elokuuta', 'syyskuuta', 'lokakuuta', 'marraskuuta', 'joulukuuta']
+    def get_current_date_for_home_tab_update(self):
         now = datetime.now()
         date = "{day}. {month} {year}".format(day=now.day, month=months[now.month - 1], year=now.year)
         return date
 
     def get_date_for_message_tab(self, weekday):
-        weekdays = ['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai']
-        short_weekdays = ['ma', 'ti', 'ke', 'to', 'pe', 'la', 'su']
         now = datetime.now()
         if now.weekday() == short_weekdays.index(weekday):
             date = "{dow}na {day}.{month}".format(dow=weekdays[short_weekdays.index(weekday)], day=now.day, month=now.month)
@@ -27,4 +27,10 @@ class HelpFunc(object):
             future_date = now + timedelta(days = (short_weekdays.index(weekday) + 7 - now.weekday()) % 7)
             date = "{dow}na {day}.{month}".format(dow=weekdays[short_weekdays.index(weekday)], day=future_date.day, month=future_date.month)
             return date
+
+    def get_date_for_home_tab_signups(self):
+        now = datetime.now()
+        while now.weekday() >= 5:
+            now = now + timedelta(days = (1))
+        date = "{dow} {day}.{month}".format(dow=weekdays[now.weekday()], day = now.day, month = now.month)
 
