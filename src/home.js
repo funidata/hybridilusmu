@@ -39,7 +39,7 @@ const getUpdateBlock = async () => {
         plainText(`Tiedot päivitetty ${DateTime.now().setZone('Europe/Helsinki').setLocale('fi').toLocaleString(format)}`),
         actions([
             button('Päivitä', 'update_click', 'updated'),
-            button('Asetukset', 'asetukset_click', 'updated'),
+            button('Asetukset', 'settings_click', 'updated'),
         ]),
         divider(),
     );

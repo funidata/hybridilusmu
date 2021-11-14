@@ -13,7 +13,7 @@ exports.enableActionFunctions = function (app) {
     /**
     * Opens a modal view for the default settings
     */
-    app.action('asetukset_click', async ({ body, ack, client }) => {
+    app.action('settings_click', async ({ body, ack, client }) => {
         home.openView(client, body.user.id, body.trigger_id)
         await ack();
     });
