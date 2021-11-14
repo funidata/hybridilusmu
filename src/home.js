@@ -39,7 +39,7 @@ const getUpdateBlock = async () => {
         plainText(`Tiedot päivitetty ${DateTime.now().setZone('Europe/Helsinki').setLocale('fi').toLocaleString(format)}`),
         actions([
             button('Päivitä', 'update_click', 'updated'),
-            button('Asetukset', 'settings_click', 'updated'),
+            button('Oletusasetukset', 'settings_click', 'updated'),
         ]),
         divider(),
     );
@@ -80,7 +80,7 @@ const modalView = {
     external_id: 'default_modal',
     title: {
         type: 'plain_text',
-        text: 'Asetukset',
+        text: 'Oletusasetukset',
     },
     close: {
         type: 'plain_text',
