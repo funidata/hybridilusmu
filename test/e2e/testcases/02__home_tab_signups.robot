@@ -13,10 +13,10 @@ Suite Teardown    common.Close Test Browser
 Can Open Home Tab
     Sleep    1s
     Maximize Browser Window
-    Scroll Element Into View    //span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']
-    Wait Until Element Is Visible    //span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']
-    Click Element    //span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']
-    Element Should Contain    //div[@data-qa='channel_name']    Lindan-hybridilusmu
+    Scroll Element Into View    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
+    Wait Until Element Is Visible    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
+    Click Element    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
+    Element Should Contain    //div[@data-qa='channel_name']    test-hybridilusmu
 
 Correct Dates
     ${date}    Get Date For Home Tab Signups

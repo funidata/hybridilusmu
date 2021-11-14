@@ -9,12 +9,12 @@ Suite Teardown    common.Close Test Browser
 
 *** Test Cases ***
 Can Open Home Tab
-    Sleep    1s
     Maximize Browser Window
-    Scroll Element Into View    //span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']
-    Wait Until Element Is Visible    //span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']
-    Click Element    //span[@data-qa='channel_sidebar_name_lindan-hybridilusmu']
-    Element Should Contain    //div[@data-qa='channel_name']    Lindan-hybridilusmu 
+    Sleep    1s
+    Scroll Element Into View    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
+    Wait Until Element Is Visible    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
+    Click Element    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
+    Element Should Contain    //div[@data-qa='channel_name']    test-hybridilusmu 
 
 Can Go To Message Tab
     Wait Until Element Is Visible    //button[@data-qa='messages']
