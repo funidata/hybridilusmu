@@ -76,15 +76,15 @@ const getRegistrationsBlock = async (userId) => {
 };
 
 const modalView = {
-    "type": "modal",
-    "external_id" : "default_modal",
-    "title": {
-        "type": "plain_text",
-        "text": "Asetukset"
+    type: 'modal',
+    external_id: 'default_modal',
+    title: {
+        type: 'plain_text',
+        text: 'Asetukset',
     },
-    "close": {
-        "type": "plain_text",
-        "text": "Sulje"
+    close: {
+        type: 'plain_text',
+        text: 'Sulje',
     },
 };
 
@@ -107,20 +107,20 @@ const update = async (client, userId) => {
 };
 
 const openView = async (client, userId, triggerId) => {
-    const block = await getDefaultSettingsBlock(userId)
-    modalView["blocks"] = block;
+    const block = await getDefaultSettingsBlock(userId);
+    modalView.blocks = block;
     const result = await client.views.open({
-      trigger_id: triggerId,
-      view: modalView
+        trigger_id: triggerId,
+        view: modalView,
     });
 };
 
 const updateView = async (client, userId) => {
-    const block = await getDefaultSettingsBlock(userId)
-    modalView["blocks"] = block;
+    const block = await getDefaultSettingsBlock(userId);
+    modalView.blocks = block;
     const result = await client.views.update({
-      external_id: "default_modal",
-      view: modalView
+        external_id: 'default_modal',
+        view: modalView,
     });
 };
 
@@ -134,4 +134,10 @@ const error = async (client, userId, message) => {
     });
 };
 
-module.exports = { update, error, getDefaultSettingsBlock, openView, updateView };
+module.exports = {
+    error,
+    getDefaultSettingsBlock,
+    openView,
+    update,
+    updateView,
+};

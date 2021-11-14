@@ -14,7 +14,7 @@ exports.enableActionFunctions = function (app) {
     * Opens a modal view for the default settings
     */
     app.action('settings_click', async ({ body, ack, client }) => {
-        home.openView(client, body.user.id, body.trigger_id)
+        home.openView(client, body.user.id, body.trigger_id);
         await ack();
     });
 
@@ -57,7 +57,8 @@ exports.enableActionFunctions = function (app) {
     */
     app.action('default_remote_click', async ({ body, ack, client }) => {
         const data = JSON.parse(body.actions[0].value);
-        await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultIsRemote, false);
+        await service.changeDefaultRegistration(body.user.id, data.weekday,
+            !data.defaultIsRemote, false);
         home.update(client, body.user.id);
         home.updateView(client, body.user.id);
         await ack();
