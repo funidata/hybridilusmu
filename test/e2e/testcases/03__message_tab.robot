@@ -29,7 +29,7 @@ List Saturday Command Gives Correct Respond
     Sleep    2s
     ${present}=    Run Keyword And Return Status    Element Should Be Visible   //button[@class='c-button-unstyled p-message_pane__unread_banner__msg']
     Run Keyword If    ${present}    Click Element    //button[@class='c-button-unstyled p-message_pane__unread_banner__msg']
-    Sleep    2s
+    Sleep    1s
     Scroll Element Into View    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]
     ${date}=    Get Date For Message Tab    la
     Element Should Contain    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]    Kukaan ei ole toimistolla ${date}   
@@ -40,7 +40,7 @@ List Sunday Command Gives Correct Respond
     Sleep    2s
     ${present}=    Run Keyword And Return Status    Element Should Be Visible   //button[@class='c-button-unstyled p-message_pane__unread_banner__msg']
     Run Keyword If    ${present}    Click Element    //button[@class='c-button-unstyled p-message_pane__unread_banner__msg']
-    Sleep    2s
+    Sleep    1s
     Scroll Element Into View    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]
     ${date}=    Get Date For Message Tab    su
     Element Should Contain    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]    Kukaan ei ole toimistolla ${date}

@@ -19,6 +19,5 @@ Can Open Home Tab
     Element Should Contain    //div[@data-qa='channel_name']    Lindan-hybridilusmu
 
 Correct Dates
-    Sleep    1s
     ${date}    Get Date For Home Tab Signups
-    Element Should Be Visible    //div[@data-qa='block-kit-renderer']//div[contains(h3, $date)]
+    Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[contains(h3, $date)]
