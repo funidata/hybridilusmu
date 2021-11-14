@@ -51,21 +51,6 @@ const listNWeekdays = (day, n) => {
 };
 
 /**
- * Returns a list of strings representing one week,
- * starting from next monday calculated from the given day.
- * Strings are of format "Maanantai 11.10."
- * @param {Luxon Date} day - Starting day as a Luxon Date object.
- */
-const listNextWeek = (day) => {
-    const nextMonday = day.plus({ days: (8 - day.weekday) });
-    const res = [];
-    for (const line of listNWeekdays(nextMonday, 5)) {  // eslint-disable-line
-        res.push(toPrettyFormat(line));
-    }
-    return res;
-};
-
-/**
  * Calculates and returns the edit distance of given strings.
  * @param {string} str1 - First string.
  * @param {string} str2 - Second string.
@@ -162,7 +147,6 @@ module.exports = {
     atWeekday,
     isWeekday,
     listNWeekdays,
-    listNextWeek,
     matchWeekday,
     parseDate,
     toPrettyFormat,
