@@ -25,7 +25,7 @@ exports.enableSlashCommands = function (app) {
             let response = library.demandDate();
             const parameters = command.text.split(' ');
             if (parameters.length === 0) {
-                helper.postEphemeralMessage(command.channel_id, userId, response);
+                helper.postEphemeralMessage(app, command.channel_id, userId, response);
                 return;
             }
             let dateString = parameters[0];
@@ -44,7 +44,7 @@ exports.enableSlashCommands = function (app) {
                     response = library.normalRegistrationRemoved(date);
                 }
             }
-            helper.postEphemeralMessage(command.channel_id, userId, response);
+            helper.postEphemeralMessage(app, command.channel_id, userId, response);
         } catch (error) {
             console.log('Tapahtui virhe :(');
             console.log(error);
@@ -61,7 +61,7 @@ exports.enableSlashCommands = function (app) {
             let response = library.demandDateAndStatus();
             const parameters = command.text.split(' ');
             if (parameters.length < 2) {
-                helper.postEphemeralMessage(command.channel_id, userId, response);
+                helper.postEphemeralMessage(app, command.channel_id, userId, response);
                 return;
             }
             let dateString = parameters[0];
@@ -85,7 +85,7 @@ exports.enableSlashCommands = function (app) {
                 if (devault) response = library.denyDefaultRegistrationForWeekend();
                 else response = library.denyNormalRegistrationForWeekend();
             }
-            helper.postEphemeralMessage(command.channel_id, userId, response);
+            helper.postEphemeralMessage(app, command.channel_id, userId, response);
         } catch (error) {
             console.log('Tapahtui virhe :(');
             console.log(error);
@@ -95,14 +95,17 @@ exports.enableSlashCommands = function (app) {
     app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
         try {
             await ack();
-            const parameter = command.text; // Antaa käskyn parametrin
+            const parameter = command.text;
+            if (parameter.trim().toLowerCase() === 'help') {
+                helper.postEphemeralMessage(app, command.channel_id, command.user_id, library.explainListaa());
+                return;
+            }
             const date = dfunc.parseDate(parameter, DateTime.now());
             if (date.isValid) {
                 const registrations = await service.getRegistrationsFor(date.toISODate());
-                const response = library.registrationList(date, registrations);
-                helper.postEphemeralMessage(command.channel_id, command.user_id, response);
+                helper.postEphemeralMessage(app, command.channel_id, command.user_id, library.registrationList(date, registrations));
             } else {
-                helper.postEphemeralMessage(command.channel_id, command.user_id, library.demandDate());
+                helper.postEphemeralMessage(app, command.channel_id, command.user_id, library.demandDate());
             }
         } catch (error) {
             console.log('Tapahtui virhe :(');

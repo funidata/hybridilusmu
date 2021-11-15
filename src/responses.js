@@ -66,6 +66,20 @@ const defaultRegistrationRemoved = (date) => {
 };
 
 /**
+ * Reply to /listaa command with help parameter.
+ * @param {Luxon Date}
+ */
+const explainListaa = () => {
+    return '*/listaa*: Anna komennolle parametrina päivä jossain seuraavista muodoista:\n'
+        + '    • Maanantai\n'
+        + '    • Ma\n'
+        + '    • 15.11. tai 15.11\n'
+        + '    • Tänään\n'
+        + '    • Huomenna\n'
+        + 'Isoilla ja pienillä kirjaimilla ei ole merkitystä.';
+};
+
+/**
  * Reply to user trying to add normal registration for weekend.
  * @param {Luxon Date}
  */
@@ -146,6 +160,7 @@ module.exports = {
     demandDateAndStatus,
     denyDefaultRegistrationForWeekend,
     denyNormalRegistrationForWeekend,
+    explainListaa,
     normalRegistrationAdded,
     normalRegistrationRemoved,
     registrationList,
