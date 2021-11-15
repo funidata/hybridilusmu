@@ -23,6 +23,16 @@ const RECORD_LIMIT = 180;
 const MAX_DIFFERENCE = 2;
 
 /**
+ * Checks if the given date is in the past, meaning yesterday or before.
+ * This function expects the given date's time to be set at 00:00.
+ * @param {Luxon Date}
+ */
+const inThePast = (date) => {
+    if (date <= DateTime.now().minus({ days: 1 })) return true;
+    return false;
+};
+
+/**
  * Returns weekday of given date as a string.
  * @param {Luxon date}
  */
@@ -148,6 +158,7 @@ const parseDate = (input, today) => {
 
 module.exports = {
     getWeekday,
+    inThePast,
     isWeekday,
     isWeekend,
     listNWeekdays,

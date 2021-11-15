@@ -1,3 +1,5 @@
+const dfunc = require('./dateFunctions');
+
 const weekdays = [
     'Maanantai',
     'Tiistai',
@@ -52,10 +54,17 @@ const atDate = (date) => `${na(date)} ${dayPointMonth(date)}`;
  * @param {List}
  */
 const registrationList = (date, registrations) => {
-    if (registrations.length === 0) return `Kukaan ei ole toimistolla ${atDate(date).toLowerCase()}`;
     let response = `${atDate(date)} toimistolla`;
-    let verb = ' ovat\n';
-    if (registrations.length === 1) verb = ' on:\n';
+    let verb;
+    if (dfunc.inThePast(date)) {
+        if (registrations.length === 0) return `Kukaan ei ollut toimistolla ${atDate(date).toLowerCase()}`;
+        verb = ' olivat\n';
+        if (registrations.length === 1) verb = ' oli:\n';
+    } else {
+        if (registrations.length === 0) return `Kukaan ei ole toimistolla ${atDate(date).toLowerCase()}`;
+        verb = ' ovat\n';
+        if (registrations.length === 1) verb = ' on:\n';
+    }
     response += verb;
     registrations.forEach((user) => {
         response += `<@${user}>\n`;
