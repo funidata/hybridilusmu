@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { DateTime } = require('luxon');
-const dfunc = require('../dateFunctions');
+const dfunc = require('../src/dateFunctions');
 
 const RECORD_LIMIT = 180;
 

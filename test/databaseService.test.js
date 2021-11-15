@@ -1,7 +1,7 @@
 const assert = require('assert');
-const database = require('../database');
-const db = require('../controllers/db.controllers');
-const service = require('../databaseService');
+const database = require('../src/database');
+const db = require('../src/controllers/db.controllers');
+const service = require('../src/databaseService');
 
 describe('ChangeRegistration Tests', function () { // eslint-disable-line
     this.beforeAll(async () => {
