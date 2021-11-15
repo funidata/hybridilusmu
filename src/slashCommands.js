@@ -15,36 +15,47 @@ const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX :
 
 exports.enableSlashCommands = function (app) {
     /**
-    * Listens to a slash-command and signs user up for given day. 
-    * Handles both normal and default registrations.
+    * Checks if user gave 'help' as a parameter to a command.
+    * If yes, posts instructions on how to use that command.
+    * Returns true, if user asked for help and false otherwise.
     */
-    app.command(`/${COMMAND_PREFIX}poista`, async ({ command, ack }) => {
+    const help = (input, channelId, userId, response) => {
+        if (input.trim().toLowerCase() === 'help') {
+            helper.postEphemeralMessage(app, channelId, userId, response());
+            return true;
+        }
+        return false;
+    };
+
+    /**
+    * Checks if user gave less parameters than was at least expected.
+    * If yes, posts instructions on how to use that command.
+    */
+    const notEnoughParameters = (limit, parameterCount, channelId, userId, response) => {
+        if (parameterCount < limit) {
+            helper.postEphemeralMessage(app, channelId, userId, response());
+            return true;
+        }
+        return false;
+    };
+
+    /**
+    * Listens to a slash-command and lists users registered for the given day.
+    */
+    app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
         try {
             await ack();
+            const input = command.text;
+            const channelId = command.channel_id;
             const userId = command.user_id;
-            let response = library.demandDate();
-            const parameters = command.text.split(' ');
-            if (parameters.length === 0) {
-                helper.postEphemeralMessage(app, command.channel_id, userId, response);
-                return;
-            }
-            let dateString = parameters[0];
-            let devault = false;
-            if (parameters.length === 2 && parameters[0] === 'def') {
-                devault = true;
-                dateString = parameters[1];
-            }
-            const date = dfunc.parseDate(dateString, DateTime.now());
+            if (help(input, channelId, userId, library.explainListaa)) return;
+            const date = dfunc.parseDate(input, DateTime.now());
             if (date.isValid) {
-                if (devault) {
-                    await service.changeDefaultRegistration(userId, dfunc.getWeekday(date), false);
-                    response = library.defaultRegistrationRemoved(date);
-                } else {
-                    await service.changeRegistration(userId, date.toISODate(), false);
-                    response = library.normalRegistrationRemoved(date);
-                }
+                const registrations = await service.getRegistrationsFor(date.toISODate());
+                helper.postEphemeralMessage(app, channelId, userId, library.registrationList(date, registrations));
+            } else {
+                helper.postEphemeralMessage(app, channelId, userId, library.demandDate());
             }
-            helper.postEphemeralMessage(app, command.channel_id, userId, response);
         } catch (error) {
             console.log('Tapahtui virhe :(');
             console.log(error);
@@ -52,25 +63,24 @@ exports.enableSlashCommands = function (app) {
     });
 
     /**
-    * Listens to a slash-command and signs user up for given day.
+    * Listens to a slash-command and registers user for given day.
+    * Handles both normal and default registrations.
     */
     app.command(`/${COMMAND_PREFIX}ilmoita`, async ({ command, ack }) => {
         try {
             await ack();
+            const input = command.text;
+            const channelId = command.channel_id;
             const userId = command.user_id;
+            if (help(input, channelId, userId, library.explainIlmoita)) return;
             let response = library.demandDateAndStatus();
-            const parameters = command.text.split(' ');
-            if (parameters.length < 2) {
-                helper.postEphemeralMessage(app, command.channel_id, userId, response);
-                return;
-            }
+            const parameters = input.split(' ');
+            if (notEnoughParameters(2, parameters.length, channelId, userId, library.demandDateAndStatus)) return;
             let dateString = parameters[0];
             let status = parameters[1];
             let devault = false;
-            if (parameters.length === 3 && parameters[0] === 'def') {
-                dateString = parameters[1];
-                status = parameters[2];
-                devault = true;
+            if (parameters[0].toLowerCase() === 'def' && parameters.length === 3) {
+                [dateString, status, devault] = [parameters[1], parameters[2], true];
             }
             const date = dfunc.parseDate(dateString, DateTime.now());
             if (dfunc.isWeekday(date) && (status === 'toimisto' || status === 'etä')) {
@@ -85,28 +95,43 @@ exports.enableSlashCommands = function (app) {
                 if (devault) response = library.denyDefaultRegistrationForWeekend();
                 else response = library.denyNormalRegistrationForWeekend();
             }
-            helper.postEphemeralMessage(app, command.channel_id, userId, response);
+            helper.postEphemeralMessage(app, channelId, userId, response);
         } catch (error) {
             console.log('Tapahtui virhe :(');
             console.log(error);
         }
     });
 
-    app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
+    /**
+    * Listens to a slash-command and removes registration for user for the given day.
+    * Handles both normal and default registration removals.
+    */
+    app.command(`/${COMMAND_PREFIX}poista`, async ({ command, ack }) => {
         try {
             await ack();
-            const parameter = command.text;
-            if (parameter.trim().toLowerCase() === 'help') {
-                helper.postEphemeralMessage(app, command.channel_id, command.user_id, library.explainListaa());
-                return;
+            const input = command.text;
+            const channelId = command.channel_id;
+            const userId = command.user_id;
+            if (help(input, channelId, userId, library.explainPoista)) return;
+            let response = library.demandDate();
+            const parameters = input.split(' ');
+            if (notEnoughParameters(1, parameters.length, channelId, userId, library.demandDate)) return;
+            let dateString = parameters[0];
+            let devault = false;
+            if (parameters[0].toLowerCase() === 'def' && parameters.length === 2) {
+                [dateString, devault] = [parameters[1], true];
             }
-            const date = dfunc.parseDate(parameter, DateTime.now());
+            const date = dfunc.parseDate(dateString, DateTime.now());
             if (date.isValid) {
-                const registrations = await service.getRegistrationsFor(date.toISODate());
-                helper.postEphemeralMessage(app, command.channel_id, command.user_id, library.registrationList(date, registrations));
-            } else {
-                helper.postEphemeralMessage(app, command.channel_id, command.user_id, library.demandDate());
+                if (devault) {
+                    await service.changeDefaultRegistration(userId, dfunc.getWeekday(date), false);
+                    response = library.defaultRegistrationRemoved(date);
+                } else {
+                    await service.changeRegistration(userId, date.toISODate(), false);
+                    response = library.normalRegistrationRemoved(date);
+                }
             }
+            helper.postEphemeralMessage(app, channelId, userId, response);
         } catch (error) {
             console.log('Tapahtui virhe :(');
             console.log(error);

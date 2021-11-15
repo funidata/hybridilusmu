@@ -63,7 +63,7 @@ exports.enableMiddleware = function (app) {
     * is a guest (restricted), and if so, stops further processing of the request,
     * displaying an error message instead.
     */
-    async function guestHandler({payload, body, client, next, ack, event}) {
+    async function guestHandler({ payload, body, client, next, ack, event }) {
         // The user ID is found in many different places depending on the type of action taken
         let userId; // Undefined evaluates as false
         if (!userId) try { userId = payload.user; } catch (error) {} // tab

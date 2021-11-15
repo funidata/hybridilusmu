@@ -11,13 +11,49 @@ const weekdays = [
 // All functions in this class return a string.
 
 /**
+ * Turns a weekday into the finnish na-form.
+ * @param {Luxon Date}
+ */
+const na = (date) => `${weekdays[date.weekday - 1]}na`;
+
+/**
+ * Turns a weekday into the finnish lta-form.
+ * @param {Luxon Date}
+ */
+const lta = (date) => {
+    if (date.weekday === 3) return 'keskiviikolta';
+    return `${weekdays[date.weekday - 1]}lta`;
+};
+
+/**
+ * Turns a weekday into the finnish sin-form.
+ * @param {Luxon Date}
+ */
+const sin = (date) => {
+    if (date.weekday === 3) return 'keskiviikkoisin';
+    return `${weekdays[date.weekday - 1]}sin`;
+};
+
+/**
+ * Turns a date into day.month.-form.
+ * @param {Luxon Date}
+ */
+const dayPointMonth = (date) => `${date.day}.${date.month}.`;
+
+/**
+ * Convenience method for this commonly needed format.
+ * @param {Luxon Date}
+ */
+const atDate = (date) => `${na(date)} ${dayPointMonth(date)}`;
+
+/**
  * Reply to /listaa command.
  * @param {Luxon Date}
  * @param {List}
  */
 const registrationList = (date, registrations) => {
-    if (registrations.length === 0) return 'Kukaan ei ole toimistolla ' + atDate(date).toLowerCase();
-    let response = atDate(date) + ' toimistolla';
+    if (registrations.length === 0) return `Kukaan ei ole toimistolla ${atDate(date).toLowerCase()}`;
+    let response = `${atDate(date)} toimistolla`;
     let verb = ' ovat\n';
     if (registrations.length === 1) verb = ' on:\n';
     response += verb;
@@ -33,7 +69,7 @@ const registrationList = (date, registrations) => {
  * @param {string}
  */
 const normalRegistrationAdded = (date, status) => {
-    const head = 'Ilmoittautuminen lisätty - ' + atDate(date).toLowerCase();
+    const head = `Ilmoittautuminen lisätty - ${atDate(date).toLowerCase()}`;
     const tail = status === 'toimisto' ? ' toimistolla.' : ' etänä.';
     return head + tail;
 };
@@ -44,7 +80,7 @@ const normalRegistrationAdded = (date, status) => {
  * @param {string}
  */
 const defaultRegistrationAdded = (date, status) => {
-    const head = 'Oletusilmoittautuminen lisätty - ' + sin(date).toLowerCase();
+    const head = `Oletusilmoittautuminen lisätty - ${sin(date).toLowerCase()}`;
     const tail = status === 'toimisto' ? ' toimistolla.' : ' etänä.';
     return head + tail;
 };
@@ -53,105 +89,69 @@ const defaultRegistrationAdded = (date, status) => {
  * Reply to /poista command.
  * @param {Luxon Date}
  */
-const normalRegistrationRemoved = (date) => {
-    return 'Ilmoittautuminen poistettu ' + lta(date).toLowerCase() + ' ' + dayPointMonth(date);
-};
+const normalRegistrationRemoved = (date) => `Ilmoittautuminen poistettu ${lta(date).toLowerCase()} ${dayPointMonth(date)}`;
 
 /**
  * Reply to /poista command with def parameter.
  * @param {Luxon Date}
  */
-const defaultRegistrationRemoved = (date) => {
-    return 'Oletusilmoittautuminen poistettu ' + lta(date).toLowerCase() + '.';
-};
+const defaultRegistrationRemoved = (date) => `Oletusilmoittautuminen poistettu ${lta(date).toLowerCase()}.`;
+
+/**
+ * Explains allowed formats for day parameter in slash commands.
+ */
+const explainPäivä = () => '    • Maanantai\n'
+    + '    • Ma\n'
+    + '    • 15.11. tai 15.11\n'
+    + '    • Tänään\n'
+    + '    • Huomenna\n'
+    + 'Isoilla ja pienillä kirjaimilla ei ole merkitystä.\n';
 
 /**
  * Reply to /listaa command with help parameter.
- * @param {Luxon Date}
  */
-const explainListaa = () => {
-    return '*/listaa*: Anna komennolle parametrina päivä jossain seuraavista muodoista:\n'
-        + '    • Maanantai\n'
-        + '    • Ma\n'
-        + '    • 15.11. tai 15.11\n'
-        + '    • Tänään\n'
-        + '    • Huomenna\n'
-        + 'Isoilla ja pienillä kirjaimilla ei ole merkitystä.';
-};
+const explainListaa = () => `*/listaa*: Anna komennolle parametrina päivä jossain seuraavista muodoista:\n${explainPäivä()}`;
+
+/**
+ * Reply to /ilmoita command with help parameter.
+ */
+const explainIlmoita = () => '*/ilmoita*: '
+    + 'Anna komennolle parametrina päivä ja status. Päivä annetaan jossain seuraavista muodoista:\n'
+    + explainPäivä()
+    + 'Status on joko *toimisto* tai *etä*.\n'
+    + 'Antamalla parametrin *def* ennen muita parametreja, voit tehdä oletusilmoittautumisen.';
+
+/**
+ * Reply to /poista command with help parameter.
+ */
+const explainPoista = () => '*/poista*: '
+    + 'Anna komennolle parametrina päivä jossain seuraavista muodoista:\n'
+    + explainPäivä()
+    + 'Antamalla parametrin *def* ennen muita parametreja, voit poistaa oletusilmoittautumisen.';
 
 /**
  * Reply to user trying to add normal registration for weekend.
  * @param {Luxon Date}
  */
-const denyNormalRegistrationForWeekend = () => {
-    return 'Et voi lisätä ilmoittautumista viikonlopulle.';
-};
+const denyNormalRegistrationForWeekend = () => 'Et voi lisätä ilmoittautumista viikonlopulle.';
 
 /**
  * Reply to user trying to add default registration for weekend.
  * @param {Luxon Date}
  */
-const denyDefaultRegistrationForWeekend = () => {
-    return 'Et voi lisätä oletusilmoittautumista viikonlopulle.';
-};
+const denyDefaultRegistrationForWeekend = () => 'Et voi lisätä oletusilmoittautumista viikonlopulle.';
 
 /**
  * Reply to /ilmoita command, if something goes wrong.
  * @param {Luxon Date}
  */
-const demandDateAndStatus = () => {
-    return 'Anna parametrina päivä ja status.';
-};
+const demandDateAndStatus = () => 'Anna parametrina päivä ja status.';
 
 /**
  * Reply to /listaa and /poista commands, if something goes wrong.
  * @param {Luxon Date}
  */
-const demandDate = () => {
-    return 'Anna parametrina päivä.';
-};
-
-/**
- * Convenience method for this commonly needed format.
- * @param {Luxon Date}
- */
-const atDate = (date) => {
-    return na(date) + ' ' + dayPointMonth(date);
-};
-
-/**
- * Turns a weekday into the finnish lta-form.
- * @param {Luxon Date}
- */
-const lta = (date) => {
-    if (date.weekday === 3) return 'keskiviikolta';
-    return weekdays[date.weekday - 1] + 'lta';
-};
-
-/**
- * Turns a weekday into the finnish sin-form.
- * @param {Luxon Date}
- */
-const sin = (date) => {
-    if (date.weekday === 3) return 'keskiviikkoisin';
-    return weekdays[date.weekday - 1] + 'sin';
-};
-
-/**
- * Turns a weekday into the finnish na-form.
- * @param {Luxon Date}
- */
-const na = (date) => {
-    return weekdays[date.weekday - 1] + 'na';
-};
-
-/**
- * Turns a date into day.month.-form.
- * @param {Luxon Date}
- */
-const dayPointMonth = (date) => {
-    return `${date.day}.${date.month}.`;
-};
+const demandDate = () => 'Anna parametrina päivä.';
 
 module.exports = {
     defaultRegistrationAdded,
@@ -160,7 +160,9 @@ module.exports = {
     demandDateAndStatus,
     denyDefaultRegistrationForWeekend,
     denyNormalRegistrationForWeekend,
+    explainIlmoita,
     explainListaa,
+    explainPoista,
     normalRegistrationAdded,
     normalRegistrationRemoved,
     registrationList,
