@@ -44,7 +44,7 @@ exports.enableSlashCommands = function ({ app, usergroups }) {
             }
             if (!error && date.isValid) {
                 const response = await helper.generateListMessage(
-                    app,
+                    { usergroups },
                     date.toISODate(),
                     usergroupId,
                 );
