@@ -11,6 +11,27 @@ const SHOW_DAYS_UNTIL = 10;
 const DAYS_IN_WEEK = 5;
 const format = { ...DateTime.DATETIME_MED, month: 'long' };
 
+/**
+ * Defines the default settings modal's title and what text is displayed as tooltip on the closing 'X' button.
+ * These are basic attributes of the modal view.
+ */
+const modalView = {
+    type: 'modal',
+    external_id: 'default_modal',
+    title: {
+        type: 'plain_text',
+        text: 'Oletusasetukset',
+    },
+    close: {
+        type: 'plain_text',
+        text: 'Sulje',
+    },
+};
+
+/**
+ * Creates and returns a block describing the default settings view.
+ * This is then displayed on the default settings modal view.
+ */
 const getDefaultSettingsBlock = async (userId) => {
     const settingsBlock = [];
     settingsBlock.push(mrkdwn('Oletusarvoisesti olen...'));
@@ -33,6 +54,9 @@ const getDefaultSettingsBlock = async (userId) => {
     return settingsBlock;
 };
 
+/**
+ * Creates and returns a block containing an update button used to update the Home tab.
+ */
 const getUpdateBlock = async () => {
     const updateBlock = [];
     updateBlock.push(
@@ -46,6 +70,10 @@ const getUpdateBlock = async () => {
     return updateBlock;
 };
 
+/**
+ * Creates and returns a list of blocks containing the registrations that are displayed in the Home tab.
+ * For every day there is a list of people registered for that day and buttons for user to register themselves.
+ */
 const getRegistrationsBlock = async (userId) => {
     const registrationsBlock = [];
     const dates = dfunc.listNWeekdays(DateTime.now(), SHOW_DAYS_UNTIL);
@@ -75,21 +103,8 @@ const getRegistrationsBlock = async (userId) => {
     return registrationsBlock;
 };
 
-const modalView = {
-    type: 'modal',
-    external_id: 'default_modal',
-    title: {
-        type: 'plain_text',
-        text: 'Oletusasetukset',
-    },
-    close: {
-        type: 'plain_text',
-        text: 'Sulje',
-    },
-};
-
 /**
- * Updates the App-Home page.
+ * Updates the Home tab.
  */
 const update = async (client, userId) => {
     let blocks = [];
@@ -106,24 +121,31 @@ const update = async (client, userId) => {
     });
 };
 
+/**
+ * Opens a modal view.
+ */
 const openView = async (client, userId, triggerId) => {
     const block = await getDefaultSettingsBlock(userId);
-    modalView.blocks = block;
     const result = await client.views.open({
         trigger_id: triggerId,
-        view: modalView,
+        view: { ...modalView, blocks: block },
     });
 };
 
+/**
+ * Updates a modal view.
+ */
 const updateView = async (client, userId) => {
     const block = await getDefaultSettingsBlock(userId);
-    modalView.blocks = block;
     const result = await client.views.update({
         external_id: 'default_modal',
-        view: modalView,
+        view: { ...modalView, blocks: block },
     });
 };
 
+/**
+ * Displays an error page on the Home tab.
+ */
 const error = async (client, userId, message) => {
     client.views.publish({
         user_id: userId,
