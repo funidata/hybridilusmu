@@ -109,7 +109,8 @@ const generatePlaintextString = (slack_usergroup_id) => {
 };
 
 /**
- * You probably shouldn't be calling this from outside of the library
+ * You probably shouldn't be calling this from outside of the library.
+ * Drops all data.
  */
 const clearData = () => {
     usergroups = {};
@@ -117,18 +118,38 @@ const clearData = () => {
     channelsLookup = {};
 };
 
+/**
+ * Gives an insight into what is happening under the hood for debug purposes.
+ * You should never use this to modify anything.
+ *
+ * @returns {Object}
+ */
 const dumpState = () => ({
     usergroups,
     usersLookup,
     channelsLookup,
 });
 
+/**
+ * Initialises an entry in the `usersLookup` map for the given Slack user id.
+ * The format is described at said symbol's definition towards the start of this file.
+ *
+ * @see usersLookup
+ * @param {string} slack_user_id Slack user id of the user in question.
+ */
 const initSlackUser = (slack_user_id) => {
     if (!usersLookup[slack_user_id]) {
         usersLookup[slack_user_id] = {};
     }
 };
 
+/**
+ * Drops a user from a usergroup
+ *
+ * @param {string} slack_user_id      The Slack id of the user to drop
+ * @param {string} slack_usergroup_id The Slack id of the usergroup to drop the user from
+ * @returns {void}
+ */
 const dropSlackUserFromUsergroup = (slack_user_id, slack_usergroup_id) => {
     const ug = usergroups[slack_usergroup_id];
     if (!ug) { return; }
@@ -143,6 +164,12 @@ const dropSlackUserFromUsergroup = (slack_user_id, slack_usergroup_id) => {
     }
 };
 
+/**
+ * Drops a Slack user from our lookup tables.
+ *
+ * @param {string} slack_user_id The Slack id of the user in question
+ * @return {void}
+ */
 const dropSlackUser = (slack_user_id) => {
     if (usersLookup[slack_user_id]) {
         const groups = Object.keys(usersLookup[slack_user_id]);
@@ -157,9 +184,10 @@ const dropSlackUser = (slack_user_id) => {
  * Initialises an entry in the `usergroups` map for the given usergroup. Also initialises a couple
  * of handy lookup tables for users and channels alike. These live in the sub-object _, which is
  * intended for internal book-keeping outside of whatever it is that Slack passes us. This includes,
- * for instance, flags for the usergroup being dirty or not (along with a dirtyDate field that
+ * for instance, flags for the usergroup being dirty or not (along with a dirty_date field that
  * contains the actual update timestamp of the dirty users).
  *
+ * @see usergroups
  * @param {string} slack_usergroup_id The Slack id of the usergroup in question
  */
 const initSlackUsergroup = (slack_usergroup_id) => {
@@ -181,6 +209,7 @@ const initSlackUsergroup = (slack_usergroup_id) => {
 
 /**
  * This really shouldn't be needed
+ *
  * @param {Object} usergroup The usergroup object to edit
  * @returns {void}
  */
@@ -198,6 +227,11 @@ const normaliseUsergroup = (usergroup) => {
     return ret;
 };
 
+/**
+ * Drops a Slack usergroup from our lookup tables
+ *
+ * @param {string} slack_usergroup_id Slack id of usergroup to drop
+ */
 const dropSlackUsergroup = (slack_usergroup_id) => {
     Object.keys(usersLookup).forEach((slack_user_id) => {
         delete usersLookup[slack_user_id][slack_usergroup_id];
@@ -216,6 +250,7 @@ const dropSlackUsergroup = (slack_usergroup_id) => {
 
 /**
  * Inserts a user to a usergroup
+ *
  * @param {string} slack_user_id      Slack id of user to add              (like "UFFFFFF")
  * @param {string} slack_usergroup_id Slack id of usergroup being added to (like "SFFFFFF")
  */
@@ -226,6 +261,12 @@ const insertUserForUsergroup = (slack_user_id, slack_usergroup_id) => {
     usergroups[slack_usergroup_id]._.users_lkup[slack_user_id] = true;
 };
 
+/**
+ * Inserts users for a Slack usergroup given a Slack usergroup object
+ *
+ * @param {Object} usergroup A Slack usergroup object
+ * @returns {boolean} Whether the usergroup's users were inserted successfully or not
+ */
 const insertUsersForUsergroup = (usergroup) => {
     if (!usergroup || !usergroup.is_usergroup) {
         return false;
@@ -242,17 +283,34 @@ const insertUsersForUsergroup = (usergroup) => {
     return true;
 };
 
+/**
+ * Initialises a lookup object in `channelsLookup` for a given channel.
+ *
+ * @see channelsLookup
+ * @param {string} slack_channel_id The Slack id of the channel in question
+ */
 const initSlackChannel = (slack_channel_id) => {
     if (!channelsLookup[slack_channel_id]) {
         channelsLookup[slack_channel_id] = {};
     }
 };
 
+/**
+ * Drops a Slack channel from a given usergroup
+ *
+ * @param {string} slack_channel_id   The Slack id of the channel in question
+ * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ */
 const dropSlackChannelFromUsergroup = (slack_channel_id, slack_usergroup_id) => {
     delete usergroups[slack_usergroup_id]._.channels_lkup[slack_channel_id];
     delete channelsLookup[slack_channel_id][slack_usergroup_id];
 };
 
+/**
+ * Drops a Slack channel from all of its associated usergroups
+ *
+ * @param {string} slack_channel_id The Slack id of the channel in question
+ */
 const dropSlackChannel = (slack_channel_id) => {
     Object.keys(channelsLookup[slack_channel_id]).forEach((slack_usergroup_id) => {
         dropSlackChannelFromUsergroup(slack_channel_id, slack_usergroup_id);
@@ -260,6 +318,12 @@ const dropSlackChannel = (slack_channel_id) => {
     delete channelsLookup[slack_channel_id];
 };
 
+/**
+ * Inserts a channel for a given usergroup into our lookup tables
+ *
+ * @param {string} slack_channel_id   The Slack id of the channel in question
+ * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ */
 const insertChannelForUsergroup = (slack_channel_id, slack_usergroup_id) => {
     initSlackChannel(slack_channel_id);
     initSlackUsergroup(slack_usergroup_id);
@@ -267,10 +331,18 @@ const insertChannelForUsergroup = (slack_channel_id, slack_usergroup_id) => {
     usergroups[slack_usergroup_id]._.channels_lkup[slack_channel_id] = true;
 };
 
+/**
+ * Inserts a given usergroup object's channels into our various lookup tables
+ *
+ * @param {Object} usergroup A Slack usergroup object
+ * @returns {boolean} Whether the operation was successful or not
+ */
 const insertChannelsForUsergroup = (usergroup) => {
+    // not an object or not a usergroup
     if (!usergroup || !usergroup.is_usergroup) {
         return false;
     }
+    // malformed object
     if (!usergroup.prefs || !usergroup.prefs.channels) {
         return false;
     }
@@ -280,10 +352,20 @@ const insertChannelsForUsergroup = (usergroup) => {
     return true;
 };
 
+/**
+ * Returns whether a given usergroup is enabled or not.
+ *
+ * @param {string} slack_usergroup_id Slack usergroup id
+ * @returns {boolean} Whether said usergroup is enabled or not
+ */
 const isEnabled = (slack_usergroup_id) => {
+    // unknown usergroups are assumed to be disabled
+    // note that disabled usergroups are by default omitted from usergroup listings provided by
+    // Slack, unless otherwise specified by a request
     if (!usergroups[slack_usergroup_id]) {
         return false;
     }
+    // if the date_delete field is set to something other than 0, the usergroup is disabled
     if (usergroups[slack_usergroup_id].date_delete !== 0) {
         return false;
     }
@@ -292,6 +374,12 @@ const isEnabled = (slack_usergroup_id) => {
 
 const getUsergroups = () => Object.keys(usergroups).filter(isEnabled);
 
+/**
+ * Returns an array of usergroup ids for the given channel.
+ *
+ * @param {string} slack_channel_id Slack channel id
+ * @returns {Array.<string>} An array of usergroup ids of enabled usergroups
+ */
 const getUsergroupsForChannel = (slack_channel_id) => {
     if (!channelsLookup[slack_channel_id]) {
         return [];
@@ -318,6 +406,25 @@ const getUsergroupsForChannels = (channel_ids) => channel_ids.map(
     }),
 );
 
+/**
+ * Inserts a Slack usergroup object into our lookup tables.
+ * You shouldn't call this directly from outside of the library.
+ *
+ * @param {Object} usergroup A Slack usergroup object
+ * @returns {boolean} Whether the operation was completed successfully or not
+ *                    If false, you should probably pass in users via
+ *                    `insertUsergroupUsersFromAPIListResponse()`.
+ *
+ * @see usergroups     Our main usergroup lookup object, housing usergroup data
+ * @see usersLookup    Our user -> usergroup lookup object
+ * @see channelsLookup Our channel -> usergroup lookup object
+ *
+ * @see insertUsergroupsFromAPIListResponse Insertion via API usergroups.list response
+ * @see insertUsergroupUsersFromAPIListResponse Insertion of users via usergroups.users.list
+ *                                              response
+ * @see processCreationEvent Insertion via subteam_created event type
+ * @see processUpdateEvent   Insertion via subteam_updated event type
+ */
 const insertUsergroup = (usergroup) => {
     const normalisedUsergroup = normaliseUsergroup(usergroup);
     if (!normalisedUsergroup || !normalisedUsergroup.is_usergroup) {
@@ -363,6 +470,8 @@ const insertUsergroup = (usergroup) => {
         // if users weren't passed in, yet there should be some, we use our pre-existing
         // user list and set this usergroup to be dirty. this allows us to fetch the user list
         // via Bolt, to be fed in via insertUsergroupUsersFromAPIListResponse()
+        // NOTE: Slack by default does not include the .users array in its usergroups.list response,
+        //       unless you specify it in some sort of extra parameter.
         usergroups[normalisedUsergroup.id] = {
             ...normalisedUsergroup,
             users: oldState.users,
@@ -380,6 +489,7 @@ const insertUsergroup = (usergroup) => {
 
 /**
  * Inserts usergroups into our thingamajig from an app.client.usergroups.list() call response
+ *
  * @param {Object} response API response fetched via app.client.usergroups.list
  * @returns {boolean} True if users were also inserted, false if you need to fetch them via
  *                    app.client.usergroups.users.list
@@ -408,6 +518,7 @@ const insertUsergroupsFromAPIListResponse = (response) => {
 
 /**
  * Inserts users for a usergroup as fetched by app.client.usergroups.users.list()
+ *
  * @param {Object} response API response fetched via app.client.usergroups.users.list
  * @param {string} slack_usergroup_id The Slack id of the relevant usergroup
  * @returns {boolean} Whether the operation was successful or not
@@ -424,6 +535,16 @@ const insertUsergroupUsersFromAPIListResponse = (response, slack_usergroup_id) =
     return true;
 };
 
+/**
+ * Checks whether a usergroup is dirty or not.
+ *
+ * A usergroup being dirty means that it has some stale data.
+ *
+ * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @returns {boolean} Whether the data for this usergroup is dirty or not. This
+ *                    means that the user list is potentially out-of-date while
+ *                    the usergroup info itself might be up-to-date.
+ */
 const isDirty = (slack_usergroup_id) => {
     // non-tracked ugs aren't dirty
     if (!usergroups[slack_usergroup_id]) {
