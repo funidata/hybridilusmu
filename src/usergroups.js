@@ -153,6 +153,15 @@ const dropSlackUser = (slack_user_id) => {
     delete usersLookup[slack_user_id];
 };
 
+/**
+ * Initialises an entry in the `usergroups` map for the given usergroup. Also initialises a couple
+ * of handy lookup tables for users and channels alike. These live in the sub-object _, which is
+ * intended for internal book-keeping outside of whatever it is that Slack passes us. This includes,
+ * for instance, flags for the usergroup being dirty or not (along with a dirtyDate field that
+ * contains the actual update timestamp of the dirty users).
+ *
+ * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ */
 const initSlackUsergroup = (slack_usergroup_id) => {
     if (!usergroups[slack_usergroup_id]) {
         usergroups[slack_usergroup_id] = {
@@ -333,6 +342,7 @@ const insertUsergroup = (usergroup) => {
         };
     }
     usergroups[normalisedUsergroup.id] = normalisedUsergroup;
+    // make sure we've initialised things properly
     initSlackUsergroup(normalisedUsergroup.id);
     // generate usergroup._.channels_lkup for the new usergroup object
     insertChannelsForUsergroup(normalisedUsergroup);
@@ -345,10 +355,14 @@ const insertUsergroup = (usergroup) => {
         });
     }
     if (extant && normalisedUsergroup.users_count === 0) {
+        // if no users were found for this usergroup, make sure to drop any pre-existing ones
         Object.keys(oldState._.users_lkup).forEach((slack_user_id) => {
             dropSlackUserFromUsergroup(slack_user_id, normalisedUsergroup.id);
         });
     } else if (!normalisedUsergroup.users && normalisedUsergroup.user_count > 0) {
+        // if users weren't passed in, yet there should be some, we use our pre-existing
+        // user list and set this usergroup to be dirty. this allows us to fetch the user list
+        // via Bolt, to be fed in via insertUsergroupUsersFromAPIListResponse()
         usergroups[normalisedUsergroup.id] = {
             ...normalisedUsergroup,
             users: oldState.users,
