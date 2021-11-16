@@ -8,6 +8,7 @@
 /**
  * An object containing the usergroups, keyed by id.
  * Format is roughly the following:
+ * ```
  *   {
  *     "SFFFFFF": {
  *       // a bunch of fields that slack returns
@@ -26,30 +27,35 @@
  *       user_count: 2
  *     }
  *   }
+ * ```
  */
 let usergroups = {};
 
 /**
   * A lookup table of users.
   * Format is roughly the following:
+  * ```
   *   {
   *     // user is in two usergroups
   *     "UFFFFFF": {"SFFFFFF": true, "S000000": true},
   *     // user is in one usergroup
   *     "U111111": {"SFFFFFF": true}
   *   }
+  * ```
  */
 let usersLookup = {};
 
 /**
   * A lookup table of channels.
   * Format is roughly the following:
+  * ```
   *   {
   *     // channel is set as a default for two usergroups
   *     "CFFFFFF": {"SFFFFFF": true, "S000000": true},
   *     // channel is set as a default for one usergroup
   *     "C111111": {"SFFFFFF": true}
   *   }
+  * ```
  */
 let channelsLookup = {};
 
@@ -182,9 +188,9 @@ const dropSlackUser = (slack_user_id) => {
 
 /**
  * Initialises an entry in the `usergroups` map for the given usergroup. Also initialises a couple
- * of handy lookup tables for users and channels alike. These live in the sub-object _, which is
+ * of handy lookup tables for users and channels alike. These live in the sub-object `_`, which is
  * intended for internal book-keeping outside of whatever it is that Slack passes us. This includes,
- * for instance, flags for the usergroup being dirty or not (along with a dirty_date field that
+ * for instance, flags for the usergroup being dirty or not (along with a `dirty_date` field that
  * contains the actual update timestamp of the dirty users).
  *
  * @see usergroups
