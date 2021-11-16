@@ -55,7 +55,7 @@ const getDefaultSettingsBlock = async (userId) => {
 };
 
 /**
- * Creates and returns a block containing an update button used to update the Home tab.
+ * Creates and returns a block containing an update button used to update the Home tab and a default settings button used to open the default settings modal.
  */
 const getUpdateBlock = async () => {
     const updateBlock = [];
