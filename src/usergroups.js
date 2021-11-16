@@ -556,6 +556,12 @@ const isDirty = (slack_usergroup_id) => {
     return false;
 };
 
+/**
+ * Gets all the (enabled) usergroups that a user belongs to.
+ *
+ * @param {string} slack_user_id The Slack id of the user in question
+ * @returns {Array.<string>} An array of Slack usergroup ids
+ */
 const getUsergroupsForUser = (slack_user_id) => {
     const uo = usersLookup[slack_user_id];
     if (!uo) {
@@ -564,6 +570,14 @@ const getUsergroupsForUser = (slack_user_id) => {
     return Object.keys(uo).filter(isEnabled);
 };
 
+/**
+ * Gets all the users associated with a given usergroup.
+ *
+ * We pay no mind to whether the usergroup is enabled or not.
+ *
+ * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @returns {Array.<string>} An array of Slack user ids
+ */
 const getUsersForUsergroup = (slack_usergroup_id) => {
     if (!usergroups[slack_usergroup_id]) {
         return [];
@@ -571,6 +585,14 @@ const getUsersForUsergroup = (slack_usergroup_id) => {
     return [...usergroups[slack_usergroup_id].users];
 };
 
+/**
+ * Gets all the channels associated with a given usergroup.
+ *
+ * We pay no mind to whether the usergroup is enabled or not.
+ *
+ * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @returns {Array.<string>} An array of Slack channel ids
+ */
 const getChannelsForUsergroup = (slack_usergroup_id) => {
     if (!usergroups[slack_usergroup_id]) {
         return [];
@@ -578,6 +600,13 @@ const getChannelsForUsergroup = (slack_usergroup_id) => {
     return [...usergroups[slack_usergroup_id].prefs.channels];
 };
 
+/**
+ * Checks whether a user belongs to a given usergroup or not.
+ *
+ * @param {string} slack_user_id      The Slack id of the user in question
+ * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @returns {boolean} Whether the user belongs to the usergroup or not.
+ */
 const isUserInUsergroup = (slack_user_id, slack_usergroup_id) => {
     const uo = usersLookup[slack_user_id];
     if (!uo || !uo[slack_usergroup_id]) {
@@ -586,6 +615,15 @@ const isUserInUsergroup = (slack_user_id, slack_usergroup_id) => {
     return true;
 };
 
+/**
+ * Processes a Slack usergroup creation event (`subteam_created`)
+ *
+ * @param {Object} response The Slack event object
+ * @returns {boolean} Whether the operation was successful or not
+ *
+ * @see processUpdateEvent
+ * @see processMembersChangedEvent
+ */
 const processCreationEvent = (response) => {
     if (!response || response.type !== 'subteam_created') {
         return false;
@@ -593,6 +631,23 @@ const processCreationEvent = (response) => {
     return insertUsergroup(response.subteam);
 };
 
+/**
+ * Processes a Slack usergroup update event (`subteam_updated`)
+ *
+ * Note that according to Slack these events have a limit of 500 users
+ * being listed in the usergroup. This means you may have dirty data
+ * after calling this function.
+ *
+ * Look at `insertUsergroupUsersFromAPIListResponse()` for more info.
+ *
+ * @param {Object} response The Slack event object
+ * @returns {boolean} Whether the operation was successful or not
+ *
+ * @see insertUsergroupUsersFromAPIListResponse
+ *
+ * @see processCreationEvent
+ * @see processMembersChangedEvent
+ */
 const processUpdateEvent = (response) => {
     if (!response || response.type !== 'subteam_updated') {
         return false;
@@ -606,6 +661,15 @@ const processUpdateEvent = (response) => {
     return insertUsergroup(newUg);
 };
 
+/**
+ * Processes a Slack usergroup member change event (`subteam_members_changed`)
+ *
+ * @param {Object} response The Slack event object
+ * @returns {boolean} Whether the operation was successful or not
+ *
+ * @see processCreationEvent
+ * @see processUpdateEvent
+ */
 const processMembersChangedEvent = (response) => {
     if (!response || response.type !== 'subteam_members_changed') {
         return false;
