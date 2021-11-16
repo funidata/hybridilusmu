@@ -60,7 +60,7 @@ const mentionTail = '>';
 
 /**
  * Generates a mention string for the given usergroup.
- * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @param {string} slack_usergroup_id - The Slack id of the usergroup in question
  * @returns {string} A string that Slack will turn into a mention
  */
 const generateMentionString = (slack_usergroup_id) => {
@@ -72,7 +72,7 @@ const generateMentionString = (slack_usergroup_id) => {
 
 /**
  * Reads a usergroup id from a mention string.
- * @param {string} str String to extract usergroup id from
+ * @param {string} str - String to extract usergroup id from
  * @returns {string} A Slack usergroup id
  */
 const parseMentionString = (str) => {
@@ -96,7 +96,7 @@ const parseMentionString = (str) => {
 
 /**
  * Generates a plaintext string describing a usergroup.
- * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @param {string} slack_usergroup_id - The Slack id of the usergroup in question
  * @returns {string} A plain text representation of the usergroup's identity, like
  *                   "Kahvinkittaajat (@kahvi)"
  */
@@ -135,7 +135,7 @@ const dumpState = () => ({
  * The format is described at said symbol's definition towards the start of this file.
  *
  * @see usersLookup
- * @param {string} slack_user_id Slack user id of the user in question.
+ * @param {string} slack_user_id - Slack user id of the user in question.
  */
 const initSlackUser = (slack_user_id) => {
     if (!usersLookup[slack_user_id]) {
@@ -146,8 +146,8 @@ const initSlackUser = (slack_user_id) => {
 /**
  * Drops a user from a usergroup
  *
- * @param {string} slack_user_id      The Slack id of the user to drop
- * @param {string} slack_usergroup_id The Slack id of the usergroup to drop the user from
+ * @param {string} slack_user_id      - The Slack id of the user to drop
+ * @param {string} slack_usergroup_id - The Slack id of the usergroup to drop the user from
  * @returns {void}
  */
 const dropSlackUserFromUsergroup = (slack_user_id, slack_usergroup_id) => {
@@ -167,7 +167,7 @@ const dropSlackUserFromUsergroup = (slack_user_id, slack_usergroup_id) => {
 /**
  * Drops a Slack user from our lookup tables.
  *
- * @param {string} slack_user_id The Slack id of the user in question
+ * @param {string} slack_user_id - The Slack id of the user in question
  * @return {void}
  */
 const dropSlackUser = (slack_user_id) => {
@@ -188,7 +188,7 @@ const dropSlackUser = (slack_user_id) => {
  * contains the actual update timestamp of the dirty users).
  *
  * @see usergroups
- * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @param {string} slack_usergroup_id - The Slack id of the usergroup in question
  */
 const initSlackUsergroup = (slack_usergroup_id) => {
     if (!usergroups[slack_usergroup_id]) {
@@ -210,7 +210,7 @@ const initSlackUsergroup = (slack_usergroup_id) => {
 /**
  * This really shouldn't be needed
  *
- * @param {Object} usergroup The usergroup object to edit
+ * @param {Object} usergroup - The usergroup object to edit
  * @returns {void}
  */
 const normaliseUsergroup = (usergroup) => {
@@ -230,7 +230,7 @@ const normaliseUsergroup = (usergroup) => {
 /**
  * Drops a Slack usergroup from our lookup tables
  *
- * @param {string} slack_usergroup_id Slack id of usergroup to drop
+ * @param {string} slack_usergroup_id - Slack id of usergroup to drop
  */
 const dropSlackUsergroup = (slack_usergroup_id) => {
     Object.keys(usersLookup).forEach((slack_user_id) => {
@@ -251,8 +251,8 @@ const dropSlackUsergroup = (slack_usergroup_id) => {
 /**
  * Inserts a user to a usergroup
  *
- * @param {string} slack_user_id      Slack id of user to add              (like "UFFFFFF")
- * @param {string} slack_usergroup_id Slack id of usergroup being added to (like "SFFFFFF")
+ * @param {string} slack_user_id      - Slack id of user to add              (like "UFFFFFF")
+ * @param {string} slack_usergroup_id - Slack id of usergroup being added to (like "SFFFFFF")
  */
 const insertUserForUsergroup = (slack_user_id, slack_usergroup_id) => {
     initSlackUser(slack_user_id);
@@ -264,7 +264,7 @@ const insertUserForUsergroup = (slack_user_id, slack_usergroup_id) => {
 /**
  * Inserts users for a Slack usergroup given a Slack usergroup object
  *
- * @param {Object} usergroup A Slack usergroup object
+ * @param {Object} usergroup - A Slack usergroup object
  * @returns {boolean} Whether the usergroup's users were inserted successfully or not
  */
 const insertUsersForUsergroup = (usergroup) => {
@@ -287,7 +287,7 @@ const insertUsersForUsergroup = (usergroup) => {
  * Initialises a lookup object in `channelsLookup` for a given channel.
  *
  * @see channelsLookup
- * @param {string} slack_channel_id The Slack id of the channel in question
+ * @param {string} slack_channel_id - The Slack id of the channel in question
  */
 const initSlackChannel = (slack_channel_id) => {
     if (!channelsLookup[slack_channel_id]) {
@@ -298,8 +298,8 @@ const initSlackChannel = (slack_channel_id) => {
 /**
  * Drops a Slack channel from a given usergroup
  *
- * @param {string} slack_channel_id   The Slack id of the channel in question
- * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @param {string} slack_channel_id   - The Slack id of the channel in question
+ * @param {string} slack_usergroup_id - The Slack id of the usergroup in question
  */
 const dropSlackChannelFromUsergroup = (slack_channel_id, slack_usergroup_id) => {
     delete usergroups[slack_usergroup_id]._.channels_lkup[slack_channel_id];
@@ -309,7 +309,7 @@ const dropSlackChannelFromUsergroup = (slack_channel_id, slack_usergroup_id) => 
 /**
  * Drops a Slack channel from all of its associated usergroups
  *
- * @param {string} slack_channel_id The Slack id of the channel in question
+ * @param {string} slack_channel_id - The Slack id of the channel in question
  */
 const dropSlackChannel = (slack_channel_id) => {
     Object.keys(channelsLookup[slack_channel_id]).forEach((slack_usergroup_id) => {
@@ -321,8 +321,8 @@ const dropSlackChannel = (slack_channel_id) => {
 /**
  * Inserts a channel for a given usergroup into our lookup tables
  *
- * @param {string} slack_channel_id   The Slack id of the channel in question
- * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @param {string} slack_channel_id   - The Slack id of the channel in question
+ * @param {string} slack_usergroup_id - The Slack id of the usergroup in question
  */
 const insertChannelForUsergroup = (slack_channel_id, slack_usergroup_id) => {
     initSlackChannel(slack_channel_id);
@@ -334,7 +334,7 @@ const insertChannelForUsergroup = (slack_channel_id, slack_usergroup_id) => {
 /**
  * Inserts a given usergroup object's channels into our various lookup tables
  *
- * @param {Object} usergroup A Slack usergroup object
+ * @param {Object} usergroup - A Slack usergroup object
  * @returns {boolean} Whether the operation was successful or not
  */
 const insertChannelsForUsergroup = (usergroup) => {
@@ -355,7 +355,7 @@ const insertChannelsForUsergroup = (usergroup) => {
 /**
  * Returns whether a given usergroup is enabled or not.
  *
- * @param {string} slack_usergroup_id Slack usergroup id
+ * @param {string} slack_usergroup_id - Slack usergroup id
  * @returns {boolean} Whether said usergroup is enabled or not
  */
 const isEnabled = (slack_usergroup_id) => {
@@ -377,7 +377,7 @@ const getUsergroups = () => Object.keys(usergroups).filter(isEnabled);
 /**
  * Returns an array of usergroup ids for the given channel.
  *
- * @param {string} slack_channel_id Slack channel id
+ * @param {string} slack_channel_id - Slack channel id
  * @returns {Array.<string>} An array of usergroup ids of enabled usergroups
  */
 const getUsergroupsForChannel = (slack_channel_id) => {
@@ -389,7 +389,7 @@ const getUsergroupsForChannel = (slack_channel_id) => {
 
 /**
  * Get the associated usergroups for a set of channels
- * @param {Array.<string>} channel_ids The channels to look things up for
+ * @param {Array.<string>} channel_ids - The channels to look things up for
  * @return {Array} An array of objects of roughly the following form
  *   {
  *     channel_id: 'C000000',
@@ -410,20 +410,20 @@ const getUsergroupsForChannels = (channel_ids) => channel_ids.map(
  * Inserts a Slack usergroup object into our lookup tables.
  * You shouldn't call this directly from outside of the library.
  *
- * @param {Object} usergroup A Slack usergroup object
+ * @param {Object} usergroup - A Slack usergroup object
  * @returns {boolean} Whether the operation was completed successfully or not
  *                    If false, you should probably pass in users via
  *                    `insertUsergroupUsersFromAPIListResponse()`.
  *
- * @see usergroups     Our main usergroup lookup object, housing usergroup data
- * @see usersLookup    Our user -> usergroup lookup object
- * @see channelsLookup Our channel -> usergroup lookup object
+ * @see usergroups     - Our main usergroup lookup object, housing usergroup data
+ * @see usersLookup    - Our user -> usergroup lookup object
+ * @see channelsLookup - Our channel -> usergroup lookup object
  *
- * @see insertUsergroupsFromAPIListResponse Insertion via API usergroups.list response
- * @see insertUsergroupUsersFromAPIListResponse Insertion of users via usergroups.users.list
+ * @see insertUsergroupsFromAPIListResponse - Insertion via API usergroups.list response
+ * @see insertUsergroupUsersFromAPIListResponse - Insertion of users via usergroups.users.list
  *                                              response
- * @see processCreationEvent Insertion via subteam_created event type
- * @see processUpdateEvent   Insertion via subteam_updated event type
+ * @see processCreationEvent - Insertion via subteam_created event type
+ * @see processUpdateEvent   - Insertion via subteam_updated event type
  */
 const insertUsergroup = (usergroup) => {
     const normalisedUsergroup = normaliseUsergroup(usergroup);
@@ -490,7 +490,7 @@ const insertUsergroup = (usergroup) => {
 /**
  * Inserts usergroups into our thingamajig from an app.client.usergroups.list() call response
  *
- * @param {Object} response API response fetched via app.client.usergroups.list
+ * @param {Object} response - API response fetched via app.client.usergroups.list
  * @returns {boolean} True if users were also inserted, false if you need to fetch them via
  *                    app.client.usergroups.users.list
  */
@@ -519,8 +519,8 @@ const insertUsergroupsFromAPIListResponse = (response) => {
 /**
  * Inserts users for a usergroup as fetched by app.client.usergroups.users.list()
  *
- * @param {Object} response API response fetched via app.client.usergroups.users.list
- * @param {string} slack_usergroup_id The Slack id of the relevant usergroup
+ * @param {Object} response - API response fetched via app.client.usergroups.users.list
+ * @param {string} slack_usergroup_id - The Slack id of the relevant usergroup
  * @returns {boolean} Whether the operation was successful or not
  */
 const insertUsergroupUsersFromAPIListResponse = (response, slack_usergroup_id) => {
@@ -540,7 +540,7 @@ const insertUsergroupUsersFromAPIListResponse = (response, slack_usergroup_id) =
  *
  * A usergroup being dirty means that it has some stale data.
  *
- * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @param {string} - slack_usergroup_id The Slack id of the usergroup in question
  * @returns {boolean} Whether the data for this usergroup is dirty or not. This
  *                    means that the user list is potentially out-of-date while
  *                    the usergroup info itself might be up-to-date.
@@ -559,7 +559,7 @@ const isDirty = (slack_usergroup_id) => {
 /**
  * Gets all the (enabled) usergroups that a user belongs to.
  *
- * @param {string} slack_user_id The Slack id of the user in question
+ * @param {string} slack_user_id - The Slack id of the user in question
  * @returns {Array.<string>} An array of Slack usergroup ids
  */
 const getUsergroupsForUser = (slack_user_id) => {
@@ -575,7 +575,7 @@ const getUsergroupsForUser = (slack_user_id) => {
  *
  * We pay no mind to whether the usergroup is enabled or not.
  *
- * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @param {string} slack_usergroup_id - The Slack id of the usergroup in question
  * @returns {Array.<string>} An array of Slack user ids
  */
 const getUsersForUsergroup = (slack_usergroup_id) => {
@@ -590,7 +590,7 @@ const getUsersForUsergroup = (slack_usergroup_id) => {
  *
  * We pay no mind to whether the usergroup is enabled or not.
  *
- * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @param {string} slack_usergroup_id - The Slack id of the usergroup in question
  * @returns {Array.<string>} An array of Slack channel ids
  */
 const getChannelsForUsergroup = (slack_usergroup_id) => {
@@ -603,8 +603,8 @@ const getChannelsForUsergroup = (slack_usergroup_id) => {
 /**
  * Checks whether a user belongs to a given usergroup or not.
  *
- * @param {string} slack_user_id      The Slack id of the user in question
- * @param {string} slack_usergroup_id The Slack id of the usergroup in question
+ * @param {string} slack_user_id      - The Slack id of the user in question
+ * @param {string} slack_usergroup_id - The Slack id of the usergroup in question
  * @returns {boolean} Whether the user belongs to the usergroup or not.
  */
 const isUserInUsergroup = (slack_user_id, slack_usergroup_id) => {
@@ -618,7 +618,7 @@ const isUserInUsergroup = (slack_user_id, slack_usergroup_id) => {
 /**
  * Processes a Slack usergroup creation event (`subteam_created`)
  *
- * @param {Object} response The Slack event object
+ * @param {Object} response - The Slack event object
  * @returns {boolean} Whether the operation was successful or not
  *
  * @see processUpdateEvent
@@ -640,7 +640,7 @@ const processCreationEvent = (response) => {
  *
  * Look at `insertUsergroupUsersFromAPIListResponse()` for more info.
  *
- * @param {Object} response The Slack event object
+ * @param {Object} response - The Slack event object
  * @returns {boolean} Whether the operation was successful or not
  *
  * @see insertUsergroupUsersFromAPIListResponse
@@ -664,7 +664,7 @@ const processUpdateEvent = (response) => {
 /**
  * Processes a Slack usergroup member change event (`subteam_members_changed`)
  *
- * @param {Object} response The Slack event object
+ * @param {Object} response - The Slack event object
  * @returns {boolean} Whether the operation was successful or not
  *
  * @see processCreationEvent
