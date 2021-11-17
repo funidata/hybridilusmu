@@ -13,6 +13,25 @@ const library = require('./responses');
  */
 const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX : '';
 
+/**
+ * Converts a string to an array of arguments. Drops all unnecessary whitespace in the process.
+ *
+ * @param {string} text - The text to turn into an array of arguments
+ * @returns {Array.<string>} Args
+ */
+const argify = (text) => {
+    if (!text) {
+        return [];
+    }
+    return text
+        // replace all tabs with spaces
+        .replaceAll('\t', ' ')
+        // turn into array
+        .split(' ')
+        // drop all 'empty' arguments
+        .filter((str) => str.trim().length > 0);
+};
+
 exports.enableSlashCommands = ({ app, usergroups }) => {
     /**
     * Checks if user gave 'help' as a parameter to a command.
@@ -52,7 +71,7 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
             const channelId = command.channel_id;
             const userId = command.user_id;
             if (help(input, channelId, userId, library.explainListaa)) return;
-            const args = input.replaceAll('\t', ' ').split(' ').filter((str) => str.trim().length > 0);
+            const args = argify(input);
             if (args.length === 0) {
                 args.push('tänään');
             } else if (args.length === 1) {
@@ -99,7 +118,7 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
             const userId = command.user_id;
             if (help(input, channelId, userId, library.explainIlmoita)) return;
             let response = library.demandDateAndStatus();
-            const parameters = input.split(' ');
+            const parameters = argify(input);
             if (notEnoughParameters(
                 2,
                 parameters.length,
@@ -150,7 +169,7 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
             const userId = command.user_id;
             if (help(input, channelId, userId, library.explainPoista)) return;
             let response = library.demandDate();
-            const parameters = input.split(' ');
+            const parameters = argify(input);
             if (notEnoughParameters(1, parameters.length, channelId, userId, library.demandDate)) {
                 return;
             }
