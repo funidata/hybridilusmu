@@ -2,12 +2,16 @@
   "name": "hytuslain",
   "version": "1.0.0",
   "description": "Toteutettu Helsingin yliopiston ohjelmistotuotantoprojektikurssin työnä syksyllä 2021.",
-  "main": "index.js",
+  "main": "./src/index.js",
+  "eslintConfig": {
+    "extends": "./dev/.eslintrc.js"
+  },
   "scripts": {
-    "start": "node index.js",
-    "migrate": "node ./bin/migrate.js",
-    "test": "nyc mocha",
-    "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
+    "start": "node ./src/index.js",
+    "migrate": "node ./dev/migrate.js",
+    "test": "nyc --reporter=html mocha",
+    "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "eslint": "npx eslint ."
   },
   "repository": {
     "type": "git",

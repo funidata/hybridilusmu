@@ -1,6 +1,6 @@
 const assert = require('assert');
-const db = require('../database');
-const controller = require('../controllers/db.controllers');
+const db = require('../src/database');
+const controller = require('../src/controllers/db.controllers');
 
 describe('Default signups test', function () { // eslint-disable-line
     this.beforeAll(async () => {
@@ -8,15 +8,14 @@ describe('Default signups test', function () { // eslint-disable-line
     });
 
     it('create weekday default and assign to a user', async () => {
-        await db.Person.create({
-            id: 1,
+        const person = await db.Person.create({
             slack_id: 'XYZ',
             real_name: 'Matti Meikalainen',
         });
         await db.Defaultsignup.create({
             weekday: 'Maanantai',
             at_office: true,
-            PersonId: 1,
+            PersonId: person.id,
         });
         const p1 = await db.Person.findByPk(1, {
             include: ['defaultsignups'],
@@ -24,15 +23,14 @@ describe('Default signups test', function () { // eslint-disable-line
         assert.equal(1, p1.defaultsignups.length);
     });
     it('find all default users for a weekday', async () => {
-        await db.Person.create({
-            id: 2,
+        const person = await db.Person.create({
             slack_id: 'ZZZ',
             real_name: 'Maija Mehilainen',
         });
         await db.Defaultsignup.create({
             weekday: 'Maanantai',
             at_office: true,
-            PersonId: 2,
+            PersonId: person.id,
         });
 
         const persons = await controller.getAllOfficeDefaultSignupsForAWeekday('Maanantai');
@@ -40,13 +38,12 @@ describe('Default signups test', function () { // eslint-disable-line
         assert.equal(2, persons.length);
     });
     it('addDefaultSignupForUser test', async () => {
-        await db.Person.create({
-            id: 3,
+        let person = await db.Person.create({
             slack_id: 'ABC',
             real_name: 'Tyyppi Tyyppinen',
         });
         await controller.addDefaultSignupForUser('ABC', 'Tiistai', true);
-        const person = await db.Person.findByPk(1, {
+        person = await db.Person.findByPk(person.id, {
             include: ['defaultsignups'],
         });
         assert.equal(1, person.defaultsignups.length);

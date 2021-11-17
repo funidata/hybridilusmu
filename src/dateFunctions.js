@@ -23,14 +23,29 @@ const RECORD_LIMIT = 180;
 const MAX_DIFFERENCE = 2;
 
 /**
+ * Checks if the given date is in the past, meaning yesterday or before.
+ * This function expects the given date's time to be set at 00:00.
+ * @param {Luxon Date}
+ */
+const inThePast = (date) => {
+    if (date <= DateTime.now().minus({ days: 1 })) return true;
+    return false;
+};
+
+/**
+ * Returns weekday of given date as a string.
+ * @param {Luxon date}
+ */
+const getWeekday = (date) => weekdays[date.weekday - 1];
+
+/**
  * Transforms a string from YYYY-MM-DD format to "Weekday day.month." -format
  * @param {string} datestring - String in the format YYYY-MM-DD.
  */
 const toPrettyFormat = (datestring) => {
     const parts = datestring.split('-');
-    const newDate = DateTime.fromObject({ year: parts[0], month: parts[1], day: parts[2] });
-    const res = `${weekdays[newDate.weekday - 1]} ${newDate.day}.${newDate.month}.`;
-    return res;
+    const date = DateTime.fromObject({ year: parts[0], month: parts[1], day: parts[2] });
+    return `${weekdays[date.weekday - 1]} ${date.day}.${date.month}.`;
 };
 
 /**
@@ -46,21 +61,6 @@ const listNWeekdays = (day, n) => {
         while (day.weekday >= 6) day = day.plus({ days: 1 }); // eslint-disable-line
         res.push(day.toISODate());
         day = day.plus({ days: 1 }); // eslint-disable-line
-    }
-    return res;
-};
-
-/**
- * Returns a list of strings representing one week,
- * starting from next monday calculated from the given day.
- * Strings are of format "Maanantai 11.10."
- * @param {Luxon Date} day - Starting day as a Luxon Date object.
- */
-const listNextWeek = (day) => {
-    const nextMonday = day.plus({ days: (8 - day.weekday) });
-    const res = [];
-    for (const line of listNWeekdays(nextMonday, 5)) {  // eslint-disable-line
-        res.push(toPrettyFormat(line));
     }
     return res;
 };
@@ -100,6 +100,11 @@ const isTomorrow = (input) => {
 
 const isWeekday = (date) => {
     if (!date.isValid || date.weekday >= 6) return false;
+    return true;
+};
+
+const isWeekend = (date) => {
+    if (!date.isValid || date.weekday < 6) return false;
     return true;
 };
 
@@ -151,18 +156,12 @@ const parseDate = (input, today) => {
     return date;
 };
 
-/**
- * Transforms a Luxon Date object to "Maanantaina 1.11." -format.
- * This is a helper function used in creating answers to slash commands.
- * @param {Luxon Date} date - Luxon Date object
- */
-const atWeekday = (date) => `${weekdays[date.weekday - 1]}na ${date.day}.${date.month}.`;
-
 module.exports = {
-    atWeekday,
+    getWeekday,
+    inThePast,
     isWeekday,
+    isWeekend,
     listNWeekdays,
-    listNextWeek,
     matchWeekday,
     parseDate,
     toPrettyFormat,

@@ -1,6 +1,6 @@
 const assert = require('assert');
-const db = require('../database');
-const controller = require('../controllers/db.controllers');
+const db = require('../src/database');
+const controller = require('../src/controllers/db.controllers');
 
 describe('Persons test', function () { // eslint-disable-line
     this.beforeAll(async () => {
@@ -9,7 +9,6 @@ describe('Persons test', function () { // eslint-disable-line
 
     it('create user', async () => {
         const person = await db.Person.create({
-            id: 1,
             slack_id: 'XYZ',
             real_name: 'Matti Meikalainen',
         });
