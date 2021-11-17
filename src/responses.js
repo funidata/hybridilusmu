@@ -152,7 +152,7 @@ Mainitsemalla tiimin, voit rajata listauksen vain kyseisen tiimin jäseniin.`;
  */
 const explainIlmoita = () => `*/ilmoita*: Anna komennolle parametrina päivä ja status. Päivä annetaan jossain seuraavista muodoista:
 ${explainPäivä()}
-'Status on joko *toimisto* tai *etä*.
+Status on joko *toimisto* tai *etä*.
 Antamalla parametrin *def* ennen muita parametreja, voit tehdä oletusilmoittautumisen.`;
 
 /**
@@ -178,7 +178,7 @@ const denyDefaultRegistrationForWeekend = () => 'Et voi lisätä oletusilmoittau
  * Reply to /ilmoita command, if something goes wrong.
  * @param {Luxon Date}
  */
-const demandDateAndStatus = () => 'Anna parametrina päivä ja status.';
+const demandDateAndStatus = () => 'Anna parametreina päivä ja status (toimisto/etä).';
 
 /**
  * Reply to /listaa and /poista commands, if something goes wrong.
