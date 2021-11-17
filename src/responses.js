@@ -138,32 +138,29 @@ const explainPäivä = () => '    • Maanantai\n'
     + '    • 15.11. tai 15.11\n'
     + '    • Tänään\n'
     + '    • Huomenna\n'
-    + 'Isoilla ja pienillä kirjaimilla ei ole merkitystä.\n';
+    + 'Isoilla ja pienillä kirjaimilla ei ole merkitystä.';
 
 /**
  * Reply to /listaa command with help parameter.
  */
-const explainListaa = () => '*/listaa*:'
-    + 'Anna komennolle parametrina päivä jossain seuraavista muodoista:\n'
-    + explainPäivä()
-    + 'Mainitsemalla tiimin, voit rajata listauksen vain kyseisen tiimin jäseniin.';
+const explainListaa = () => `*/listaa*: Anna komennolle parametrina päivä jossain seuraavista muodoista:
+${explainPäivä()}
+Mainitsemalla tiimin, voit rajata listauksen vain kyseisen tiimin jäseniin.`;
 
 /**
  * Reply to /ilmoita command with help parameter.
  */
-const explainIlmoita = () => '*/ilmoita*: '
-    + 'Anna komennolle parametrina päivä ja status. Päivä annetaan jossain seuraavista muodoista:\n'
-    + explainPäivä()
-    + 'Status on joko *toimisto* tai *etä*.\n'
-    + 'Antamalla parametrin *def* ennen muita parametreja, voit tehdä oletusilmoittautumisen.';
+const explainIlmoita = () => `*/ilmoita*: Anna komennolle parametrina päivä ja status. Päivä annetaan jossain seuraavista muodoista:
+${explainPäivä()}
+'Status on joko *toimisto* tai *etä*.
+Antamalla parametrin *def* ennen muita parametreja, voit tehdä oletusilmoittautumisen.`;
 
 /**
  * Reply to /poista command with help parameter.
  */
-const explainPoista = () => '*/poista*: '
-    + 'Anna komennolle parametrina päivä jossain seuraavista muodoista:\n'
-    + explainPäivä()
-    + 'Antamalla parametrin *def* ennen muita parametreja, voit poistaa oletusilmoittautumisen.';
+const explainPoista = () => `*/poista*: Anna komennolle parametrina päivä jossain seuraavista muodoista:
+${explainPäivä()}
+Antamalla parametrin *def* ennen muita parametreja, voit poistaa oletusilmoittautumisen.`;
 
 /**
  * Reply to user trying to add normal registration for weekend.

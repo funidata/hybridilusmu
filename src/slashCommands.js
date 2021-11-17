@@ -100,9 +100,13 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
             if (help(input, channelId, userId, library.explainIlmoita)) return;
             let response = library.demandDateAndStatus();
             const parameters = input.split(' ');
-            if (notEnoughParameters(2, parameters.length, channelId, userId, library.demandDateAndStatus)) {
-                return;
-            }
+            if (notEnoughParameters(
+                2,
+                parameters.length,
+                channelId,
+                userId,
+                library.demandDateAndStatus,
+            )) { return; }
             let dateString = parameters[0];
             let status = parameters[1];
             let devault = false;
@@ -116,7 +120,7 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
                         userId,
                         dfunc.getWeekday(date),
                         true,
-                        (status === 'toimisto')
+                        (status === 'toimisto'),
                     );
                     response = library.defaultRegistrationAdded(date, status);
                 } else {

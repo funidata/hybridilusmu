@@ -18,10 +18,10 @@ features:
       usage_hint: <päivä> [<tiimi>]
     - command: /ilmoita
       description: Lisää ilmoittautumisen
-      usage_hint: [<def>] <päivä> <status>
+      usage_hint: [def] <päivä> <status>
     - command: /poista
       description: Poistaa ilmoittautumisen
-      usage_hint: [<def>] <päivä>
+      usage_hint: [def] <päivä>
 oauth_config:
   scopes:
     bot:
