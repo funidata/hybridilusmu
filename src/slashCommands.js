@@ -51,10 +51,8 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
     * If yes, posts instructions on how to use that command.
     */
     const enoughParameters = (limit, parameterCount, channelId, userId, response) => {
-        if (parameterCount >= limit) {
-            helper.postEphemeralMessage(app, channelId, userId, response());
-            return true;
-        }
+        if (parameterCount >= limit) return true;
+        helper.postEphemeralMessage(app, channelId, userId, response());
         return false;
     };
 
