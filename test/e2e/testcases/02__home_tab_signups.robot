@@ -19,5 +19,9 @@ Can Open Home Tab
     Element Should Contain    //div[@data-qa='channel_name']    test-hybridilusmu
 
 Correct Dates
-    ${date}    Get Date For Home Tab Signups
-    Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[contains(h3, $date)]
+    Wait Until Element Is Visible    //button[@data-qa-action-id='update_click']
+    FOR    ${INDEX}    IN RANGE    0    ${10}
+        ${date}    Get Date For Home Tab Signups    ${INDEX}
+        Scroll Element Into View    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]
+        Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]
+    END

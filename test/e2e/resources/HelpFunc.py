@@ -5,6 +5,7 @@ from decouple import config
 months = ['tammikuuta', 'helmikuuta', 'maaliskuuta', 'huhtikuuta', 'toukokuuta',
     'kesäkuuta', 'heinäkuuta', 'elokuuta', 'syyskuuta', 'lokakuuta', 'marraskuuta', 'joulukuuta']
 weekdays = ['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai']
+Weekdays = ['Maanantai', 'Tiistai', 'Keskiviikko', 'Torstai', 'Perjantai']
 short_weekdays = ['ma', 'ti', 'ke', 'to', 'pe', 'la', 'su']
 
 class HelpFunc(object):
@@ -29,11 +30,12 @@ class HelpFunc(object):
             date = "{dow}na {day}.{month}".format(dow=weekdays[short_weekdays.index(weekday)], day=future_date.day, month=future_date.month)
             return date
 
-    def get_date_for_home_tab_signups(self):
-        now = datetime.now()
+    def get_date_for_home_tab_signups(self, order):
+        now = datetime.now() + timedelta(days = (order))
         while now.weekday() >= 5:
             now = now + timedelta(days = (1))
-        date = "{dow} {day}.{month}".format(dow=weekdays[now.weekday()], day = now.day, month = now.month)
+        date = "{dow} {day}.{month}".format(dow=Weekdays[now.weekday()], day = now.day, month = now.month)
+        return date
 
     def get_list_command(self):
         command = "/{prefix}listaa".format(prefix=config('COMMAND_PREFIX'))
