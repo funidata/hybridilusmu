@@ -1,5 +1,3 @@
-const { DateTime } = require('luxon');
-
 /**
 * Returns a list of all the channels the bot is a member of.
 */
