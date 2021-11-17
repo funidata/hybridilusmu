@@ -47,15 +47,39 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
     };
 
     /**
-    * Checks if user gave less parameters than was at least expected.
+    * Checks if user gave at least as many parameters as was expected.
     * If yes, posts instructions on how to use that command.
     */
-    const notEnoughParameters = (limit, parameterCount, channelId, userId, response) => {
-        if (parameterCount < limit) {
+    const enoughParameters = (limit, parameterCount, channelId, userId, response) => {
+        if (parameterCount >= limit) {
             helper.postEphemeralMessage(app, channelId, userId, response());
             return true;
         }
         return false;
+    };
+
+    /**
+    * Checks the given parameters and arranges them so that date is
+    * first and possible usergroup mention is second.
+    * After calling this function, what is interpreted as the date is found at index 0
+    * and usergroup mention, if such was given, is found at index 1.
+    * @param {List} args - List of strings, the parameters from the user.
+    */
+    const arrangeParameters = (args) => {
+        if (args.length === 0) {
+            // Ei argumentteja tarkoittaa tätä päivää.
+            args.push('tänään');
+        } else if (args.length === 1) {
+            if (usergroups.parseMentionString(args[0]) !== false) {
+                // Ainoa argumentti on usergroup mention ja päivä on tämä päivä.
+                args.push('tänään');
+                args.reverse();
+            }
+        }
+        if (args.length === 2 && usergroups.parseMentionString(args[0]) !== false) {
+            // Käyttäjä antoi ensin usergroup mentionin ja sitten päivän.
+            args.reverse();
+        }
     };
 
     /**
@@ -64,45 +88,37 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
     app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
         try {
             await ack();
-            let error = false;
-            // command.text antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon
-            // ja ensimmäisen välilyönnin jälkeen
             const input = command.text;
             const channelId = command.channel_id;
             const userId = command.user_id;
             if (help(input, channelId, userId, library.explainListaa)) return;
             const args = argify(input);
-            if (args.length === 0) {
-                args.push('tänään');
-            } else if (args.length === 1) {
-                if (usergroups.parseMentionString(args[0]) !== false) {
-                    args.push('tänään');
-                    args.reverse();
-                }
-            } else if (args.length > 2) {
-                error = true;
-            }
-            if (args.length === 2 && usergroups.parseMentionString(args[0]) !== false) {
-                args.reverse();
-            }
+            arrangeParameters(args);
+            let response = library.demandDateAndRemindAboutUGName();
             const date = dfunc.parseDate(args[0], DateTime.now());
-            const usergroupId = args.length === 2 ? usergroups.parseMentionString(args[1]) : null;
-            if (usergroupId === false) {
-                error = true;
+            if (date.isValid) {
+                if (args.length === 2) { // Usergroup mention mukana
+                    const ugId = usergroups.parseMentionString(args[1]);
+                    if (ugId === false) {
+                        response = library.usergroupNotFound();
+                    } else {
+                        const usergroupFilter = (uid) => usergroups.isUserInUsergroup(uid, ugId);
+                        const registrations = (
+                            await service.getRegistrationsFor(date.toISODate())
+                        ).filter(usergroupFilter);
+                        response = library.registrationListWithUsergroup(date,
+                            registrations,
+                            usergroups.generateMentionString(ugId));
+                    }
+                } else {
+                    const registrations = await service.getRegistrationsFor(date.toISODate());
+                    response = library.registrationList(date, registrations);
+                }
             }
-            if (!error && date.isValid) {
-                const response = await library.registrationList(
-                    { usergroups },
-                    date,
-                    usergroupId,
-                );
-                helper.postEphemeralMessage(app, channelId, userId, response);
-            } else {
-                helper.postEphemeralMessage(app, channelId, userId, library.demandDate());
-            }
-        } catch (error) {
+            helper.postEphemeralMessage(app, channelId, userId, response);
+        } catch (errori) {
             console.log('Tapahtui virhe :(');
-            console.log(error);
+            console.log(errori);
         }
     });
 
@@ -119,7 +135,7 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
             if (help(input, channelId, userId, library.explainIlmoita)) return;
             let response = library.demandDateAndStatus();
             const parameters = argify(input);
-            if (notEnoughParameters(
+            if (!enoughParameters(
                 2,
                 parameters.length,
                 channelId,
@@ -170,7 +186,7 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
             if (help(input, channelId, userId, library.explainPoista)) return;
             let response = library.demandDate();
             const parameters = argify(input);
-            if (notEnoughParameters(1, parameters.length, channelId, userId, library.demandDate)) {
+            if (!enoughParameters(1, parameters.length, channelId, userId, library.demandDate)) {
                 return;
             }
             let dateString = parameters[0];

@@ -1,5 +1,4 @@
 const dfunc = require('./dateFunctions');
-const service = require('./databaseService');
 
 const weekdays = [
     'Maanantai',
@@ -50,46 +49,63 @@ const dayPointMonth = (date) => `${date.day}.${date.month}.`;
 const atDate = (date) => `${na(date)} ${dayPointMonth(date)}`;
 
 /**
+ * Reply to no one being at the office.
+ * @param {Luxon Date}
+ */
+const nobodyAtOffice = (date) => {
+    if (dfunc.inThePast(date)) return `Kukaan ei ollut toimistolla ${atDate(date).toLowerCase()}`;
+    return `Kukaan ei ole toimistolla ${atDate(date).toLowerCase()}`;
+};
+
+/**
+ * Reply to no one being at the office from the given usergroup.
+ * @param {Luxon Date}
+ */
+const nobodyAtOfficeFromTeam = (date, usergroupMention) => {
+    if (dfunc.inThePast(date)) return `Kukaan tiimistä ${usergroupMention} ei ollut toimistolla ${atDate(date).toLowerCase()}`;
+    return `Kukaan tiimistä ${usergroupMention} ei ole toimistolla ${atDate(date).toLowerCase()}`;
+};
+
+/**
+ * Returns the correct verb form based on tense and amount of people.
+ * @param {Luxon Date}
+ */
+const correctVerbForm = (date, peopleCnt) => {
+    let verb = 'ovat';
+    if (dfunc.inThePast(date)) {
+        verb = peopleCnt === 1 ? 'oli' : 'olivat';
+    } else {
+        verb = peopleCnt === 1 ? 'on' : 'ovat';
+    }
+    return verb;
+};
+
+/**
  * Response to /listaa command.
- * Generates a listing message for a given date
- * @param {Luxon Date} date - Luxon Date object. If null:
- *  - please provide data via fetchedRegistrations
- *  - we'll also use a "today" string for rendering
- * @param {string} slackUsergroupId A Slack usergroup id, if any.
- * @param {*} fetchedRegistrations A ready set of registration data for perfomance reasons
+ * @param {Luxon Date} date - Luxon Date object.
+ * @param {List} registrations - List of strings, usernames to be added to the response.
+ */
+const registrationList = (date, registrations) => {
+    if (registrations.length === 0) return nobodyAtOffice(date);
+    const verb = correctVerbForm(date, registrations.length);
+    let response = `${atDate(date)} toimistolla ${verb}\n`;
+    registrations.forEach((user) => {
+        response += `<@${user}>\n`;
+    });
+    return response;
+};
+
+/**
+ * Response to /listaa command with usergroup defined.
+ * @param {Luxon Date} date - Luxon Date object.
+ * @param {List} registrations - List of strings, usernames to be added to the response.
+ * @param {string} usergroupMention - Usergroup mention string to be added to the response.
  * @return {string} A message ready to post
  */
-const registrationList = async (
-    { usergroups },
-    date,
-    slackUsergroupId = null,
-    fetchedRegistrations = null,
-) => {
-    const usergroupFilter = !slackUsergroupId
-        ? () => true
-        : (uid) => usergroups.isUserInUsergroup(uid, slackUsergroupId);
-    const registrations = fetchedRegistrations || (
-        await service.getRegistrationsFor(date.toISODate())
-    ).filter(usergroupFilter);
-    const specifier = !slackUsergroupId
-        ? ''
-        : ` tiimistä ${usergroups.generateMentionString(slackUsergroupId)}`;
-    let predicate = 'ovat';
-    if (dfunc.inThePast(date)) {
-        predicate = registrations.length === 1 ? 'oli' : 'olivat';
-    } else {
-        predicate = registrations.length === 1 ? 'on' : 'ovat';
-    }
-    const dateInResponse = date ? atDate(date) : 'Tänään';
-    let response = !slackUsergroupId
-        ? `${dateInResponse} toimistolla ${predicate}:`
-        : `${dateInResponse}${specifier} ${predicate} toimistolla:`;
-    if (registrations.length === 0) {
-        response = dfunc.inThePast(date)
-            ? `Kukaan${specifier} ei ollut toimistolla ${dateInResponse.toLowerCase()}`
-            : `Kukaan${specifier} ei ole toimistolla ${dateInResponse.toLowerCase()}`;
-    }
-    response += '\n';
+const registrationListWithUsergroup = (date, registrations, usergroupMention) => {
+    if (registrations.length === 0) return nobodyAtOfficeFromTeam(date, usergroupMention);
+    const verb = correctVerbForm(date, registrations.length);
+    let response = `${atDate(date)} tiimistä ${usergroupMention} ${verb} toimistolla:\n`;
     registrations.forEach((user) => {
         response += `<@${user}>\n`;
     });
@@ -163,6 +179,11 @@ ${explainPäivä()}
 Antamalla parametrin *def* ennen muita parametreja, voit poistaa oletusilmoittautumisen.`;
 
 /**
+ * Reply when user has given a mention string but no usergroup matches.
+ */
+const usergroupNotFound = () => 'Tarkista, että kirjoitit tiimin nimen oikein.';
+
+/**
  * Reply to user trying to add normal registration for weekend.
  * @param {Luxon Date}
  */
@@ -181,16 +202,23 @@ const denyDefaultRegistrationForWeekend = () => 'Et voi lisätä oletusilmoittau
 const demandDateAndStatus = () => 'Anna parametreina päivä ja status (toimisto/etä).';
 
 /**
- * Reply to /listaa and /poista commands, if something goes wrong.
+ * Reply to /poista command, if something goes wrong.
  * @param {Luxon Date}
  */
 const demandDate = () => 'Anna parametrina päivä.';
+
+/**
+ * Reply to /listaa command, if something goes wrong.
+ * @param {Luxon Date}
+ */
+const demandDateAndRemindAboutUGName = () => 'Anna parametrina päivä. Jos annoit tiimin nimen, tarkista että kirjoitit sen oikein.';
 
 module.exports = {
     defaultRegistrationAdded,
     defaultRegistrationRemoved,
     demandDate,
     demandDateAndStatus,
+    demandDateAndRemindAboutUGName,
     denyDefaultRegistrationForWeekend,
     denyNormalRegistrationForWeekend,
     explainIlmoita,
@@ -199,4 +227,6 @@ module.exports = {
     normalRegistrationAdded,
     normalRegistrationRemoved,
     registrationList,
+    registrationListWithUsergroup,
+    usergroupNotFound,
 };
