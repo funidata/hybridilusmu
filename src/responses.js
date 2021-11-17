@@ -1,4 +1,5 @@
 const dfunc = require('./dateFunctions');
+const service = require('./databaseService');
 
 const weekdays = [
     'Maanantai',
@@ -49,23 +50,46 @@ const dayPointMonth = (date) => `${date.day}.${date.month}.`;
 const atDate = (date) => `${na(date)} ${dayPointMonth(date)}`;
 
 /**
- * Reply to /listaa command.
- * @param {Luxon Date}
- * @param {List}
+ * Response to /listaa command.
+ * Generates a listing message for a given date
+ * @param {Luxon Date} date - Luxon Date object. If null:
+ *  - please provide data via fetchedRegistrations
+ *  - we'll also use a "today" string for rendering
+ * @param {string} slackUsergroupId A Slack usergroup id, if any.
+ * @param {*} fetchedRegistrations A ready set of registration data for perfomance reasons
+ * @return {string} A message ready to post
  */
-const registrationList = (date, registrations) => {
-    let response = `${atDate(date)} toimistolla`;
-    let verb;
+const registrationList = async (
+    { usergroups },
+    date,
+    slackUsergroupId = null,
+    fetchedRegistrations = null,
+) => {
+    const usergroupFilter = !slackUsergroupId
+        ? () => true
+        : (uid) => usergroups.isUserInUsergroup(uid, slackUsergroupId);
+    const registrations = fetchedRegistrations || (
+        await service.getRegistrationsFor(date.toISODate())
+    ).filter(usergroupFilter);
+    const specifier = !slackUsergroupId
+        ? ''
+        : ` tiimistä ${usergroups.generateMentionString(slackUsergroupId)}`;
+    let predicate = 'ovat';
     if (dfunc.inThePast(date)) {
-        if (registrations.length === 0) return `Kukaan ei ollut toimistolla ${atDate(date).toLowerCase()}`;
-        verb = ' olivat\n';
-        if (registrations.length === 1) verb = ' oli:\n';
+        predicate = registrations.length === 1 ? 'oli' : 'olivat';
     } else {
-        if (registrations.length === 0) return `Kukaan ei ole toimistolla ${atDate(date).toLowerCase()}`;
-        verb = ' ovat\n';
-        if (registrations.length === 1) verb = ' on:\n';
+        predicate = registrations.length === 1 ? 'on' : 'ovat';
     }
-    response += verb;
+    const dateInResponse = date ? atDate(date) : 'Tänään';
+    let response = !slackUsergroupId
+        ? `${dateInResponse} toimistolla ${predicate}:`
+        : `${dateInResponse}${specifier} ${predicate} toimistolla:`;
+    if (registrations.length === 0) {
+        response = dfunc.inThePast(date)
+            ? `Kukaan${specifier} ei ollut toimistolla ${dateInResponse.toLowerCase()}`
+            : `Kukaan${specifier} ei ole toimistolla ${dateInResponse.toLowerCase()}`;
+    }
+    response += '\n';
     registrations.forEach((user) => {
         response += `<@${user}>\n`;
     });
@@ -73,7 +97,7 @@ const registrationList = (date, registrations) => {
 };
 
 /**
- * Reply to /ilmoita command.
+ * Response to /ilmoita command.
  * @param {Luxon Date}
  * @param {string}
  */
@@ -84,7 +108,7 @@ const normalRegistrationAdded = (date, status) => {
 };
 
 /**
- * Reply to /ilmoita command with def parameter.
+ * Response to /ilmoita command with def parameter.
  * @param {Luxon Date}
  * @param {string}
  */
@@ -95,13 +119,13 @@ const defaultRegistrationAdded = (date, status) => {
 };
 
 /**
- * Reply to /poista command.
+ * Response to /poista command.
  * @param {Luxon Date}
  */
 const normalRegistrationRemoved = (date) => `Ilmoittautuminen poistettu ${lta(date).toLowerCase()} ${dayPointMonth(date)}`;
 
 /**
- * Reply to /poista command with def parameter.
+ * Response to /poista command with def parameter.
  * @param {Luxon Date}
  */
 const defaultRegistrationRemoved = (date) => `Oletusilmoittautuminen poistettu ${lta(date).toLowerCase()}.`;
@@ -119,7 +143,10 @@ const explainPäivä = () => '    • Maanantai\n'
 /**
  * Reply to /listaa command with help parameter.
  */
-const explainListaa = () => `*/listaa*: Anna komennolle parametrina päivä jossain seuraavista muodoista:\n${explainPäivä()}`;
+const explainListaa = () => '*/listaa*:'
+    + 'Anna komennolle parametrina päivä jossain seuraavista muodoista:\n'
+    + explainPäivä()
+    + 'Mainitsemalla tiimin, voit rajata listauksen vain kyseisen tiimin jäseniin.';
 
 /**
  * Reply to /ilmoita command with help parameter.

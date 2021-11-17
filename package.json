@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "description": "Toteutettu Helsingin yliopiston ohjelmistotuotantoprojektikurssin työnä syksyllä 2021.",
   "main": "./src/index.js",
+  "eslintConfig": {
+    "extends": "./dev/.eslintrc.js"
+  },
   "scripts": {
     "start": "node ./src/index.js",
     "migrate": "node ./dev/migrate.js",
-    "test": "nyc mocha",
+    "test": "nyc --reporter=html mocha",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
-    "eslint": "npx eslint -c ./dev/.eslintrc.js ."
+    "eslint": "npx eslint ."
   },
   "repository": {
     "type": "git",

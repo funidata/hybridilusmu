@@ -1,8 +1,8 @@
 const { DateTime } = require('luxon');
 
-const service = require('./databaseService');
 const dfunc = require('./dateFunctions');
 const helper = require('./helperFunctions');
+const service = require('./databaseService');
 const library = require('./responses');
 
 /**
@@ -13,7 +13,7 @@ const library = require('./responses');
  */
 const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX : '';
 
-exports.enableSlashCommands = function (app) {
+exports.enableSlashCommands = ({ app, usergroups }) => {
     /**
     * Checks if user gave 'help' as a parameter to a command.
     * If yes, posts instructions on how to use that command.
@@ -40,19 +40,44 @@ exports.enableSlashCommands = function (app) {
     };
 
     /**
-    * Listens to a slash-command and lists users registered for the given day.
-    */
+     * Listens to a slash-command and prints a list of people at the office on the given day.
+     */
     app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
         try {
             await ack();
+            let error = false;
+            // command.text antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon
+            // ja ensimmäisen välilyönnin jälkeen
             const input = command.text;
             const channelId = command.channel_id;
             const userId = command.user_id;
             if (help(input, channelId, userId, library.explainListaa)) return;
-            const date = dfunc.parseDate(input, DateTime.now());
-            if (date.isValid) {
-                const registrations = await service.getRegistrationsFor(date.toISODate());
-                helper.postEphemeralMessage(app, channelId, userId, library.registrationList(date, registrations));
+            const args = input.replaceAll('\t', ' ').split(' ').filter((str) => str.trim().length > 0);
+            if (args.length === 0) {
+                args.push('tänään');
+            } else if (args.length === 1) {
+                if (usergroups.parseMentionString(args[0]) !== false) {
+                    args.push('tänään');
+                    args.reverse();
+                }
+            } else if (args.length > 2) {
+                error = true;
+            }
+            if (args.length === 2 && usergroups.parseMentionString(args[0]) !== false) {
+                args.reverse();
+            }
+            const date = dfunc.parseDate(args[0], DateTime.now());
+            const usergroupId = args.length === 2 ? usergroups.parseMentionString(args[1]) : null;
+            if (usergroupId === false) {
+                error = true;
+            }
+            if (!error && date.isValid) {
+                const response = await library.registrationList(
+                    { usergroups },
+                    date,
+                    usergroupId,
+                );
+                helper.postEphemeralMessage(app, channelId, userId, response);
             } else {
                 helper.postEphemeralMessage(app, channelId, userId, library.demandDate());
             }
@@ -75,7 +100,9 @@ exports.enableSlashCommands = function (app) {
             if (help(input, channelId, userId, library.explainIlmoita)) return;
             let response = library.demandDateAndStatus();
             const parameters = input.split(' ');
-            if (notEnoughParameters(2, parameters.length, channelId, userId, library.demandDateAndStatus)) return;
+            if (notEnoughParameters(2, parameters.length, channelId, userId, library.demandDateAndStatus)) {
+                return;
+            }
             let dateString = parameters[0];
             let status = parameters[1];
             let devault = false;
@@ -85,7 +112,12 @@ exports.enableSlashCommands = function (app) {
             const date = dfunc.parseDate(dateString, DateTime.now());
             if (dfunc.isWeekday(date) && (status === 'toimisto' || status === 'etä')) {
                 if (devault) {
-                    await service.changeDefaultRegistration(userId, dfunc.getWeekday(date), true, status === 'toimisto');
+                    await service.changeDefaultRegistration(
+                        userId,
+                        dfunc.getWeekday(date),
+                        true,
+                        (status === 'toimisto')
+                    );
                     response = library.defaultRegistrationAdded(date, status);
                 } else {
                     await service.changeRegistration(userId, date.toISODate(), true, status === 'toimisto');
@@ -115,7 +147,9 @@ exports.enableSlashCommands = function (app) {
             if (help(input, channelId, userId, library.explainPoista)) return;
             let response = library.demandDate();
             const parameters = input.split(' ');
-            if (notEnoughParameters(1, parameters.length, channelId, userId, library.demandDate)) return;
+            if (notEnoughParameters(1, parameters.length, channelId, userId, library.demandDate)) {
+                return;
+            }
             let dateString = parameters[0];
             let devault = false;
             if (parameters[0].toLowerCase() === 'def' && parameters.length === 2) {

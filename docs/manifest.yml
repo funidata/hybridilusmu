@@ -3,6 +3,7 @@ _metadata:
   minor_version: 1
 display_information:
   name: Hybridilusmu
+  description: Hybridityöskentelyn tukisovellus
 features:
   app_home:
     home_tab_enabled: true
@@ -14,13 +15,13 @@ features:
   slash_commands:
     - command: /listaa
       description: Listaa paikallaolijat
-      usage_hint: päivä
+      usage_hint: <päivä> [<tiimi>]
     - command: /ilmoita
       description: Lisää ilmoittautumisen
-      usage_hint: [def] päivä status
+      usage_hint: [<def>] <päivä> <status>
     - command: /poista
       description: Poistaa ilmoittautumisen
-      usage_hint: [def] päivä
+      usage_hint: [<def>] <päivä>
 oauth_config:
   scopes:
     bot:
@@ -46,6 +47,9 @@ settings:
       - message.mpim
       - reaction_added
       - app_home_opened
+      - subteam_created
+      - subteam_members_changed
+      - subteam_updated
   interactivity:
     is_enabled: true
   org_deploy_enabled: false
