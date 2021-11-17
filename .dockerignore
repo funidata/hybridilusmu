@@ -1,0 +1,5 @@
+.env*
+.git
+.github
+.nyc_output
+.vscode

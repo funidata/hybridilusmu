@@ -12,8 +12,10 @@ require('./tools/quotenv').checkEnv([
 ]);
 const { App } = require('@slack/bolt');
 const scheduler = require('./scheduleMessage');
+const usergroups = require('./usergroups');
 const { enableActionFunctions } = require('./actionFunctions');
 const { enableEventListeners } = require('./eventListeners');
+const { enableUserCache } = require('./userCache');
 const { enableMiddleware } = require('./middleware');
 const { enableSlashCommands } = require('./slashCommands');
 
@@ -24,17 +26,26 @@ const app = new App({
     appToken: process.env.SLACK_APP_TOKEN,
 });
 
-enableActionFunctions(app);
-enableEventListeners(app);
-enableMiddleware(app);
-enableSlashCommands(app);
+const state = {
+    app,
+    usergroups,
+};
+
+const userCache = enableUserCache(state);
+state.userCache = userCache;
+
+enableMiddleware(state);
+enableActionFunctions(state);
+enableEventListeners(state);
+enableSlashCommands(state);
 
 /**
  * Starts the bot.
  */
 (async () => {
     await app.start(process.env.PORT || 3000);
-    scheduler.startScheduling(app);
+    scheduler.startScheduling(state);
+    scheduler.scheduleUsergroupReadings(state);
     console.log('⚡️ Bolt app is running!');
 })();
 

@@ -1,6 +1,5 @@
 const { DateTime } = require('luxon');
 
-const service = require('./databaseService');
 const dfunc = require('./dateFunctions');
 const helper = require('./helperFunctions');
 
@@ -12,24 +11,42 @@ const helper = require('./helperFunctions');
  */
 const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX : '';
 
-exports.enableSlashCommands = function (app) {
+exports.enableSlashCommands = ({ app, usergroups }) => {
     /**
-    * Listens to a slash-command and prints a list of people at the office on the given day.
-    */
+     * Listens to a slash-command and prints a list of people at the office on the given day.
+     */
     app.command(`/${COMMAND_PREFIX}listaa`, async ({ command, ack }) => {
         try {
             await ack();
-            const parameter = command.text; // Antaa käskyn parametrin
-            const date = dfunc.parseDate(parameter, DateTime.now());
-            if (date.isValid) {
-                const registrations = await service.getRegistrationsFor(date.toISODate());
-                let response = `${dfunc.atWeekday(date)} toimistolla `;
-                if (registrations.length === 0) response = `Kukaan ei ole toimistolla ${dfunc.atWeekday(date).toLowerCase()}`;
-                else if (registrations.length === 1) response += 'on:\n';
-                else response += 'ovat:\n';
-                registrations.forEach((user) => {
-                    response += `<@${user}>\n`;
-                });
+            let error = false;
+            // Antaa käskyn parametrin, eli kaiken mitä tulee slash-komennon ja ensimmäisen
+            // välilyönnin jälkeen
+            const parameter = command.text;
+            const args = parameter.replaceAll('\t', ' ').split(' ').filter((str) => str.trim().length > 0);
+            if (args.length === 0) {
+                args.push('tänään');
+            } else if (args.length === 1) {
+                if (usergroups.parseMentionString(args[0]) !== false) {
+                    args.push('tänään');
+                    args.reverse();
+                }
+            } else if (args.length > 2) {
+                error = true;
+            }
+            if (args.length === 2 && usergroups.parseMentionString(args[0]) !== false) {
+                args.reverse();
+            }
+            const date = dfunc.parseDate(args[0], DateTime.now());
+            const usergroupId = args.length === 2 ? usergroups.parseMentionString(args[1]) : null;
+            if (usergroupId === false) {
+                error = true;
+            }
+            if (!error && date.isValid) {
+                const response = await helper.generateListMessage(
+                    { usergroups },
+                    date.toISODate(),
+                    usergroupId,
+                );
                 helper.postEphemeralMessage(app, command.channel_id, command.user_id, response);
             } else {
                 helper.postEphemeralMessage(app, command.channel_id, command.user_id, 'Anteeksi, en ymmärtänyt äskeistä.');

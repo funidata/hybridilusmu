@@ -1,7 +1,7 @@
 const home = require('./home');
 const service = require('./databaseService');
 
-exports.enableActionFunctions = function (app) {
+exports.enableActionFunctions = ({ app }) => {
     /**
     * Updates the Home tab for the specified user.
     */
