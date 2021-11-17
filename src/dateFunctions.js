@@ -23,14 +23,29 @@ const RECORD_LIMIT = 180;
 const MAX_DIFFERENCE = 2;
 
 /**
+ * Checks if the given date is in the past, meaning yesterday or before.
+ * This function expects the given date's time to be set at 00:00.
+ * @param {Luxon Date}
+ */
+const inThePast = (date) => {
+    if (date <= DateTime.now().minus({ days: 1 })) return true;
+    return false;
+};
+
+/**
+ * Returns weekday of given date as a string.
+ * @param {Luxon date}
+ */
+const getWeekday = (date) => weekdays[date.weekday - 1];
+
+/**
  * Transforms a string from YYYY-MM-DD format to "Weekday day.month." -format
  * @param {string} datestring - String in the format YYYY-MM-DD.
  */
 const toPrettyFormat = (datestring) => {
     const parts = datestring.split('-');
-    const newDate = DateTime.fromObject({ year: parts[0], month: parts[1], day: parts[2] });
-    const res = `${weekdays[newDate.weekday - 1]} ${newDate.day}.${newDate.month}.`;
-    return res;
+    const date = DateTime.fromObject({ year: parts[0], month: parts[1], day: parts[2] });
+    return `${weekdays[date.weekday - 1]} ${date.day}.${date.month}.`;
 };
 
 /**
@@ -88,6 +103,11 @@ const isWeekday = (date) => {
     return true;
 };
 
+const isWeekend = (date) => {
+    if (!date.isValid || date.weekday < 6) return false;
+    return true;
+};
+
 /**
  * Checks if the string represents a weekday.
  * Returns 0 if string is not a weekday, 1 if it matches "Maanantai", 2 for "Tiistai" etc.
@@ -136,16 +156,11 @@ const parseDate = (input, today) => {
     return date;
 };
 
-/**
- * Transforms a Luxon Date object to "Maanantaina 1.11." -format.
- * This is a helper function used in creating answers to slash commands.
- * @param {Luxon Date} date - Luxon Date object
- */
-const atWeekday = (date) => `${weekdays[date.weekday - 1]}na ${date.day}.${date.month}.`;
-
 module.exports = {
-    atWeekday,
+    getWeekday,
+    inThePast,
     isWeekday,
+    isWeekend,
     listNWeekdays,
     matchWeekday,
     parseDate,

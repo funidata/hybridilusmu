@@ -44,7 +44,7 @@ const changeDefaultRegistration = async (userId, weekday, addRegistration, atOff
  */
 const getRegistrationsFor = async (date) => {
     const defaultOfficeIds = await db.getAllOfficeDefaultSignupsForAWeekday(
-        dfunc.weekdays[DateTime.fromISO(date).weekday - 1],
+        dfunc.getWeekday(DateTime.fromISO(date)),
     );
     const officeIds = new Set(await db.getAllOfficeSignupsForADate(date));
     const remoteIds = new Set(await db.getAllOfficeSignupsForADate(date, false));

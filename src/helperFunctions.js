@@ -1,8 +1,5 @@
 const { DateTime } = require('luxon');
 
-const service = require('./databaseService');
-const dfunc = require('./dateFunctions');
-
 /**
 * Returns a list of all the channels the bot is a member of.
 */
@@ -38,47 +35,6 @@ async function postMessage(app, channelId, message) {
 }
 
 /**
- * Generates a listing message for a given date
- * @param {string} date An ISO-8601 date string. If null:
- *  - please provide data via fetchedRegistrations
- *  - we'll also use a "today" string for rendering
- * @param {string} slackUsergroupId A Slack usergroup id, if any.
- * @param {*} fetchedRegistrations A ready set of registration data for perfomance reasons
- * @return {string} A message ready to post
- */
-const generateListMessage = async (
-    { usergroups },
-    date,
-    slackUsergroupId = null,
-    fetchedRegistrations = null,
-) => {
-    const usergroupFilter = !slackUsergroupId
-        ? () => true
-        : (uid) => usergroups.isUserInUsergroup(uid, slackUsergroupId);
-    const registrations = fetchedRegistrations || (
-        await service.getRegistrationsFor(date)
-    ).filter(usergroupFilter);
-    const specifier = !slackUsergroupId
-        ? ''
-        : ` tiimistä ${usergroups.generateMentionString(slackUsergroupId)}`;
-    const predicate = registrations.length === 1 ? 'on' : 'ovat';
-    const dateInResponse = date
-        ? dfunc.atWeekday(DateTime.fromISO(date))
-        : 'Tänään';
-    let response = !slackUsergroupId
-        ? `${dateInResponse} toimistolla ${predicate}:`
-        : `${dateInResponse}${specifier} ${predicate} toimistolla:`;
-    if (registrations.length === 0) {
-        response = `Kukaan${specifier} ei ole toimistolla ${dateInResponse.toLowerCase()}`;
-    }
-    response += '\n';
-    registrations.forEach((user) => {
-        response += `<@${user}>\n`;
-    });
-    return response;
-};
-
-/**
  * Reads usergroups from Slack to our local cache
  */
 const readUsergroupsFromCleanSlate = async ({ app, usergroups }) => {
@@ -110,6 +66,5 @@ module.exports = {
     getMemberChannelIds,
     postEphemeralMessage,
     postMessage,
-    generateListMessage,
     readUsergroupsFromCleanSlate,
 };
