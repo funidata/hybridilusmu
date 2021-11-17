@@ -58,3 +58,6 @@ jobs:
           # The default PostgreSQL port
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
     - run: npm run report-coverage
+    # Run eslint as the very last step so as to primarily test functionality in this workflow
+    - name: eslint
+      run: npm run eslint
