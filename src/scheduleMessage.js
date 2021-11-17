@@ -5,7 +5,7 @@ const service = require('./databaseService');
 const helper = require('./helperFunctions');
 
 /**
-* Sends a scheduled message every Sunday to all the channels the bot is in.
+* Sends a scheduled message every weekday to all the channels the bot is in.
 */
 async function startScheduling({ app, usergroups }) {
     const rule = new schedule.RecurrenceRule();
