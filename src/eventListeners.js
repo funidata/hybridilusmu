@@ -18,7 +18,7 @@ exports.enableEventListeners = function ({ app, usergroups, userCache }) {
         const shorthand = usergroups.generatePlaintextString(id);
         console.log(`ug ${shorthand} <${id}>: ${type}, returning ${ret}`);
     });
-    
+
     /**
      * Event listener for usergroup update events
      */
@@ -39,7 +39,7 @@ exports.enableEventListeners = function ({ app, usergroups, userCache }) {
             }
         }
     });
-    
+
     /**
      * Event listener for usergroup member change events
      */
