@@ -1,6 +1,6 @@
 const home = require('./home');
 
-exports.enableEventListeners = function ({ app, usergroups, userCache }) {
+exports.enableEventListeners = ({ app, usergroups }) => {
     /**
     * Updates the App-Home page for the specified user when they click on the Home tab.
     */

@@ -317,6 +317,7 @@ const dropSlackChannelFromUsergroup = (slack_channel_id, slack_usergroup_id) => 
  *
  * @param {string} slack_channel_id - The Slack id of the channel in question
  */
+// eslint-disable-next-line no-unused-vars
 const dropSlackChannel = (slack_channel_id) => {
     Object.keys(channelsLookup[slack_channel_id]).forEach((slack_usergroup_id) => {
         dropSlackChannelFromUsergroup(slack_channel_id, slack_usergroup_id);

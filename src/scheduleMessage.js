@@ -14,7 +14,7 @@ async function startScheduling({ app, usergroups }) {
     rule.hour = 4;
     rule.minute = 0;
     console.log('Scheduling posts to every public channel the bot is a member of every weekday at hour', rule.hour, rule.tz);
-    const job = schedule.scheduleJob(rule, async () => {
+    schedule.scheduleJob(rule, async () => {
         const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
         const channels = await helper.getMemberChannelIds(app);
         usergroups.getUsergroupsForChannels(channels).forEach(async (obj) => {
@@ -55,7 +55,7 @@ const scheduleUsergroupReadings = async ({ app, usergroups }) => {
     everyNight.hour = 0;
     everyNight.minute = 25;
     console.log(`scheduling nightly usergroup reads at ${everyNight.hour}h ${everyNight.minute}m (${everyNight.tz})`);
-    const job = schedule.scheduleJob(everyNight, procedure);
+    schedule.scheduleJob(everyNight, procedure);
     // also run it _now_
     procedure();
 };

@@ -12,7 +12,8 @@ const DAYS_IN_WEEK = 5;
 const format = { ...DateTime.DATETIME_MED, month: 'long' };
 
 /**
- * Defines the default settings modal's title and what text is displayed as tooltip on the closing 'X' button.
+ * Defines the default settings modal's title
+ * and what text is displayed as tooltip on the closing 'X' button.
  * These are basic attributes of the modal view.
  */
 const modalView = {
@@ -55,7 +56,8 @@ const getDefaultSettingsBlock = async (userId) => {
 };
 
 /**
- * Creates and returns a block containing an update button used to update the Home tab and a default settings button used to open the default settings modal.
+ * Creates and returns a block containing an update button used to update the Home tab
+ * and a default settings button used to open the default settings modal.
  */
 const getUpdateBlock = async () => {
     const updateBlock = [];
@@ -71,8 +73,8 @@ const getUpdateBlock = async () => {
 };
 
 /**
- * Creates and returns a list of blocks containing the registrations that are displayed in the Home tab.
- * For every day there is a list of people registered for that day and buttons for user to register themselves.
+ * Creates and returns a list of blocks containing the registrations to be displayed.
+ * For every day there is a list of people registered for that day and buttons for user to register.
  */
 const getRegistrationsBlock = async (userId) => {
     const registrationsBlock = [];
@@ -126,7 +128,7 @@ const update = async (client, userId) => {
  */
 const openView = async (client, userId, triggerId) => {
     const block = await getDefaultSettingsBlock(userId);
-    const result = await client.views.open({
+    await client.views.open({
         trigger_id: triggerId,
         view: { ...modalView, blocks: block },
     });
@@ -137,7 +139,7 @@ const openView = async (client, userId, triggerId) => {
  */
 const updateView = async (client, userId) => {
     const block = await getDefaultSettingsBlock(userId);
-    const result = await client.views.update({
+    await client.views.update({
         external_id: 'default_modal',
         view: { ...modalView, blocks: block },
     });

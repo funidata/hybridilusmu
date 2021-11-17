@@ -1,6 +1,5 @@
 const { DateTime } = require('luxon');
 
-const service = require('./databaseService');
 const dfunc = require('./dateFunctions');
 const helper = require('./helperFunctions');
 
@@ -12,7 +11,7 @@ const helper = require('./helperFunctions');
  */
 const COMMAND_PREFIX = process.env.COMMAND_PREFIX ? process.env.COMMAND_PREFIX : '';
 
-exports.enableSlashCommands = function ({ app, usergroups }) {
+exports.enableSlashCommands = ({ app, usergroups }) => {
     /**
      * Listens to a slash-command and prints a list of people at the office on the given day.
      */

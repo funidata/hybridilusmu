@@ -1,7 +1,7 @@
 const helper = require('./helperFunctions');
 const home = require('./home');
 
-exports.enableMiddleware = function ({ app, userCache }) {
+exports.enableMiddleware = ({ app, userCache }) => {
     /**
     * Get the restriction/guest value of the given user from Slack API.
     * @param {*} userId
