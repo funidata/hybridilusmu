@@ -3,6 +3,7 @@ const { DateTime } = require('luxon');
 const schedule = require('node-schedule');
 const service = require('./databaseService');
 const helper = require('./helperFunctions');
+const library = require('./responses');
 
 /**
 * Sends a scheduled message every weekday to all the channels the bot is in.
@@ -19,20 +20,17 @@ async function startScheduling({ app, usergroups }) {
         const channels = await helper.getMemberChannelIds(app);
         usergroups.getUsergroupsForChannels(channels).forEach(async (obj) => {
             if (obj.usergroup_ids.length === 0) {
-                const message = await helper.generateListMessage(
-                    { usergroups },
-                    null,
-                    null,
-                    registrations,
+                const message = library.registrationList(
+                        DateTime.now(),
+                        registrations,
                 );
                 helper.postMessage(app, obj.channel_id, message);
             } else {
                 obj.usergroup_ids.forEach(async (usergroupId) => {
-                    const message = await helper.generateListMessage(
-                        { usergroups },
-                        null,
-                        usergroupId,
+                    const message = library.registrationListWithUsergroup(
+                        DateTime.now(),
                         registrations,
+                        usergroups.generateMentionString(usergroupId),
                     );
                     helper.postMessage(app, obj.channel_id, message);
                 });
