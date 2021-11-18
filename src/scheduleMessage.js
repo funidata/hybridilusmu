@@ -21,8 +21,8 @@ async function startScheduling({ app, usergroups }) {
         usergroups.getUsergroupsForChannels(channels).forEach(async (obj) => {
             if (obj.usergroup_ids.length === 0) {
                 const message = library.registrationList(
-                        DateTime.now(),
-                        registrations,
+                    DateTime.now(),
+                    registrations,
                 );
                 helper.postMessage(app, obj.channel_id, message);
             } else {
