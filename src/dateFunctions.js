@@ -86,15 +86,23 @@ const editDistance = (str1, str2) => {
     return dp[a][b];
 };
 
-const isToday = (input) => {
+const isTodayString = (input) => {
     if (input.length > MAX_INPUT_LENGTH) return false;
     if (editDistance(input.toLowerCase(), 'tänään') <= MAX_DIFFERENCE) return true;
     return false;
 };
 
-const isTomorrow = (input) => {
+const isTomorrowString = (input) => {
     if (input.length > MAX_INPUT_LENGTH) return false;
     if (editDistance(input.toLowerCase(), 'huomenna') <= MAX_DIFFERENCE) return true;
+    return false;
+};
+
+const isToday = (date) => {
+    const today = DateTime.now();
+    if (date.day === today.day && date.month === today.month && date.year === today.year) {
+        return true;
+    }
     return false;
 };
 
@@ -142,8 +150,8 @@ const matchWeekday = (str) => {
  * @param {Luxon Date} today - Date that serves as the central date for calculation.
  */
 const parseDate = (input, today) => {
-    if (isToday(input)) return today;
-    if (isTomorrow(input)) return today.plus({ days: 1 });
+    if (isTodayString(input)) return today;
+    if (isTomorrowString(input)) return today.plus({ days: 1 });
     const weekday = matchWeekday(input);
     if (weekday) {
         return today.plus({ days: (weekday + 7 - today.weekday) % 7 });
@@ -159,6 +167,7 @@ const parseDate = (input, today) => {
 module.exports = {
     getWeekday,
     inThePast,
+    isToday,
     isWeekday,
     isWeekend,
     listNWeekdays,

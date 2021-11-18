@@ -46,7 +46,10 @@ const dayPointMonth = (date) => `${date.day}.${date.month}.`;
  * Convenience method for this commonly needed format.
  * @param {Luxon Date}
  */
-const atDate = (date) => `${na(date)} ${dayPointMonth(date)}`;
+const atDate = (date) => {
+    if (dfunc.isToday(date)) return 'Tänään';
+    return `${na(date)} ${dayPointMonth(date)}`;
+};
 
 /**
  * Reply to no one being at the office.
@@ -54,6 +57,7 @@ const atDate = (date) => `${na(date)} ${dayPointMonth(date)}`;
  */
 const nobodyAtOffice = (date) => {
     if (dfunc.inThePast(date)) return `Kukaan ei ollut toimistolla ${atDate(date).toLowerCase()}`;
+    if (dfunc.isToday(date)) return `Kukaan ei ole toimistolla ${atDate(date).toLowerCase()}.`;
     return `Kukaan ei ole toimistolla ${atDate(date).toLowerCase()}`;
 };
 
@@ -63,6 +67,7 @@ const nobodyAtOffice = (date) => {
  */
 const nobodyAtOfficeFromTeam = (date, usergroupMention) => {
     if (dfunc.inThePast(date)) return `Kukaan tiimistä ${usergroupMention} ei ollut toimistolla ${atDate(date).toLowerCase()}`;
+    if (dfunc.isToday(date)) return `Kukaan tiimistä ${usergroupMention} ei ole toimistolla ${atDate(date).toLowerCase()}.`;
     return `Kukaan tiimistä ${usergroupMention} ei ole toimistolla ${atDate(date).toLowerCase()}`;
 };
 
@@ -88,7 +93,7 @@ const correctVerbForm = (date, peopleCnt) => {
 const registrationList = (date, registrations) => {
     if (registrations.length === 0) return nobodyAtOffice(date);
     const verb = correctVerbForm(date, registrations.length);
-    let response = `${atDate(date)} toimistolla ${verb}\n`;
+    let response = `${atDate(date)} toimistolla ${verb}:\n`;
     registrations.forEach((user) => {
         response += `<@${user}>\n`;
     });
