@@ -30,7 +30,9 @@ async function startScheduling({ app, usergroups }) {
                 obj.usergroup_ids.forEach(async (usergroupId) => {
                     const message = library.registrationListWithUsergroup(
                         DateTime.now(),
-                        registrations,
+                        registrations.filter(
+                            (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
+                        ),
                         usergroups.generateMentionString(usergroupId),
                     );
                     helper.postMessage(app, obj.channel_id, message);
