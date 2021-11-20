@@ -11,8 +11,8 @@ Suite Teardown    common.Close Test Browser
 
 *** Test Cases ***
 Can Open Home Tab
-    Sleep    1s
     Maximize Browser Window
+    Sleep    5s
     Scroll Element Into View    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
     Wait Until Element Is Visible    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
     Click Element    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']

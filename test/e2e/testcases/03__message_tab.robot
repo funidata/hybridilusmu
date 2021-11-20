@@ -10,7 +10,7 @@ Suite Teardown    common.Close Test Browser
 *** Test Cases ***
 Can Open Home Tab
     Maximize Browser Window
-    Sleep    1s
+    Sleep    5s
     Scroll Element Into View    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
     Wait Until Element Is Visible    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
     Click Element    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
@@ -22,8 +22,6 @@ Can Go To Message Tab
     Wait Until Element Is Visible    //div[@data-qa='message_input']/div
 
 List Saturday Command Gives Correct Respond
-    ${LIST_COMMAND}=    Get List Command
-    Set Global Variable    ${LIST_COMMAND}    ${LIST_COMMAND}
     Input Text    //div[@data-qa='message_input']/div    ${LIST_COMMAND} la
     Click Element    //button[@data-qa='texty_send_button']
     Sleep    2s

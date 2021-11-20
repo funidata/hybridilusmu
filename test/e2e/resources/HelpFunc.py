@@ -1,6 +1,5 @@
 from pynput.keyboard import Key, Controller
 from datetime import datetime, timedelta
-from decouple import config
 
 months = ['tammikuuta', 'helmikuuta', 'maaliskuuta', 'huhtikuuta', 'toukokuuta',
     'kesäkuuta', 'heinäkuuta', 'elokuuta', 'syyskuuta', 'lokakuuta', 'marraskuuta', 'joulukuuta']
@@ -37,7 +36,4 @@ class HelpFunc(object):
         date = "{dow} {day}.{month}".format(dow=Weekdays[now.weekday()], day = now.day, month = now.month)
         return date
 
-    def get_list_command(self):
-        command = "/{prefix}listaa".format(prefix=config('COMMAND_PREFIX'))
-        return command
 

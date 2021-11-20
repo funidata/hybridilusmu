@@ -6,4 +6,5 @@ coverage
 *.lcov
 .vscode
 test/e2e/results/*
-!test/e2e/results/.keep 
+!test/e2e/results/.keep
+test/e2e/resources/__pycache__

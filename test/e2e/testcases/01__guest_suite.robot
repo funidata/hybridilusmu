@@ -15,8 +15,7 @@ Can Go To Guest Channel
     Element Should Contain    //div[@data-qa='channel_name']    vieraskanava
 
 Use Slash Command In Guest Channel
-    ${LIST_COMMAND}=    Get List Command
-    Set Global Variable    ${LIST_COMMAND}    ${LIST_COMMAND}
+    Set Global Variable    ${LIST_COMMAND}    /${COMMAND_PREFIX}listaa
     Input Text    //div[@data-qa='message_input']/div    ${LIST_COMMAND} tänään
     Click Element    //button[@data-qa='texty_send_button']
     Sleep    1s
