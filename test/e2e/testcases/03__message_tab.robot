@@ -1,4 +1,5 @@
 *** Settings ***
+Documentation    Tests to verify message tab functionality for a user with member role
 Library    Selenium2Library
 Library    Screenshot
 Library    ../resources/HelpFunc.py

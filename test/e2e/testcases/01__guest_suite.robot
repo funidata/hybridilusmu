@@ -1,4 +1,5 @@
 *** Settings ***
+Documentation    Tests to verify that user with guest role can not use the bot and gets correct error messages
 Library    Selenium2Library
 Library    Screenshot
 Library    ../resources/HelpFunc.py

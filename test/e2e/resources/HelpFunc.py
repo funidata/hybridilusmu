@@ -10,16 +10,26 @@ short_weekdays = ['ma', 'ti', 'ke', 'to', 'pe', 'la', 'su']
 class HelpFunc(object):
 
     def cancelPopup(self):
+        """Cancels a popup asking to open Slack in desktop app"""
         keyboard = Controller()
         keyboard.press(Key.space)
         keyboard.release(Key.space)
 
     def get_current_date_for_home_tab_update(self):
+        """
+        Returns a date in form of '1. tammikuuta 2021.
+        Used in home tab's update message.
+        """
         now = datetime.now()
         date = "{day}. {month} {year}".format(day=now.day, month=months[now.month - 1], year=now.year)
         return date
 
     def get_date_for_message_tab(self, weekday):
+        """
+        Returns the date that should be in the answer to the /listaa command.
+        weekday --- weekday shortcut given as a parameter to the /listaa command.
+        Date in form of 'Maanantaina 1.1'.
+        """
         now = datetime.now()
         if now.weekday() == short_weekdays.index(weekday):
             date = "{dow}na {day}.{month}".format(dow=weekdays[short_weekdays.index(weekday)], day=now.day, month=now.month)
@@ -30,6 +40,11 @@ class HelpFunc(object):
             return date
 
     def get_dates_for_home_tab_signups(self):
+        """
+        Returns an array of the next 10 weekdays.
+        Used for checking the dates in home tab.
+        Dates in form of 'Maanantai 1.1'.
+        """
         date_array = []
         now = datetime.now()
         while len(date_array) < 10:

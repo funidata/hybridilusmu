@@ -1,4 +1,5 @@
 *** Settings ***
+Documentation    Common keywords used across test suites
 Library    Selenium2Library
 Library    HelpFunc.py
 Resource    variables.robot
