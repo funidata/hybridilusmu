@@ -17,8 +17,8 @@ Can Open Home Tab
 
 Correct Dates
     Wait Until Element Is Visible    //button[@data-qa-action-id='update_click']
-    FOR    ${INDEX}    IN RANGE    0    ${10}
-        ${date}    Get Date For Home Tab Signups    ${INDEX}
-        Scroll Element Into View    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]
-        Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]
+    @{DATES}=    Get Dates For Home Tab Signups
+    FOR    ${ITEM}    IN    @{DATES}
+        Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${ITEM}')]
+        Scroll Element Into View    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${ITEM}')]
     END

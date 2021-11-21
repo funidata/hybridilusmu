@@ -29,11 +29,15 @@ class HelpFunc(object):
             date = "{dow}na {day}.{month}".format(dow=weekdays[short_weekdays.index(weekday)], day=future_date.day, month=future_date.month)
             return date
 
-    def get_date_for_home_tab_signups(self, order):
-        now = datetime.now() + timedelta(days = (order))
-        while now.weekday() >= 5:
+    def get_dates_for_home_tab_signups(self):
+        date_array = []
+        now = datetime.now()
+        while len(date_array) < 10:
+            while now.weekday() >= 5:
+                now = now + timedelta(days = (1))
+            date = "{dow} {day}.{month}".format(dow=Weekdays[now.weekday()], day = now.day, month = now.month)
+            date_array.append(date)
             now = now + timedelta(days = (1))
-        date = "{dow} {day}.{month}".format(dow=Weekdays[now.weekday()], day = now.day, month = now.month)
-        return date
+        return date_array
 
 

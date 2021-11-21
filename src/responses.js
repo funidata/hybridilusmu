@@ -152,7 +152,7 @@ Mainitsemalla tiimin, voit rajata listauksen vain kyseisen tiimin jäseniin.`;
  */
 const explainIlmoita = () => `*/ilmoita*: Anna komennolle parametrina päivä ja status. Päivä annetaan jossain seuraavista muodoista:
 ${explainPäivä()}
-'Status on joko *toimisto* tai *etä*.
+Status on joko *toimisto* tai *etä*.
 Antamalla parametrin *def* ennen muita parametreja, voit tehdä oletusilmoittautumisen.`;
 
 /**
