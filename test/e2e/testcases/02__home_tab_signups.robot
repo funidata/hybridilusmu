@@ -7,8 +7,6 @@ Resource    ../resources/common.robot
 Suite Setup    common.Open Slack In Browser And Login As User
 Suite Teardown    common.Close Test Browser
 
-*** Variables ***
-
 *** Test Cases ***
 Can Open Home Tab
     Maximize Browser Window
