@@ -25,3 +25,9 @@ Open Slack In Browser And Login As Guest
 
 Close Test Browser
     Close All Browsers 
+
+Go To Home Tab
+    Wait Until Element Is Visible    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
+    Scroll Element Into View    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
+    Click Element    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
+    Element Should Contain    //div[@data-qa='channel_name']    test-hybridilusmu

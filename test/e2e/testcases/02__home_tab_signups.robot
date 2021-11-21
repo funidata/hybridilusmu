@@ -10,10 +10,7 @@ Suite Teardown    common.Close Test Browser
 *** Test Cases ***
 Can Open Home Tab
     Maximize Browser Window
-    Wait Until Element Is Visible    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
-    Scroll Element Into View    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
-    Click Element    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
-    Element Should Contain    //div[@data-qa='channel_name']    test-hybridilusmu
+    Go To Home Tab
 
 Correct Dates
     Wait Until Element Is Visible    //button[@data-qa-action-id='update_click']

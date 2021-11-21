@@ -23,8 +23,7 @@ Use Slash Command In Guest Channel
     Element Should Contain    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]    This command can't be used by guests in this workspace.  
 
 Cannot See App Content
-    Wait Until Element Is Visible    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
-    Click Element    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
+    Go To Home Tab
     Wait Until Element Is Visible    //div[@data-qa='app_home_bk_app_view']
     Element Should Contain    //div[@data-qa='app_home_bk_app_view']/*    Pahoittelut, @Vieras Käyttäjä. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.
     Element Should Not Contain    //div[@data-qa='app_home_bk_app_view']/*    Tiedot päivitetty
