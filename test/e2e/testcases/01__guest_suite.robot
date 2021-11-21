@@ -30,9 +30,7 @@ Cannot See App Content
     Page Should Not Contain Element    //div[@data-qa='app_home_bk_app_view']//button
 
 Error Message In Message Tab
-    Wait Until Element Is Visible    //button[@data-qa='messages']
-    Click Element    //button[@data-qa='messages']
-    Wait Until Element Is Visible    //div[@data-qa='message_input']/div
+    Go To Message Tab
     Sleep    1s
     Element Should Contain    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]    Pahoittelut, @Vieras Käyttäjä. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.
     Input Text    //div[@data-qa='message_input']/div    ${LIST_COMMAND} tänään

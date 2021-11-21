@@ -12,29 +12,9 @@ Can Open Home Tab
     Maximize Browser Window
     Go To Home Tab
 
-Can Go To Message Tab
-    Wait Until Element Is Visible    //button[@data-qa='messages']
-    Click Element    //button[@data-qa='messages']
-    Wait Until Element Is Visible    //div[@data-qa='message_input']/div
-
 List Saturday Command Gives Correct Respond
-    Input Text    //div[@data-qa='message_input']/div    ${LIST_COMMAND} la
-    Click Element    //button[@data-qa='texty_send_button']
-    Sleep    2s
-    ${present}=    Run Keyword And Return Status    Element Should Be Visible   //button[@class='c-button-unstyled p-message_pane__unread_banner__msg']
-    Run Keyword If    ${present}    Click Element    //button[@class='c-button-unstyled p-message_pane__unread_banner__msg']
-    Sleep    1s
-    Scroll Element Into View    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]
-    ${date}=    Get Date For Message Tab    la
-    Element Should Contain    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]    Kukaan ei ole toimistolla ${date}   
+    Go To Message Tab
+    Send List Command With Weekend Date Shortcut    la  
 
 List Sunday Command Gives Correct Respond
-    Input Text    //div[@data-qa='message_input']/div    ${LIST_COMMAND} su
-    Click Element    //button[@data-qa='texty_send_button']
-    Sleep    2s
-    ${present}=    Run Keyword And Return Status    Element Should Be Visible   //button[@class='c-button-unstyled p-message_pane__unread_banner__msg']
-    Run Keyword If    ${present}    Click Element    //button[@class='c-button-unstyled p-message_pane__unread_banner__msg']
-    Sleep    1s
-    Scroll Element Into View    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]
-    ${date}=    Get Date For Message Tab    su
-    Element Should Contain    (//div[@class='c-virtual_list__scroll_container'])[2]/div[@class='c-virtual_list__item'][last()]    Kukaan ei ole toimistolla ${date}
+    Send List Command With Weekend Date Shortcut    su
