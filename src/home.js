@@ -78,7 +78,7 @@ const getUpdateBlock = async () => {
  */
 const getRegistrationsBlock = async (userId) => {
     const registrationsBlock = [];
-    registrationsBlock.push(plainText(`:writing_hand: = Käsin tehty ilmoittautuminen   :robot_face: = Oletusilmoittautuminen`));
+    registrationsBlock.push(plainText(':writing_hand: = Käsin tehty ilmoittautuminen   :robot_face: = Oletusilmoittautuminen'));
     const dates = dfunc.listNWeekdays(DateTime.now(), SHOW_DAYS_UNTIL);
     for (let i = 0; i < dates.length; i += 1) {
         const date = dates[i];
@@ -95,8 +95,8 @@ const getRegistrationsBlock = async (userId) => {
             atOfficeDefault: await service.userAtOfficeByDefault(userId, dfunc.getWeekday(DateTime.fromISO(date))), // eslint-disable-line
             isRemoteDefault: await service.userIsRemoteByDefault(userId, dfunc.getWeekday(DateTime.fromISO(date))), // eslint-disable-line
         };
-        let officeColor = `${buttonValue.atOfficeDefault ? 'primary' : null}`
-        let remoteColor = `${buttonValue.isRemoteDefault ? 'primary' : null}`
+        let officeColor = `${buttonValue.atOfficeDefault ? 'primary' : null}`;
+        let remoteColor = `${buttonValue.isRemoteDefault ? 'primary' : null}`;
         let emoji = 'default';
         if (buttonValue.atOffice || buttonValue.isRemote) {
             officeColor = `${buttonValue.atOffice ? 'primary' : null}`;

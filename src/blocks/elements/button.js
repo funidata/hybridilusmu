@@ -4,7 +4,7 @@ const button = (text, callback, value, style, registrationStatus = null) => {
         text: {
             type: 'plain_text',
             emoji: true,
-            text: text,
+            text,
         },
         value,
         action_id: callback,
