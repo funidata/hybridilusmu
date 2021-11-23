@@ -10,12 +10,8 @@ const getUser = async (userId, transaction) => {
         where: {
             slack_id: userId,
         },
-        defaults: {
-            real_name: 'Nope',
-        },
         transaction,
     });
-
     return userQuery[0].dataValues;
 };
 
@@ -46,10 +42,11 @@ exports.addSignupForUser = async (userId, date, atOffice) => {
     }
 };
 
-// hakee tietylle päivämäärälle ilmoittautuneet käyttäjät
-// palauttaa arrayn käyttäjien id:stä
-// atOffice = true antaa toimistolle ilmoittautuneet ja false etänä ilmoittautuneet
-exports.getAllOfficeSignupsForADate = (date, atOffice = true) => Signup.findAll({
+/**
+ * Hakee tietylle päivämäärälle ilmoittautuneet käyttäjät palauttaa arrayn käyttäjien id:stä.
+ * atOffice = true antaa toimistolle ilmoittautuneet ja false etänä ilmoittautuneet.
+ */
+exports.getAllOfficeRegistrationsForADate = (date, atOffice = true) => Signup.findAll({
     attributes: ['PersonId'],
     where: {
         office_date: date,
@@ -120,7 +117,6 @@ exports.getOfficeSignupForUserAndDate = async (userId, date) => {
 
 exports.addUser = (user) => Person.upsert({
     slack_id: user.id,
-    real_name: user.real_name,
 })
     .then((person) => person)
     .catch((err) => {

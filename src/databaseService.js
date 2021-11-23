@@ -43,11 +43,12 @@ const changeDefaultRegistration = async (userId, weekday, addRegistration, atOff
  * @param {string} date - Date string in the ISO date format.
  */
 const getRegistrationsFor = async (date) => {
+    // Tämä pitää muuttaa niin, että tekee vain yhden tietokantakutsun
     const defaultOfficeIds = await db.getAllOfficeDefaultSignupsForAWeekday(
         dfunc.getWeekday(DateTime.fromISO(date)),
     );
-    const officeIds = new Set(await db.getAllOfficeSignupsForADate(date));
-    const remoteIds = new Set(await db.getAllOfficeSignupsForADate(date, false));
+    const officeIds = new Set(await db.getAllOfficeRegistrationsForADate(date));
+    const remoteIds = new Set(await db.getAllOfficeRegistrationsForADate(date, false));
     defaultOfficeIds.forEach((id) => {
         if (!remoteIds.has(id)) officeIds.add(id);
     });

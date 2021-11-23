@@ -37,6 +37,8 @@ const getDefaultSettingsBlock = async (userId) => {
     const settingsBlock = [];
     settingsBlock.push(mrkdwn('Oletusarvoisesti olen...'));
     for (let i = 0; i < DAYS_IN_WEEK; i += 1) {
+        // Täällä tehdään tällä hetkellä !! 10 !! tietokantakutsua.
+        // -> 1
         const weekday = dfunc.weekdays[i];
         const buttonValue = {
             weekday,
@@ -78,6 +80,8 @@ const getUpdateBlock = async () => {
  * For every day there is a list of people registered for that day and buttons for user to register.
  */
 const getRegistrationsBlock = async (userId) => {
+    // Täällä tehdään tällä hetkellä !! 70 !! tietokantakutsua
+    // -> 2
     const registrationsBlock = [];
     registrationsBlock.push(plainText(':writing_hand: = Käsin tehty ilmoittautuminen   :robot_face: = Oletusilmoittautuminen\n'));
     const dates = dfunc.listNWeekdays(DateTime.now(), SHOW_DAYS_UNTIL);

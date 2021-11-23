@@ -4,14 +4,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             allowNull: false,
         },
-        real_name: {
-            type: Sequelize.STRING,
-            allowNull: true,
-        },
     }, {
         indexes: [
             {
-                // enforce slack id uniqueness
+                // Enforce Slack id uniqueness.
                 fields: ['slack_id'],
                 unique: true,
             },
