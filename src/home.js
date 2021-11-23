@@ -62,11 +62,12 @@ const getDefaultSettingsBlock = async (userId) => {
 const getUpdateBlock = async () => {
     const updateBlock = [];
     updateBlock.push(
-        plainText(`Tiedot päivitetty ${DateTime.now().setZone('Europe/Helsinki').setLocale('fi').toLocaleString(format)}`),
+        header('ILMOITTAUTUMISET :spiral_calendar_pad:'),
         actions([
-            button('Päivitä', 'update_click', 'updated'),
             button('Oletusasetukset', 'settings_click', 'updated'),
+            button('Päivitä', 'update_click', 'updated'),
         ]),
+        mrkdwn(`(_Tiedot päivitetty ${DateTime.now().setZone('Europe/Helsinki').setLocale('fi').toLocaleString(format)}_)`),
         divider(),
     );
     return updateBlock;
@@ -78,7 +79,7 @@ const getUpdateBlock = async () => {
  */
 const getRegistrationsBlock = async (userId) => {
     const registrationsBlock = [];
-    registrationsBlock.push(plainText(':writing_hand: = Käsin tehty ilmoittautuminen   :robot_face: = Oletusilmoittautuminen'));
+    registrationsBlock.push(plainText(':writing_hand: = Käsin tehty ilmoittautuminen   :robot_face: = Oletusilmoittautuminen\n'));
     const dates = dfunc.listNWeekdays(DateTime.now(), SHOW_DAYS_UNTIL);
     for (let i = 0; i < dates.length; i += 1) {
         const date = dates[i];
@@ -110,7 +111,6 @@ const getRegistrationsBlock = async (userId) => {
                 button('Toimistolla', 'office_click', JSON.stringify(buttonValue), officeColor, emoji),
                 button('Etänä', 'remote_click', JSON.stringify(buttonValue), remoteColor, emoji),
             ]),
-            divider(),
         );
     }
     return registrationsBlock;
