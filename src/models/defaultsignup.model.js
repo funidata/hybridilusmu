@@ -8,14 +8,8 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.BOOLEAN,
             allowNull: false,
         },
-    }, {
-        indexes: [
-            {
-                // a two-field index to ensure uniqueness of signups
-                fields: ['weekday', 'PersonId'],
-                unique: true,
-            },
-        ],
+    },  {
+        timestamps: false
     });
     return Defaultsignup;
 };

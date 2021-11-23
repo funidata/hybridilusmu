@@ -26,6 +26,24 @@ const getUser = async (userId, transaction) => {
 };
 
 /**
+ * Checks, if a user has a registration for the given date already.
+ * Returns on object with properties {count, rows}:
+ * - count is the amount of rows on the query
+ * - rows are the rows in question
+ * @param {String} personId - Primary key of the Person table, identifying the person.
+ * @param {String} date - Date in the ISO date format.
+ * @param {*} transaction - Transcation object, with which this query can be made part of the given transaction.
+ * @returns {Object}
+ */
+const userHasRegitrationForDate = async (personId, date, transaction) => await Signup.findAndCountAll({
+    where: {
+        office_date: date,
+        PersonId: personId,
+    },
+    transaction,
+});
+
+/**
  * Adds a registration for the given user.
  * @param {String} userId - Slack user ID.
  * @param {String} date - Date in the ISO date format.
@@ -35,16 +53,35 @@ exports.addRegistrationForUser = async (userId, date, atOffice) => {
     try {
         await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t);
-            const signup = await Signup.upsert({
-                office_date: date,
-                at_office: atOffice,
-                PersonId: user.id,
-            }, {
-                transaction: t 
-            });
+            const data = await userHasRegitrationForDate(user.id, date, t);
+            if (data.count > 1) {
+                console.log('ONGELMIA!');
+            } else if (data.count === 0) {
+                // Luodaan uusi ilmoittautuminen.
+                const signup = await Signup.create({
+                    office_date: date,
+                    at_office: atOffice,
+                    PersonId: user.id,
+                }, {
+                    transaction: t
+                });
+            } else {
+                // Päivitetään olemassa olevaa ilmoittautumista.
+                const row = data.rows[0].dataValues;
+                console.log(row);
+                await Signup.update({
+                    at_office: atOffice,
+                }, {
+                    where: {
+                        id: row.id,
+                    }
+                }, {
+                    transaction: t
+                });
+            }
         });
-    } catch (err) {
-        console.log('Error while adding a sign up: ', err);
+    } catch (error) {
+        console.log('Error while adding a sign up: ', error);
     }
 };
 

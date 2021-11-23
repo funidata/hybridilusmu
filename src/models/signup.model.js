@@ -11,15 +11,12 @@ module.exports = (sequelize, Sequelize) => {
     }, {
         indexes: [
             {
-                // just for speeding up date lookups
+                // For speeding up date lookups.
                 fields: ['office_date'],
             },
-            {
-                // a two-field index to ensure uniqueness of signups
-                fields: ['office_date', 'PersonId'],
-                unique: true,
-            },
         ],
+    },  {
+        timestamps: false
     });
     return Signups;
 };

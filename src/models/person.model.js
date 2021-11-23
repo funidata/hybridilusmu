@@ -7,11 +7,13 @@ module.exports = (sequelize, Sequelize) => {
     }, {
         indexes: [
             {
-                // Enforce Slack id uniqueness.
+                // Enforce Slack id uniqueness and speed up queries made by Slack user ID.
                 fields: ['slack_id'],
                 unique: true,
             },
         ],
+    },  {
+        timestamps: false
     });
     return Person;
 };
