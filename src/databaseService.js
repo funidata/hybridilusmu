@@ -14,7 +14,7 @@ const dfunc = require('./dateFunctions');
  */
 const changeRegistration = async (userId, date, addRegistration, atOffice = true) => {
     if (addRegistration) {
-        await db.addSignupForUser(userId, date, atOffice);
+        await db.addRegistrationForUser(userId, date, atOffice);
     } else {
         await db.removeSignup(userId, date);
     }

@@ -12,29 +12,29 @@ describe('ChangeRegistration Tests', function () { // eslint-disable-line
     // joten seuraavat testit muodostavat yhden "tarinan".
 
     it('Adding a normal registration works.', async () => {
-        let registrations = await db.getAllOfficeSignupsForADate('2021-10-21');
+        let registrations = await db.getAllOfficeRegistrationsForADate('2021-10-21');
         assert.equal(0, registrations.length);
         await service.changeRegistration('userId', '2021-10-21', true, true);
-        registrations = await db.getAllOfficeSignupsForADate('2021-10-21');
+        registrations = await db.getAllOfficeRegistrationsForADate('2021-10-21');
         assert.equal(1, registrations.length);
     });
 
     it('Removing a normal registration works.', async () => {
-        let registrations = await db.getAllOfficeSignupsForADate('2021-10-21');
+        let registrations = await db.getAllOfficeRegistrationsForADate('2021-10-21');
         assert.equal(1, registrations.length);
         await service.changeRegistration('userId', '2021-10-21', false);
-        registrations = await db.getAllOfficeSignupsForADate('2021-10-21');
+        registrations = await db.getAllOfficeRegistrationsForADate('2021-10-21');
         assert.equal(0, registrations.length);
     });
 
     it('Changing a normal registration works.', async () => {
-        let registrations = await db.getAllOfficeSignupsForADate('2021-10-21');
+        let registrations = await db.getAllOfficeRegistrationsForADate('2021-10-21');
         assert.equal(0, registrations.length);
         await service.changeRegistration('userId', '2021-10-21', true, true);
-        registrations = await db.getAllOfficeSignupsForADate('2021-10-21');
+        registrations = await db.getAllOfficeRegistrationsForADate('2021-10-21');
         assert.equal(1, registrations.length);
         await service.changeRegistration('userId', '2021-10-21', true, false);
-        registrations = await db.getAllOfficeSignupsForADate('2021-10-21');
+        registrations = await db.getAllOfficeRegistrationsForADate('2021-10-21');
         assert.equal(0, registrations.length);
     });
 

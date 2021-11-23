@@ -14,10 +14,6 @@ describe('Persons test', function () { // eslint-disable-line
         });
         assert.equal(person.id, 1);
     });
-    it('should return correct username', async () => {
-        const person = await db.Person.findByPk(1);
-        assert.equal(person.real_name, 'Matti Meikalainen');
-    });
     it('findUserId test', async () => {
         const id = await controller.findUserId('XYZ');
         assert.equal(1, id);

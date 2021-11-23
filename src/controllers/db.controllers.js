@@ -5,6 +5,16 @@ const { Person } = db;
 const { Signup } = db;
 const { Defaultsignup } = db;
 
+/**
+ * Returns a row from the People table that matches the Slack user ID.
+ * The row contains the following:
+ * - Primary key
+ * - Slack user ID
+ * - Time when this row was created and last updated. These are added by Sequalize.
+ * @param {String} userId - Slack user ID.
+ * @param {*} transaction - Transcation object, with which this query can be made part of the given transaction.
+ * @returns {Array}
+ */
 const getUser = async (userId, transaction) => {
     const userQuery = await Person.findOrCreate({
         where: {
@@ -15,30 +25,26 @@ const getUser = async (userId, transaction) => {
     return userQuery[0].dataValues;
 };
 
-exports.findUserId = (slackId) => Person.findOne({
-    attributes: ['id'],
-    where: {
-        slack_id: slackId,
-    },
-})
-    .then((p) => p.id)
-    .catch(() => {});
-
-exports.addSignupForUser = async (userId, date, atOffice) => {
+/**
+ * Adds a registration for the given user.
+ * @param {String} userId - Slack user ID.
+ * @param {String} date - Date in the ISO date format.
+ * @param {Boolean} atOffice - True, if we want to add an office registration. False otherwise.
+ */
+exports.addRegistrationForUser = async (userId, date, atOffice) => {
     try {
         await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t);
-
             const signup = await Signup.upsert({
                 office_date: date,
                 at_office: atOffice,
                 PersonId: user.id,
-            }, { transaction: t });
-
-            return signup;
+            }, {
+                transaction: t 
+            });
         });
     } catch (err) {
-        console.log('Error while adding a sign up ', err);
+        console.log('Error while adding a sign up: ', err);
     }
 };
 
@@ -62,8 +68,10 @@ exports.getAllOfficeRegistrationsForADate = (date, atOffice = true) => Signup.fi
         console.log('Error while finding signups ', err);
     });
 
-// hakee kaikki tietyn käyttäjän ilmoittautumiset, joiden at_office === atOffice
-// palauttaa arrayn päivämääristä
+/** 
+ * Hakee kaikki tietyn käyttäjän ilmoittautumiset, joiden at_office === atOffice.
+ * Palauttaa arrayn päivämääristä.
+ */
 exports.getAllOfficeSignupsForAUser = (userId, atOffice = true) => Person.findByPk(userId, {
     include: ['signups'],
 })
@@ -128,6 +136,18 @@ exports.getSlackId = (id) => Person.findByPk(id)
     .catch((err) => {
         console.log('Error while finding slack id ', err);
     });
+
+/**
+ * Used in testing?
+ */    
+exports.findUserId = (slackId) => Person.findOne({
+    attributes: ['id'],
+    where: {
+        slack_id: slackId,
+    },
+})
+    .then((p) => p.id)
+    .catch(() => {});
 
 exports.removeSignup = async (userId, date) => {
     try {
