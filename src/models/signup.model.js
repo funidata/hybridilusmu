@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-    const Signups = sequelize.define('Signups', {
+    const Signup = sequelize.define('Signups', {
         office_date: {
             type: Sequelize.DATEONLY,
             allowNull: false,
@@ -15,8 +15,6 @@ module.exports = (sequelize, Sequelize) => {
                 fields: ['office_date'],
             },
         ],
-    },  {
-        timestamps: false
     });
-    return Signups;
+    return Signup;
 };
