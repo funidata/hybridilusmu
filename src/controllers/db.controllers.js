@@ -30,12 +30,12 @@ const getUser = async (userId, transaction) => {
  * Returns on object with properties {count, rows}:
  * - count is the amount of rows on the query
  * - rows are the rows in question
- * @param {String} personId - Primary key of the Person table, identifying the person.
+ * @param {String} personId - Primary key of the Person table, identifying the user.
  * @param {String} date - Date in the ISO date format.
  * @param {*} transaction - Transcation object, with which this query can be made part of the given transaction.
  * @returns {Object}
  */
-const userHasRegitrationForDate = async (personId, date, transaction) => await Signup.findAndCountAll({
+const getRegistrationsForUserAndDate = async (personId, date, transaction) => await Signup.findAndCountAll({
     where: {
         office_date: date,
         PersonId: personId,
@@ -44,7 +44,25 @@ const userHasRegitrationForDate = async (personId, date, transaction) => await S
 });
 
 /**
- * Adds a registration for the given user.
+ * Checks, if user has a default registration for the given weekday already.
+ * Returns on object with properties {count, rows}:
+ * - count is the amount of rows on the query
+ * - rows are the rows in question
+ * @param {String} personId - Primary key of the Person table, identifying the user.
+ * @param {String} weekday - Weekday as in "Maanantai".
+ * @param {*} transaction - Transcation object, with which this query can be made part of the given transaction.
+ * @returns {Object}
+ */
+const getDefaultRegitrationsForUserAndWeekday = async (personId, weekday, transaction) => await Defaultsignup.findAndCountAll({
+    where: {
+        weekday: weekday,
+        PersonId: personId,
+    },
+    transaction,
+});
+
+/**
+ * Adds a normal registration for the given user.
  * @param {String} userId - Slack user ID.
  * @param {String} date - Date in the ISO date format.
  * @param {Boolean} atOffice - True, if we want to add an office registration. False otherwise.
@@ -53,22 +71,17 @@ exports.addRegistrationForUser = async (userId, date, atOffice) => {
     try {
         await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t);
-            const data = await userHasRegitrationForDate(user.id, date, t);
-            if (data.count > 1) {
-                console.log('ONGELMIA!');
-            } else if (data.count === 0) {
-                // Luodaan uusi ilmoittautuminen.
-                const signup = await Signup.create({
+            const data = await getRegistrationsForUserAndDate(user.id, date, t);
+            if (data.count === 0) { // Let's add a new registration.
+                await Signup.create({
                     office_date: date,
                     at_office: atOffice,
                     PersonId: user.id,
                 }, {
                     transaction: t
                 });
-            } else {
-                // Päivitetään olemassa olevaa ilmoittautumista.
+            } else if (data.count === 1) { // Let's modify an existing registration.
                 const row = data.rows[0].dataValues;
-                console.log(row);
                 await Signup.update({
                     at_office: atOffice,
                 }, {
@@ -78,16 +91,60 @@ exports.addRegistrationForUser = async (userId, date, atOffice) => {
                 }, {
                     transaction: t
                 });
+            } else {
+                console.log('Error! The database seems to have more than one registration for the same user with the same date.');
             }
         });
     } catch (error) {
-        console.log('Error while adding a sign up: ', error);
+        console.log('Error while adding a registration: ', error);
     }
 };
 
 /**
- * Hakee tietylle päivämäärälle ilmoittautuneet käyttäjät palauttaa arrayn käyttäjien id:stä.
- * atOffice = true antaa toimistolle ilmoittautuneet ja false etänä ilmoittautuneet.
+ * Adds a default registration for the given user.
+ * @param {String} userId - Slack user ID.
+ * @param {String} weekday - Weekday as in "Maanantai".
+ * @param {Boolean} atOffice - True, if we want to add an office registration. False otherwise.
+ */
+exports.addDefaultRegistrationForUser = async (userId, weekday, atOffice) => {
+    try {
+        await sequelize.transaction(async (t) => {
+            const user = await getUser(userId, t);
+            const data = await getDefaultRegitrationsForUserAndWeekday(user.id, weekday, t);
+            if (data.count === 0) { // Let's add a new registration.
+                await Defaultsignup.create({
+                    weekday: weekday,
+                    at_office: atOffice,
+                    PersonId: user.id,
+                }, {
+                    transaction: t
+                });
+            } else if (data.count === 1) { // Let's modify an existing registration.
+                const row = data.rows[0].dataValues;
+                await Defaultsignup.update({
+                    at_office: atOffice,
+                }, {
+                    where: {
+                        id: row.id,
+                    }
+                }, {
+                    transaction: t
+                });
+            } else {
+                console.log('Error! The database seems to have more than one default registration for the same user with the same day.');
+            }
+        });
+    } catch (err) {
+        console.log('Error while adding a default registration: ', err);
+    }
+};
+
+/**
+ * Fetches all normal registrations for the given date,
+ * either office or remote registrations depending on the value of @atOffice.
+ * @param {String} date - Date in the ISO date format.
+ * @param {Boolean} atOffice - True, if we fetch office registrations and false, if we fetch remote registrations.
+ * @returns {Array}
  */
 exports.getAllOfficeRegistrationsForADate = (date, atOffice = true) => Signup.findAll({
     attributes: ['PersonId'],
@@ -200,22 +257,6 @@ exports.removeSignup = async (userId, date) => {
         });
     } catch (err) {
         console.log('Error while removing signup ', err);
-    }
-};
-
-exports.addDefaultSignupForUser = async (userId, weekday, atOffice) => {
-    try {
-        await sequelize.transaction(async (t) => {
-            const user = await getUser(userId, t);
-            const defaultsignup = await Defaultsignup.upsert({
-                weekday,
-                at_office: atOffice,
-                PersonId: user.id,
-            }, { transaction: t });
-            return defaultsignup;
-        });
-    } catch (err) {
-        console.log('Error while adding a default signup ', err);
     }
 };
 

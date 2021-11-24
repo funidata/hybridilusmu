@@ -32,7 +32,7 @@ const changeRegistration = async (userId, date, addRegistration, atOffice = true
  */
 const changeDefaultRegistration = async (userId, weekday, addRegistration, atOffice = true) => {
     if (addRegistration) {
-        await db.addDefaultSignupForUser(userId, weekday, atOffice);
+        await db.addDefaultRegistrationForUser(userId, weekday, atOffice);
     } else {
         await db.removeDefaultSignup(userId, weekday);
     }
