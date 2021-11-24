@@ -47,8 +47,8 @@ const getRegistrationsFor = async (date) => {
     const defaultOfficeIds = await db.getAllOfficeDefaultSignupsForAWeekday(
         dfunc.getWeekday(DateTime.fromISO(date)),
     );
-    const officeIds = new Set(await db.getAllOfficeRegistrationsForADate(date));
-    const remoteIds = new Set(await db.getAllOfficeRegistrationsForADate(date, false));
+    const officeIds = new Set(await db.getAllRegistrationsForDate(date));
+    const remoteIds = new Set(await db.getAllRegistrationsForDate(date, false));
     defaultOfficeIds.forEach((id) => {
         if (!remoteIds.has(id)) officeIds.add(id);
     });
