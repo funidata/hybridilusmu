@@ -21,7 +21,7 @@ describe('Default signups test', function () { // eslint-disable-line
         });
         assert.equal(1, p1.defaultsignup.length);
     });
-    
+
     it('Find all default registrations for a weekday.', async () => {
         const person = await db.Person.create({
             slackId: 'ZZZ',
@@ -34,7 +34,7 @@ describe('Default signups test', function () { // eslint-disable-line
         const persons = await controller.getAllDefaultRegistrationsForWeekday('Maanantai');
         assert.equal(2, persons.length);
     });
-    
+
     it('addDefaultRegistrationForUser test', async () => {
         let person = await db.Person.create({
             slackId: 'ABC',
@@ -45,7 +45,7 @@ describe('Default signups test', function () { // eslint-disable-line
         });
         assert.equal(1, person.defaultsignup.length);
     });
-    
+
     it('removeDefaultRegistration test', async () => {
         let signup = await controller.getUsersDefaultRegistrationForWeekday('ABC', 'Tiistai');
         assert.notEqual(undefined, signup);

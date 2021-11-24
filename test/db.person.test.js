@@ -13,7 +13,7 @@ describe('Persons test', function () { // eslint-disable-line
         });
         assert.equal(person.id, 1);
     });
-    
+
     it('getPersonId test', async () => {
         const id = await controller.getPersonId('XYZ');
         assert.equal(1, id);
