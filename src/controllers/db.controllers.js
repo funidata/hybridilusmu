@@ -285,24 +285,22 @@ exports.getUsersDefaultRegistrationForWeekday = async (userId, weekday) => {
  */
 
 /** 
- * Multiple functions similar to this?
  * Fetches all normal registrations for a user, where the registration status is the same as @atOffice.
  * Returns an array of the registration dates.
- * @param {String} userId - Slack user ID.
+ * @param {String} personId - A primary key of People table.
  * @param {Boolean} atOffice - True, if we are fetching office registrations and false otherwise.
  */
-exports.getAllRegistrationDatesForAUser = async (userId, atOffice = true) => {
+exports.getAllRegistrationDatesForAUser = async (personId, atOffice = true) => {
     try {
-        const registrations = await Person.findByPk(userId, {
-            include: ['signups'],
+        const registrations = await Signup.findAll({
+            attributes: ['officeDate'],
+            where: {
+                atOffice: atOffice,
+                PersonId: personId,
+            },
+            include: { model: Person, as: 'person'},
         });
-        const arr = [];
-        for (let i = 0; i < registrations.length; i += 1) {
-            if (registrations[i].atOffice === atOffice) {
-                arr.push(registrations[i].officeDate);
-            }
-        }
-        return arr;
+        return registrations.map((s) => s.dataValues.officeDate);
     } catch (error) {
         console.log('Error while finding registrations:', error);
     }
@@ -319,7 +317,7 @@ exports.getPersonId = async (slackId) => {
                 slackId: slackId,
             },
         });
-        return person.id;
+        return person.dataValues.id;
     } catch (error) {
         console.log('Error while finding people:', error);
     }

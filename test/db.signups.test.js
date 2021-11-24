@@ -7,13 +7,13 @@ describe('Signups Tests', function () { // eslint-disable-line
         await db.sequelize.sync({ force: true });
     });
 
-    it('create office date and assign to a user', async () => {
+    it('Create an office registration for a user.', async () => {
         const person = await db.Person.create({
-            slack_id: 'XYZ',
+            slackId: 'XYZ',
         });
         await db.Signup.create({
-            office_date: '2021-10-10',
-            at_office: true,
+            officeDate: '2021-10-10',
+            atOffice: true,
             PersonId: person.id,
         });
         const p1 = await db.Person.findByPk(1, {
@@ -22,22 +22,22 @@ describe('Signups Tests', function () { // eslint-disable-line
         assert.equal(1, p1.signups.length);
     });
     
-    it('find all users for a date', async () => {
+    it('List all registered users for a date.', async () => {
         const person = await db.Person.create({
-            slack_id: 'ZZZ',
+            slackId: 'ZZZ',
         });
         await db.Signup.create({
-            office_date: '2021-10-10',
-            at_office: true,
+            officeDate: '2021-10-10',
+            atOffice: true,
             PersonId: person.id,
         });
-        const persons = await controller.getAllOfficeRegistrationsForADate('2021-10-10');
-        assert.equal(2, persons.length);
+        const people = await controller.getAllRegistrationsForDate('2021-10-10');
+        assert.equal(2, people.length);
     });
     
-    it('addSignUpForUser test', async () => {
+    it('addRegistrationForUser test', async () => {
         let person = await db.Person.create({
-            slack_id: 'ABC',
+            slackId: 'ABC',
         });
         await controller.addRegistrationForUser('ABC', '2021-10-11', true);
         person = await db.Person.findByPk(person.id, {
@@ -46,17 +46,17 @@ describe('Signups Tests', function () { // eslint-disable-line
         assert.equal(1, person.signups.length);
     });
     
-    it('find signups for a person test', async () => {
-        const userId = await controller.getPersonId('ABC');
+    it('Get all registrations for a user and a date.', async () => {
+        const personId = await controller.getPersonId('ABC');
         await controller.addRegistrationForUser('ABC', '2021-10-12', true);
-        const signups = await controller.getAllRegistrationDatesForAUser(userId);
-        assert.equal(2, signups.length);
-        assert.equal('2021-10-11', signups[0]);
+        const registrations = await controller.getAllRegistrationDatesForAUser(personId);
+        assert.equal(2, registrations.length);
+        assert.equal('2021-10-11', registrations[0]);
     });
     
-    it('removeSignup test', async () => {
+    it('removeRegistration test', async () => {
         await controller.removeRegistration('ABC', '2021-10-11');
-        const signups = await controller.getAllRegistrationDatesForAUser(3);
-        assert.equal(1, signups.length);
+        const registrations = await controller.getAllRegistrationDatesForAUser(3);
+        assert.equal(1, registrations.length);
     });
 });
