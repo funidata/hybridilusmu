@@ -165,7 +165,7 @@ exports.removeRegistration = async (userId, date) => {
  * @param {String} userId - Slack user ID.
  * @param {String} date - Date in the ISO date format.
  */
-exports.removeDefaultSignup = async (userId, weekday) => {
+exports.removeDefaultRegistration = async (userId, weekday) => {
     try {
         await sequelize.transaction(async (t) => {
             const person = await getUser(userId, t);
@@ -198,14 +198,48 @@ exports.getAllRegistrationsForDate = async (date, atOffice = true) => {
                     atOffice: atOffice,
                 },
             }, 
-        })
-        return = registrations.map((s) => s.dataValues.slackId);
+        });
+        return registrations.map((s) => s.dataValues.slackId);
     } catch (error) {
         console.log('Error while finding registrations:', error);
     }
 };
 
-exports.getOfficeSignupForUserAndDate = async (userId, date) => {
+/**
+ * Fetches all default registrations for the given weekday,
+ * either office or remote registrations depending on the value of @atOffice.
+ * @param {String} date - Date in the ISO date format.
+ * @param {Boolean} atOffice - True, if we fetch office registrations and false, if we fetch remote registrations.
+ * @returns {Array}
+ */
+exports.getAllDefaultRegistrationsForWeekday = async (weekday, atOffice = true) => {
+    try {
+        const registrations = await Person.findAll({
+            attributes: ['slackId'],
+            include: { model: Defaultsignup, as: 'defaultsignups',
+                where: {
+                    weekday,
+                    atOffice: atOffice,
+                },
+            }, 
+        });
+        return registrations.map((s) => s.dataValues.slackId);
+    } catch(error) {
+        console.log('Error while finding default registrations:', error);
+    }
+};
+
+/**
+ * Checks if user has a registration for the given date and returns it.
+ * Returns undefined if no registration for that date was found or for some reason an error has occured
+ * and user has many registrations for the same date.
+ * Returns undefined if an error occurs during the query.
+ * Basically a wrapper for @getRegistrationsForUserAndDate.
+ * @param {String} userId - Slack user ID.
+ * @param {String} date - Date in the ISO date format.
+ * @returns {Object}
+ */
+exports.getUsersRegistrationForDate = async (userId, date) => {
     try {
         const result = await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t);
@@ -214,13 +248,23 @@ exports.getOfficeSignupForUserAndDate = async (userId, date) => {
             return undefined;
         });
         return result;
-    } catch (err) {
-        console.log('Error while finding signups ', err);
+    } catch (error) {
+        console.log('Error while finding registrations:', error);
         return undefined;
     }
 };
 
-exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
+/**
+ * Checks if user has a default registration for the given weekday and returns it.
+ * Returns undefined if no registration for that weekday was found or for some reason an error has occured
+ * and user has many registrations for the same weekday.
+ * Returns undefined if an error occurs during the query.
+ * Basically a wrapper for @getDefaultRegistrationsForUserAndWeekday.
+ * @param {String} userId - Slack user ID.
+ * @param {String} weekday - Weekday as in "Maanantai".
+ * @returns {Object}
+ */
+exports.getUsersDefaultRegistrationForWeekday = async (userId, weekday) => {
     try {
         const result = await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t);
@@ -229,71 +273,54 @@ exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
             return undefined;
         });
         return result;
-    } catch (err) {
-        console.log('Error while finding signups ', err);
+    } catch (error) {
+        console.log('Error while finding registrations:', error);
         return undefined;
     }
 };
 
-/** 
- * Hakee kaikki tietyn käyttäjän ilmoittautumiset, joiden at_office === atOffice.
- * Palauttaa arrayn päivämääristä.
+
+/**
+ * Used in testing.
  */
-exports.getAllOfficeSignupsForAUser = (userId, atOffice = true) => Person.findByPk(userId, {
-    include: ['signups'],
-})
-    .then((person) => {
-        const { signups } = person;
+
+/** 
+ * Multiple functions similar to this?
+ * Fetches all normal registrations for a user, where the registration status is the same as @atOffice.
+ * Returns an array of the registration dates.
+ * @param {String} userId - Slack user ID.
+ * @param {Boolean} atOffice - True, if we are fetching office registrations and false otherwise.
+ */
+exports.getAllRegistrationDatesForAUser = async (userId, atOffice = true) => {
+    try {
+        const registrations = await Person.findByPk(userId, {
+            include: ['signups'],
+        });
         const arr = [];
-        for (let i = 0; i < signups.length; i += 1) {
-            if (signups[i].atOffice === atOffice) {
-                arr.push(signups[i].officeDate);
+        for (let i = 0; i < registrations.length; i += 1) {
+            if (registrations[i].atOffice === atOffice) {
+                arr.push(registrations[i].officeDate);
             }
         }
         return arr;
-    })
-    .catch((err) => {
-        console.log('Error while finding signups ', err);
-    });
-
-exports.addUser = (user) => Person.upsert({
-    slackId: user.id,
-})
-    .then((person) => person)
-    .catch((err) => {
-        console.log('Error while creating a person ', err);
-    });
-
-exports.getSlackId = (id) => Person.findByPk(id)
-    .then((user) => user.slackId)
-    .catch((err) => {
-        console.log('Error while finding slack id ', err);
-    });
+    } catch (error) {
+        console.log('Error while finding registrations:', error);
+    }
+};
 
 /**
- * Used in testing?
- */    
-exports.findUserId = (slackId) => Person.findOne({
-    attributes: ['id'],
-    where: {
-        slackId: slackId,
-    },
-})
-    .then((p) => p.id)
-    .catch(() => {});
-
-exports.getAllOfficeDefaultSignupsForAWeekday = (weekday) => Defaultsignup.findAll({
-    attributes: ['PersonId'],
-    where: {
-        weekday,
-        atOffice: true,
-    },
-    include: { model: Person, as: 'person' },
-})
-    .then((signups) => {
-        const ids = signups.map((s) => s.dataValues.person.dataValues.slackId);
-        return ids;
-    })
-    .catch((err) => {
-        console.log('Error while finding default signups ', err);
-    });
+ * Returns the primary key of the People table corresponding to the given Slack user ID.
+ */
+exports.getPersonId = async (slackId) => {
+    try {
+        const person = await Person.findOne({
+            attributes: ['id'],
+            where: {
+                slackId: slackId,
+            },
+        });
+        return person.id;
+    } catch (error) {
+        console.log('Error while finding people:', error);
+    }
+};

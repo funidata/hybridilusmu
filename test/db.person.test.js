@@ -14,12 +14,8 @@ describe('Persons test', function () { // eslint-disable-line
         });
         assert.equal(person.id, 1);
     });
-    it('findUserId test', async () => {
-        const id = await controller.findUserId('XYZ');
+    it('getPersonId test', async () => {
+        const id = await controller.getPersonId('XYZ');
         assert.equal(1, id);
-    });
-    it('find slack_id', async () => {
-        const slackId = await controller.getSlackId(1);
-        assert.equal('XYZ', slackId);
     });
 });

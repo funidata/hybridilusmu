@@ -47,16 +47,16 @@ describe('Signups Tests', function () { // eslint-disable-line
     });
     
     it('find signups for a person test', async () => {
-        const userId = await controller.findUserId('ABC');
+        const userId = await controller.getPersonId('ABC');
         await controller.addRegistrationForUser('ABC', '2021-10-12', true);
-        const signups = await controller.getAllOfficeSignupsForAUser(userId);
+        const signups = await controller.getAllRegistrationDatesForAUser(userId);
         assert.equal(2, signups.length);
         assert.equal('2021-10-11', signups[0]);
     });
     
     it('removeSignup test', async () => {
-        await controller.removeSignup('ABC', '2021-10-11');
-        const signups = await controller.getAllOfficeSignupsForAUser(3);
+        await controller.removeRegistration('ABC', '2021-10-11');
+        const signups = await controller.getAllRegistrationDatesForAUser(3);
         assert.equal(1, signups.length);
     });
 });

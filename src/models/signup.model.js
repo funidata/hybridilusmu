@@ -8,12 +8,5 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.BOOLEAN,
             allowNull: false,
         },
-    }, {
-        indexes: [
-            {
-                // For speeding up date lookups.
-                fields: ['officeDate'],
-            },
-        ],
-    });
+    }, { timestamps: false });
 };

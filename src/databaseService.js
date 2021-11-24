@@ -34,7 +34,7 @@ const changeDefaultRegistration = async (userId, weekday, addRegistration, atOff
     if (addRegistration) {
         await db.addDefaultRegistrationForUser(userId, weekday, atOffice);
     } else {
-        await db.removeDefaultSignup(userId, weekday);
+        await db.removeDefaultRegistration(userId, weekday);
     }
 };
 
@@ -44,7 +44,7 @@ const changeDefaultRegistration = async (userId, weekday, addRegistration, atOff
  */
 const getRegistrationsFor = async (date) => {
     // Tämä pitää muuttaa niin, että tekee vain yhden tietokantakutsun
-    const defaultOfficeIds = await db.getAllOfficeDefaultSignupsForAWeekday(
+    const defaultOfficeIds = await db.getAllDefaultRegistrationsForWeekday(
         dfunc.getWeekday(DateTime.fromISO(date)),
     );
     const officeIds = new Set(await db.getAllRegistrationsForDate(date));
@@ -63,8 +63,9 @@ const getRegistrationsFor = async (date) => {
  * present at the office. False otherwise.
  */
 const userAtOffice = async (userId, date, atOffice = true) => {
-    const registration = await db.getOfficeSignupForUserAndDate(userId, date);
-    return registration && registration.atOffice === atOffice;
+    const registration = await db.getUsersRegistrationForDate(userId, date);
+    if (registration === undefined) return false;
+    return registration.atOffice === atOffice;
 };
 
 /**
@@ -75,8 +76,9 @@ const userAtOffice = async (userId, date, atOffice = true) => {
  * present at the office by default. False otherwise.
  */
 const userAtOfficeByDefault = async (userId, weekday, atOffice = true) => {
-    const registration = await db.getOfficeDefaultSignupForUserAndWeekday(userId, weekday);
-    return registration && registration.atOffice === atOffice;
+    const registration = await db.getUsersDefaultRegistrationForWeekday(userId, weekday);
+    if (registration === undefined) return false;
+    return registration.atOffice === atOffice;
 };
 
 /**
