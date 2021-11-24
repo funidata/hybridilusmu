@@ -178,6 +178,33 @@ exports.removeDefaultRegistration = async (userId, weekday) => {
 };
 
 /**
+ * Returns a list of users default settings.
+ * Notice, that this list is not ordered according to the weekdays
+ * and does not contain weekdays, which there is no entry.
+ */
+exports.getDefaultSettingsForUser = async (userId) => {
+    try {
+        const defaultSettings = await Defaultsignup.findAll({
+            attributes: ['weekday', 'atOffice'],
+            include: {
+                model: Person,
+                as: 'person',
+                where: {
+                    slackId: userId,
+                },
+            },
+        });
+        return defaultSettings.map((s) => ({
+            weekday: s.dataValues.weekday,
+            status: s.dataValues.atOffice,
+        }));
+    } catch (error) {
+        console.log('Error while finding default registrations:', error);
+        return [];
+    }
+};
+
+/**
  * Fetches all normal registrations for the given date,
  * either office or remote registrations depending on the value of @atOffice.
  * @param {String} date - Date in the ISO date format.

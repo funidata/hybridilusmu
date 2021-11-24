@@ -43,7 +43,6 @@ const changeDefaultRegistration = async (userId, weekday, addRegistration, atOff
  * @param {string} date - Date string in the ISO date format.
  */
 const getRegistrationsFor = async (date) => {
-    // Tämä pitää muuttaa niin, että tekee vain yhden tietokantakutsun
     const defaultOfficeIds = await db.getAllDefaultRegistrationsForWeekday(
         dfunc.getWeekday(DateTime.fromISO(date)),
     );
@@ -53,6 +52,59 @@ const getRegistrationsFor = async (date) => {
         if (!remoteIds.has(id)) officeIds.add(id);
     });
     return Array.from(officeIds);
+};
+
+/**
+ * Returns a list of Slack user IDs of people who are at the office for every weekday
+ * between firstDate and lastDate (inclusive).
+ * Returns an array of arrays.
+ * @param {string} firstDate - Date string in the ISO date format.
+ * @param {string} lastDate - Date string in the ISO date format.
+ * @returns {Array}
+ */
+const getRegistrationsBetween = async (firstDate, lastDate) => {
+    // Toteutetaan tänne.
+    // KESKEN!
+};
+
+/**
+ * Returns a list of values (true, false, undefined) for everyweek day,
+ * representing given users default registration settings.
+ * List is ordered from Monday to Friday and contains the following information for every day:
+ * - weekday: Name of the weekday as in "Maanantai".
+ * - status: (true, false, none)
+ *      True means office, false remote and none that there is no setting for that weekday.
+ * @param {string} userId - Slack user ID.
+ * @param {string} firstDate - Date string in the ISO date format.
+ * @param {string} lastDate - Date string in the ISO date format.
+ * @returns {Array}
+ */
+const getDefaultSettingsForUser = async (userId) => {
+    // Toteutetaan tänne.
+    const unorderedSettings = await db.getDefaultSettingsForUser(userId);
+    // KESKEN!
+};
+
+/**
+ * Returns a array of objects, representing the users registration status for that day.
+ * List is sorted from firstDate to lastDate and for everyday the object contains the following information:
+ * - status : (default, normal or none)
+ *      Shows the type of registration to be shown for this day, none if neither default nor normal registration is present.
+ * - value: (true, false)
+ *      If status is default or normal, value will be set. True means office and false remote.
+ * @param {string} userId - Slack user ID.
+ * @param {string} firstDate - Date string in the ISO date format.
+ * @param {string} lastDate - Date string in the ISO date format.
+ * @returns {Array}
+ */
+const getRegistrationsForUserBetween = async (userId, firstDate, lastDate) => {
+    // Toteutetaan tänne.
+    // 1. Hae normaalit ilmoittautumiset väliltä (firstDate -> lastDate) (tee tätä varten oma funktio).
+    // 2. Hae käyttäjän oletusasetukset funktiolla getDefaultSettingsForUser.
+    // 3. Käy läpi normaalit ilmoittautumiset ja jos jollekin päivälle ei ole, lisää oletusilmoittautuminen ja
+    // jos ei ole, lisää merkitse statukseksi none.
+    // 4. Palauta näin muodostettu lista.
+    // KESKEN!
 };
 
 /**
@@ -100,6 +152,7 @@ const userIsRemoteByDefault = async (userId, weekday) => (
 module.exports = {
     changeRegistration,
     changeDefaultRegistration,
+    getDefaultSettingsForUser,
     getRegistrationsFor,
     userAtOffice,
     userAtOfficeByDefault,

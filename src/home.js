@@ -82,6 +82,7 @@ const getUpdateBlock = async () => {
 const getRegistrationsBlock = async (userId) => {
     // Täällä tehdään tällä hetkellä !! 70 !! tietokantakutsua
     // -> 2
+    // service.getDefaultSettingsForUser(userId);
     const registrationsBlock = [];
     registrationsBlock.push(plainText(':writing_hand: = Käsin tehty ilmoittautuminen   :robot_face: = Oletusilmoittautuminen\n'));
     const dates = dfunc.listNWeekdays(DateTime.now(), SHOW_DAYS_UNTIL);
