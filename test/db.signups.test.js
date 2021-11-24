@@ -17,9 +17,9 @@ describe('Signups Tests', function () { // eslint-disable-line
             PersonId: person.id,
         });
         const p1 = await db.Person.findByPk(1, {
-            include: ['signups'],
+            include: ['signup'],
         });
-        assert.equal(1, p1.signups.length);
+        assert.equal(1, p1.signup.length);
     });
     
     it('List all registered users for a date.', async () => {
@@ -41,9 +41,9 @@ describe('Signups Tests', function () { // eslint-disable-line
         });
         await controller.addRegistrationForUser('ABC', '2021-10-11', true);
         person = await db.Person.findByPk(person.id, {
-            include: ['signups'],
+            include: ['signup'],
         });
-        assert.equal(1, person.signups.length);
+        assert.equal(1, person.signup.length);
     });
     
     it('Get all registrations for a user and a date.', async () => {

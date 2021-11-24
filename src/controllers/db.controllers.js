@@ -192,7 +192,7 @@ exports.getAllRegistrationsForDate = async (date, atOffice = true) => {
     try {
         const registrations = await Person.findAll({
             attributes: ['slackId'],
-            include: { model: Signup, as: 'signups', 
+            include: { model: Signup, as: 'signup', 
                 where: {
                     officeDate: date,
                     atOffice: atOffice,
@@ -216,7 +216,7 @@ exports.getAllDefaultRegistrationsForWeekday = async (weekday, atOffice = true) 
     try {
         const registrations = await Person.findAll({
             attributes: ['slackId'],
-            include: { model: Defaultsignup, as: 'defaultsignups',
+            include: { model: Defaultsignup, as: 'defaultsignup',
                 where: {
                     weekday,
                     atOffice: atOffice,

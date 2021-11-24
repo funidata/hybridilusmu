@@ -17,9 +17,9 @@ describe('Default signups test', function () { // eslint-disable-line
             PersonId: person.id,
         });
         const p1 = await db.Person.findByPk(1, {
-            include: ['defaultsignups'],
+            include: ['defaultsignup'],
         });
-        assert.equal(1, p1.defaultsignups.length);
+        assert.equal(1, p1.defaultsignup.length);
     });
     
     it('Find all default registrations for a weekday.', async () => {
@@ -41,9 +41,9 @@ describe('Default signups test', function () { // eslint-disable-line
         });
         await controller.addDefaultRegistrationForUser('ABC', 'Tiistai', true);
         person = await db.Person.findByPk(person.id, {
-            include: ['defaultsignups'],
+            include: ['defaultsignup'],
         });
-        assert.equal(1, person.defaultsignups.length);
+        assert.equal(1, person.defaultsignup.length);
     });
     
     it('removeDefaultRegistration test', async () => {
