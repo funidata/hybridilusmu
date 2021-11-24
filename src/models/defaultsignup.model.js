@@ -1,13 +1,12 @@
 module.exports = (sequelize, Sequelize) => {
-    const Defaultsignup = sequelize.define('Defaultsignup', {
+    return sequelize.define('Defaultsignup', {
         weekday: {
             type: Sequelize.STRING,
             allowNull: false,
         },
-        at_office: {
+        atOffice: {
             type: Sequelize.BOOLEAN,
             allowNull: false,
         },
     });
-    return Defaultsignup;
 };

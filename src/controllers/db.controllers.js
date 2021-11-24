@@ -18,7 +18,7 @@ const { Defaultsignup } = db;
 const getUser = async (userId, transaction) => {
     const userQuery = await Person.findOrCreate({
         where: {
-            slack_id: userId,
+            slackId: userId,
         },
         transaction,
     });
@@ -37,7 +37,7 @@ const getUser = async (userId, transaction) => {
  */
 const getRegistrationsForUserAndDate = async (personId, date, transaction) => await Signup.findAndCountAll({
     where: {
-        office_date: date,
+        officeDate: date,
         PersonId: personId,
     },
     transaction,
@@ -53,7 +53,7 @@ const getRegistrationsForUserAndDate = async (personId, date, transaction) => aw
  * @param {*} transaction - Transcation object, with which this query can be made part of the given transaction.
  * @returns {Object}
  */
-const getDefaultRegitrationsForUserAndWeekday = async (personId, weekday, transaction) => await Defaultsignup.findAndCountAll({
+const getDefaultRegistrationsForUserAndWeekday = async (personId, weekday, transaction) => await Defaultsignup.findAndCountAll({
     where: {
         weekday: weekday,
         PersonId: personId,
@@ -74,8 +74,8 @@ exports.addRegistrationForUser = async (userId, date, atOffice) => {
             const data = await getRegistrationsForUserAndDate(user.id, date, t);
             if (data.count === 0) { // Let's add a new registration.
                 await Signup.create({
-                    office_date: date,
-                    at_office: atOffice,
+                    officeDate: date,
+                    atOffice: atOffice,
                     PersonId: user.id,
                 }, {
                     transaction: t
@@ -83,7 +83,7 @@ exports.addRegistrationForUser = async (userId, date, atOffice) => {
             } else if (data.count === 1) { // Let's modify an existing registration.
                 const row = data.rows[0].dataValues;
                 await Signup.update({
-                    at_office: atOffice,
+                    atOffice: atOffice,
                 }, {
                     where: {
                         id: row.id,
@@ -110,11 +110,11 @@ exports.addDefaultRegistrationForUser = async (userId, weekday, atOffice) => {
     try {
         await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t);
-            const data = await getDefaultRegitrationsForUserAndWeekday(user.id, weekday, t);
+            const data = await getDefaultRegistrationsForUserAndWeekday(user.id, weekday, t);
             if (data.count === 0) { // Let's add a new registration.
                 await Defaultsignup.create({
                     weekday: weekday,
-                    at_office: atOffice,
+                    atOffice: atOffice,
                     PersonId: user.id,
                 }, {
                     transaction: t
@@ -122,7 +122,7 @@ exports.addDefaultRegistrationForUser = async (userId, weekday, atOffice) => {
             } else if (data.count === 1) { // Let's modify an existing registration.
                 const row = data.rows[0].dataValues;
                 await Defaultsignup.update({
-                    at_office: atOffice,
+                    atOffice: atOffice,
                 }, {
                     where: {
                         id: row.id,
@@ -140,6 +140,25 @@ exports.addDefaultRegistrationForUser = async (userId, weekday, atOffice) => {
 };
 
 /**
+ * 
+ */
+exports.removeRegistration = async (userId, date) => {
+    try {
+        await sequelize.transaction(async (t) => {
+            const user = await getUser(userId, t);
+            await Signup.destroy({
+                where: {
+                    officeDate: date,
+                    PersonId: user.id,
+                },
+            });
+        });
+    } catch (err) {
+        console.log('Error while removing signup ', err);
+    }
+};
+
+/**
  * Fetches all normal registrations for the given date,
  * either office or remote registrations depending on the value of @atOffice.
  * @param {String} date - Date in the ISO date format.
@@ -149,13 +168,13 @@ exports.addDefaultRegistrationForUser = async (userId, weekday, atOffice) => {
 exports.getAllOfficeRegistrationsForADate = (date, atOffice = true) => Signup.findAll({
     attributes: ['PersonId'],
     where: {
-        office_date: date,
-        at_office: atOffice,
+        officeDate: date,
+        atOffice: atOffice,
     },
     include: { model: Person, as: 'person' },
 })
     .then((signups) => {
-        const ids = signups.map((s) => s.dataValues.person.dataValues.slack_id);
+        const ids = signups.map((s) => s.dataValues.person.dataValues.slackId);
         return ids;
     })
     .catch((err) => {
@@ -173,8 +192,8 @@ exports.getAllOfficeSignupsForAUser = (userId, atOffice = true) => Person.findBy
         const { signups } = person;
         const arr = [];
         for (let i = 0; i < signups.length; i += 1) {
-            if (signups[i].at_office === atOffice) {
-                arr.push(signups[i].office_date);
+            if (signups[i].atOffice === atOffice) {
+                arr.push(signups[i].officeDate);
             }
         }
         return arr;
@@ -182,33 +201,29 @@ exports.getAllOfficeSignupsForAUser = (userId, atOffice = true) => Person.findBy
     .catch((err) => {
         console.log('Error while finding signups ', err);
     });
-
-// palauttaa Signupin käyttäjälle haluttuna päivänä
-// palauttaa undefined, jos Signupia ei löydy
-
+    
 exports.getOfficeSignupForUserAndDate = async (userId, date) => {
     try {
         const result = await sequelize.transaction(async (t) => {
             const user = await getUser(userId, t);
+            const data = await getRegistrationsForUserAndDate(user.id, date, t);
+            if (data.count === 1) return data.rows[0].dataValues;
+            return undefined;
+        });
+        return result;
+    } catch (err) {
+        console.log('Error while finding signups ', err);
+        return undefined;
+    }
+};
 
-            const person = await Person.findByPk(user.id, {
-                include: [
-                    {
-                        model: Signup,
-                        as: 'signups',
-                        where: { office_date: date },
-                    },
-                ],
-                transaction: t,
-            });
-
-            // if nothing is found, escape early
-            if (!person) {
-                return undefined;
-            }
-
-            const { signups } = person;
-            return (signups && signups.length === 1) ? signups[0].dataValues : undefined;
+exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
+    try {
+        const result = await sequelize.transaction(async (t) => {
+            const user = await getUser(userId, t);
+            const data = await getDefaultRegistrationsForUserAndWeekday(user.id, weekday, t);
+            if (data.count === 1) return data.rows[0].dataValues;
+            return undefined;
         });
         return result;
     } catch (err) {
@@ -218,7 +233,7 @@ exports.getOfficeSignupForUserAndDate = async (userId, date) => {
 };
 
 exports.addUser = (user) => Person.upsert({
-    slack_id: user.id,
+    slackId: user.id,
 })
     .then((person) => person)
     .catch((err) => {
@@ -226,7 +241,7 @@ exports.addUser = (user) => Person.upsert({
     });
 
 exports.getSlackId = (id) => Person.findByPk(id)
-    .then((user) => user.slack_id)
+    .then((user) => user.slackId)
     .catch((err) => {
         console.log('Error while finding slack id ', err);
     });
@@ -237,28 +252,11 @@ exports.getSlackId = (id) => Person.findByPk(id)
 exports.findUserId = (slackId) => Person.findOne({
     attributes: ['id'],
     where: {
-        slack_id: slackId,
+        slackId: slackId,
     },
 })
     .then((p) => p.id)
     .catch(() => {});
-
-exports.removeSignup = async (userId, date) => {
-    try {
-        await sequelize.transaction(async (t) => {
-            const user = await getUser(userId, t);
-
-            await Signup.destroy({
-                where: {
-                    office_date: date,
-                    PersonId: user.id,
-                },
-            });
-        });
-    } catch (err) {
-        console.log('Error while removing signup ', err);
-    }
-};
 
 exports.removeDefaultSignup = async (userId, weekday) => {
     try {
@@ -281,45 +279,14 @@ exports.getAllOfficeDefaultSignupsForAWeekday = (weekday) => Defaultsignup.findA
     attributes: ['PersonId'],
     where: {
         weekday,
-        at_office: true,
+        atOffice: true,
     },
     include: { model: Person, as: 'person' },
 })
     .then((signups) => {
-        const ids = signups.map((s) => s.dataValues.person.dataValues.slack_id);
+        const ids = signups.map((s) => s.dataValues.person.dataValues.slackId);
         return ids;
     })
     .catch((err) => {
         console.log('Error while finding default signups ', err);
     });
-
-exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
-    try {
-        const result = await sequelize.transaction(async (t) => {
-            const user = await getUser(userId, t);
-
-            const person = await Person.findByPk(user.id, {
-                include: [
-                    {
-                        model: Defaultsignup,
-                        as: 'defaultsignups',
-                        where: { weekday },
-                    },
-                ],
-                transaction: t,
-            });
-
-            // if nothing is found, escape early
-            if (!person) {
-                return undefined;
-            }
-
-            const signups = person.defaultsignups;
-            return (signups && signups.length === 1) ? signups[0].dataValues : undefined;
-        });
-        return result;
-    } catch (err) {
-        console.log('Error while finding default signups ', err);
-        return undefined;
-    }
-};

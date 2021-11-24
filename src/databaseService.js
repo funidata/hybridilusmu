@@ -16,7 +16,7 @@ const changeRegistration = async (userId, date, addRegistration, atOffice = true
     if (addRegistration) {
         await db.addRegistrationForUser(userId, date, atOffice);
     } else {
-        await db.removeSignup(userId, date);
+        await db.removeRegistration(userId, date);
     }
 };
 
@@ -64,7 +64,7 @@ const getRegistrationsFor = async (date) => {
  */
 const userAtOffice = async (userId, date, atOffice = true) => {
     const registration = await db.getOfficeSignupForUserAndDate(userId, date);
-    return registration && registration.at_office === atOffice;
+    return registration && registration.atOffice === atOffice;
 };
 
 /**
@@ -76,7 +76,7 @@ const userAtOffice = async (userId, date, atOffice = true) => {
  */
 const userAtOfficeByDefault = async (userId, weekday, atOffice = true) => {
     const registration = await db.getOfficeDefaultSignupForUserAndWeekday(userId, weekday);
-    return registration && registration.at_office === atOffice;
+    return registration && registration.atOffice === atOffice;
 };
 
 /**

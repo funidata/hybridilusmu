@@ -1,10 +1,10 @@
 module.exports = (sequelize, Sequelize) => {
-    const Signup = sequelize.define('Signups', {
-        office_date: {
+    return sequelize.define('Signup', {
+        officeDate: {
             type: Sequelize.DATEONLY,
             allowNull: false,
         },
-        at_office: {
+        atOffice: {
             type: Sequelize.BOOLEAN,
             allowNull: false,
         },
@@ -12,9 +12,8 @@ module.exports = (sequelize, Sequelize) => {
         indexes: [
             {
                 // For speeding up date lookups.
-                fields: ['office_date'],
+                fields: ['officeDate'],
             },
         ],
     });
-    return Signup;
 };
