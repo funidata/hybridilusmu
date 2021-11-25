@@ -48,9 +48,11 @@ exports.enableMiddleware = ({ app, userCache }) => {
         } catch (error) {
         // This user is restricted. Show them an error message and stop processing the request
             if (error.message === 'User is restricted') {
-                if (event !== undefined && (event.channel_type === 'channel' || event.channel_type === 'group')) { // Don't send the error message in this case
+                if (event !== undefined && (event.channel_type === 'channel' || event.channel_type === 'group')) {
+                    // Don't send the error message in this case
                     return;
                 }
+                // eslint-disable-next-line max-len
                 const message = `Pahoittelut, <@${userId}>. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.`;
                 if (payload.command !== undefined) { // Responds to a slash-command
                     await ack();

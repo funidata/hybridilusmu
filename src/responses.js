@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 const dfunc = require('./dateFunctions');
 
 const weekdays = [

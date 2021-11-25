@@ -47,8 +47,14 @@ const getDefaultSettingsBlock = async (userId) => {
         else settingsBlock.push(mrkdwn(`*${weekday}sin*`));
         settingsBlock.push(
             actions([
-                button('Toimistolla', 'default_office_click', JSON.stringify(buttonValue), `${buttonValue.defaultAtOffice ? 'primary' : null}`),
-                button('Etänä', 'default_remote_click', JSON.stringify(buttonValue), `${buttonValue.defaultIsRemote ? 'primary' : null}`),
+                button('Toimistolla',
+                    'default_office_click',
+                    JSON.stringify(buttonValue),
+                    `${buttonValue.defaultAtOffice ? 'primary' : null}`),
+                button('Etänä',
+                    'default_remote_click',
+                    JSON.stringify(buttonValue),
+                    `${buttonValue.defaultIsRemote ? 'primary' : null}`),
             ]),
         );
     }
