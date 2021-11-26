@@ -11,6 +11,7 @@ Suite Teardown    common.Close Test Browser
 *** Test Cases ***
 Can Open Home Tab
     Maximize Browser Window
+    Sleep   2s
     Go To Home Tab
 
 List Saturday Command Gives Correct Respond
