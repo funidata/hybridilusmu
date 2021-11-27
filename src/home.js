@@ -111,6 +111,7 @@ const getRegistrationsBlock = async (userId) => {
                 button('Toimistolla', 'office_click', JSON.stringify(buttonValue), officeColor, emoji),
                 button('Etänä', 'remote_click', JSON.stringify(buttonValue), remoteColor, emoji),
             ]),
+            divider(),
         );
     }
     return registrationsBlock;
