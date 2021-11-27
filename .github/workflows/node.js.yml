@@ -95,7 +95,7 @@ jobs:
     - name: Build node
       run: npm run build --if-present
     - name: migrate and start app
-      run: npm migrate
+      run: npm run migrate
       env:
           # The hostname used to communicate with the PostgreSQL service container
         POSTGRES_HOST: localhost
