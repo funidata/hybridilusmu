@@ -122,7 +122,7 @@ jobs:
         name: reports
         path: ${{ github.workspace }}/test/e2e/results
     - name: Get Repository Name
-       run: |
+        run: |
          export REPO="$(echo "${{ github.repository }}" | awk -F / '{print $2}' | sed -e "s/:refs//")"
          echo "::set-env name=REPOSITORY_NAME::$REPO"
         # when test are run for a commit, post results as a comment
