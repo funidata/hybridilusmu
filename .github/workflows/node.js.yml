@@ -116,7 +116,7 @@ jobs:
         docker run \
           -v ${{ github.workspace }}/test/e2e/results:/opt/robotframework/reports:Z \
           -v ${{ github.workspace }}/test/e2e/testcases:/opt/robotframework/tests:Z \
-          -e ROBOT_OPTIONS="--variable USER_EMAIL:${{ secrets.SLACK_EMAIL }} --variable USER_PASSWORD:${{ secrets.SLACK_PASSWORD }} --variable GUEST_EMAIL:${{ secrets.SLACK_GUEST_EMAIL }} -variable      GUEST_PASSWORD:${{ secrect.SLACK_GUEST_PASSWORD"}} --variable COMMAND_PREFIX:testi \
+          -e ROBOT_OPTIONS="--variable USER_EMAIL:${{ secrets.SLACK_EMAIL }} --variable USER_PASSWORD:${{ secrets.SLACK_PASSWORD }} --variable GUEST_EMAIL:${{ secrets.SLACK_GUEST_EMAIL }} --variable GUEST_PASSWORD:${{ secrets.SLACK_GUEST_PASSWORD"}} --variable COMMAND_PREFIX:${{ secrets.TEST_COMMAND_PREFIX}} \
           ppodgorsek/robot-framework:latest
     - name: Upload test results
       uses: actions/upload-artifact@v1
