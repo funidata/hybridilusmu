@@ -6,12 +6,11 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches: [ e2e_workflow ]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     services:
@@ -58,3 +57,82 @@ jobs:
           # The default PostgreSQL port
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
     - run: npm run report-coverage
+
+  e2e_test:
+    environment: E2E testing
+
+    runs-on: ubuntu-latest
+
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_DB: test
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14.x
+        cache: 'npm'
+    - run: npm install
+    - run: npm run build --if-present
+    - name: migrate and start app
+    - run: npm migrate
+      env:
+          # The hostname used to communicate with the PostgreSQL service container
+        POSTGRES_HOST: localhost
+          # The default PostgreSQL port
+        POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+    - run: npm start
+      env:
+        POSTGRES_HOST: localhost
+          # The default PostgreSQL port
+        POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+        SLACK_BOT_TOKEN: ${{ secrets.TEST_SLACK_BOT_TOKEN }}
+        SLACK_SIGNING_SECRET: ${{ secrets.TEST_SLACK_SIGNING_SECRET }}
+        SLACK_APP_TOKEN: ${{ secrets.TEST_SLACK_APP_TOKEN }}
+        COMMAND_PREFIX: ${{ secrets.TEST_COMMAND_PREFIX }}
+    - name: Execute tests
+      run: |
+        docker run \
+          -v ${{ github.workspace }}/test/e2e/results:/opt/robotframework/reports:Z \
+          -v ${{ github.workspace }}/test/e2e/testcases:/opt/robotframework/tests:Z \
+          -e ROBOT_OPTIONS="--variable USER_EMAIL:${{ secrets.SLACK_EMAIL }} --variable USER_PASSWORD:${{ secrets.SLACK_PASSWORD }} --variable GUEST_EMAIL:${{ secrets.SLACK_GUEST_EMAIL }} -variable      GUEST_PASSWORD:${{ secrect.SLACK_GUEST_PASSWORD"}} --variable COMMAND_PREFIX:testi \
+          ppodgorsek/robot-framework:latest
+    - name: Upload test results
+      uses: actions/upload-artifact@v1
+      if: always()
+      with:
+        name: reports
+        path: ${{ github.workspace }}/test/e2e/results
+     - name: Get Repository Name
+       run: |
+         export REPO="$(echo "${{ github.repository }}" | awk -F / '{print $2}' | sed -e "s/:refs//")"
+         echo "::set-env name=REPOSITORY_NAME::$REPO"
+        # when test are run for a commit, post results as a comment
+        # note: comment is not posted for tests triggered for pull requests, only for a main branch (master)
+      - name: Send test report as comment to commit
+        uses: joonvena/robotframework-reporter-action@v0.1
+        if: ${{ github.event_name == 'push' }}
+        env:
+          GH_ACCESS_TOKEN: ${{ github.TOKEN }}
+          REPO_OWNER: ${{ github.REPOSITORY_OwNER }}
+          COMMIT_SHA: ${{ github.SHA }}
+          REPOSITORY: ${{ env.REPOSITORY_NAME }}
+          REPORT_PATH: ${{ github.workspace }}/test/e2e/results
