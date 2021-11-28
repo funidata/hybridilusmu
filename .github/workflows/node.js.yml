@@ -105,7 +105,6 @@ jobs:
     - name: Run Robot
       uses: joonvena/robotframework-docker-action@v1.0
       with:
-        start: npm start
         browser: chrome
         robot_tests_dir: ${{ github.workspace }}/test/e2e/testcases
         robot_reports_dir: ${{ github.workspace }}/test/e2e/results
