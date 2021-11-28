@@ -86,32 +86,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Run Robot
-      uses: joonvena/robotframework-docker-action@v1.0
-      with:
-        browser: chrome
-        robot_tests_dir: /test/e2e/testcases
-        robot_reports_dir: /test/e2e/results
-        robot_options: "--variable USER_EMAIL:${{ secrets.E2E_SLACK_EMAIL }} --variable USER_PASSWORD:${{ secrets.E2E_SLACK_PASSWORD }} 
-          --variable GUEST_EMAIL:${{ secrets.E2E_SLACK_GUEST_EMAIL }} --variable GUEST_PASSWORD:${{ secrets.E2E_SLACK_GUEST_PASSWORD }} --variable COMMAND_PREFIX:${{ secrets.TEST_COMMAND_PREFIX }}"
-      env:
-        POSTGRES_HOST: localhost
-          # The default PostgreSQL port
-        POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
-        SLACK_BOT_TOKEN: ${{ secrets.TEST_SLACK_BOT_TOKEN }}
-        SLACK_SIGNING_SECRET: ${{ secrets.TEST_SLACK_SIGNING_SECRET }}
-        SLACK_APP_TOKEN: ${{ secrets.TEST_SLACK_APP_TOKEN }}
-        COMMAND_PREFIX: ${{ secrets.TEST_COMMAND_PREFIX }}
-    - name: Start app
-      run: npm run start & npx wait-on http://localhost:3000
-      env:
-        POSTGRES_HOST: localhost
-          # The default PostgreSQL port
-        POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
-        SLACK_BOT_TOKEN: ${{ secrets.TEST_SLACK_BOT_TOKEN }}
-        SLACK_SIGNING_SECRET: ${{ secrets.TEST_SLACK_SIGNING_SECRET }}
-        SLACK_APP_TOKEN: ${{ secrets.TEST_SLACK_APP_TOKEN }}
-        COMMAND_PREFIX: ${{ secrets.TEST_COMMAND_PREFIX }}
     - name: Execute tests
       run: |
         docker run \
