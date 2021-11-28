@@ -86,13 +86,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: migrate
-      run: npm run migrate
-      env:
-          # The hostname used to communicate with the PostgreSQL service container
-        POSTGRES_HOST: localhost
-          # The default PostgreSQL port
-        POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
     - name: Run Robot
       uses: joonvena/robotframework-docker-action@v1.0
       with:
