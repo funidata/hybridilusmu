@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation    Common keywords used across test suites
-Library    Selenium2Library
+Library    SeleniumLibrary
 Library    HelpFunc.py
 Resource    variables.robot
 Resource    elements.robot
@@ -13,7 +13,7 @@ Open Slack In Browser And Login As User
     Input Password    ${login_password}    ${USER_PASSWORD}
     Click Element    ${login_button}
     Sleep    2s
-    cancelPopup
+    Press Keys ESCAPE
     Go To    ${LOGIN URL}
 
 Open Slack In Browser And Login As Guest
@@ -23,7 +23,7 @@ Open Slack In Browser And Login As Guest
     Input Password    ${login_password}    ${GUEST_PASSWORD}
     Click Element    ${login_button}
     Sleep    2s
-    cancelPopup
+    Press Keys ESCAPE
     Go To    ${LOGIN URL}
 
 Close Test Browser
