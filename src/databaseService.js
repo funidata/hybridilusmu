@@ -99,7 +99,7 @@ module.exports = {
     changeDefaultRegistration,
     getRegistrationsFor,
     userAtOffice,
-    userIsRemote,
     userAtOfficeByDefault,
+    userIsRemote,
     userIsRemoteByDefault,
 };
