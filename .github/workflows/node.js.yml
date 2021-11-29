@@ -114,6 +114,7 @@ jobs:
       uses: hytuslain/robotframework-docker-action@v1.1-hl-starter
       with:
         start: npm start
+        allowed-shared-memory: 2g
         browser: chrome
         robot_tests_dir: test/e2e/testcases
         robot_reports_dir: test/e2e/results
