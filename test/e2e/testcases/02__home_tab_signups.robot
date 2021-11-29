@@ -2,8 +2,8 @@
 Documentation    Tests to verify home tab functionality for a user with member role
 Library    Selenium2Library
 Library    Screenshot
-Library    ../resources/HelpFunc.py
-Resource    ../resources/common.robot
+Library    ./resources/HelpFunc.py
+Resource    ./resources/common.robot
 
 Suite Setup    common.Open Slack In Browser And Login As User
 Suite Teardown    common.Close Test Browser

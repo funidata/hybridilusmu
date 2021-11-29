@@ -2,9 +2,9 @@
 Documentation    Tests to verify that user with guest role can not use the bot and gets correct error messages
 Library    Selenium2Library
 Library    Screenshot
-Library    ../resources/HelpFunc.py
-Resource    ../resources/common.robot
-Resource    ../resources/elements.robot
+Library    ./resources/HelpFunc.py
+Resource    ./resources/common.robot
+Resource    ./resources/elements.robot
 
 Suite Setup    common.Open Slack In Browser And Login As Guest
 Suite Teardown    common.Close Test Browser
