@@ -13,7 +13,7 @@ Open Slack In Browser And Login As User
     Input Password    ${login_password}    ${USER_PASSWORD}
     Click Element    ${login_button}
     Sleep    2s
-    Press Keys ESCAPE
+    Press Keys None ESCAPE
     Go To    ${LOGIN URL}
 
 Open Slack In Browser And Login As Guest
@@ -23,7 +23,7 @@ Open Slack In Browser And Login As Guest
     Input Password    ${login_password}    ${GUEST_PASSWORD}
     Click Element    ${login_button}
     Sleep    2s
-    Press Keys ESCAPE
+    Press Keys None ESCAPE
     Go To    ${LOGIN URL}
 
 Close Test Browser
