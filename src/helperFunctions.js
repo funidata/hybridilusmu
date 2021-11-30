@@ -13,7 +13,7 @@ async function getMemberChannelIds(app) {
 async function postEphemeralMessage(app, channelId, userId, message) {
     // Tarkistetaan, onko sovellus kutsuttu kanavalle tai onko kyseessä yksityisviesti
     const conversation = await app.client.conversations.info({ channel: channelId });
-    if (conversation.channel.is_member || conversation.channel.is_im) {
+    if (conversation.channel.is_member || conversation.channel.is_im ) {
         await app.client.chat.postEphemeral({
             channel: channelId,
             user: userId,
