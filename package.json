@@ -11,6 +11,7 @@
     "migrate": "node ./dev/migrate.js",
     "test": "nyc --reporter=html mocha",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "setup-e2e": "pip3 install --upgrade --target ./test/e2e/testcases/site-packages/ pynput",
     "eslint": "npx eslint ."
   },
   "repository": {

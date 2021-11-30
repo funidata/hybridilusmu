@@ -110,8 +110,8 @@ jobs:
         COMMAND_PREFIX: ${{ secrets.TEST_COMMAND_PREFIX }}
     - name: migrate
       run: npm run migrate
-    - name: install pynput
-      run: mkdir -p test/e2e/testcases/site-packages && pip3 install --target "${PWD}"/test/e2e/testcases/site-packages pynput
+    - name: install e2e dependencies
+      run: npm run setup-e2e
     - name: Run Robot
       uses: hytuslain/robotframework-docker-action@v1.1-hl-starter
       with:
