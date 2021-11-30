@@ -36,14 +36,13 @@ const modalView = {
 const getDefaultSettingsBlock = async (userId) => {
     const settingsBlock = [];
     settingsBlock.push(mrkdwn('Oletusarvoisesti olen...'));
+    const settings = await service.getDefaultSettingsForUser(userId);
     for (let i = 0; i < DAYS_IN_WEEK; i += 1) {
-        // Täällä tehdään tällä hetkellä !! 10 !! tietokantakutsua.
-        // -> 1
         const weekday = dfunc.weekdays[i];
         const buttonValue = {
             weekday,
-            defaultAtOffice: await service.userAtOfficeByDefault(userId, weekday), // eslint-disable-line
-            defaultIsRemote: await service.userIsRemoteByDefault(userId, weekday), // eslint-disable-line
+            defaultAtOffice: settings[i].status === null ? false : settings[i].status,
+            defaultIsRemote: settings[i].status === null ? false : !settings[i].status,
         };
         if (weekday === 'Keskiviikko') settingsBlock.push(mrkdwn(`*${weekday}isin*`));
         else settingsBlock.push(mrkdwn(`*${weekday}sin*`));

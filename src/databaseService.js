@@ -80,9 +80,24 @@ const getRegistrationsBetween = async (firstDate, lastDate) => {
  * @returns {Array}
  */
 const getDefaultSettingsForUser = async (userId) => {
-    // Toteutetaan tänne.
     const unorderedSettings = await db.getDefaultSettingsForUser(userId);
-    // KESKEN!
+    let result = [];
+    for (let i = 0; i < 5; i++) {
+        let found = false;
+        unorderedSettings.every((entry) => {
+            if (entry.weekday === dfunc.weekdays[i]) {
+                result.push(entry);
+                found = true;
+                return false;
+            }
+            return true;
+        });
+        if (!found) result.push({
+            weekday: dfunc.weekdays[i], 
+            status: null,
+        });
+    }
+    return result;
 };
 
 /**
