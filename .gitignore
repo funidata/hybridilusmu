@@ -7,4 +7,5 @@ coverage
 .vscode
 test/e2e/results/
 !test/e2e/results/.keep
-test/e2e/resources/__pycache__
+**/__pycache__
+test/e2e/testcases/site-packages/
