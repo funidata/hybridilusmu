@@ -1,4 +1,11 @@
-#from pynput.keyboard import Key, Controller
+import os
+helper_dir = os.path.dirname(os.path.realpath(__file__))
+addtnl_package_dir = os.path.dirname(helper_dir) + '/site-packages'
+
+import sys
+sys.path.append(addtnl_package_dir)
+
+from pynput.keyboard import Key, Controller
 from datetime import datetime, timedelta
 
 months = ['tammikuuta', 'helmikuuta', 'maaliskuuta', 'huhtikuuta', 'toukokuuta',
@@ -9,11 +16,11 @@ short_weekdays = ['ma', 'ti', 'ke', 'to', 'pe', 'la', 'su']
 
 class HelpFunc(object):
 
-#    def cancelPopup(self):
-#        """Cancels a popup asking to open Slack in desktop app"""
-#        keyboard = Controller()
-#        keyboard.press(Key.space)
-#        keyboard.release(Key.space)
+    def cancelPopup(self):
+        """Cancels a popup asking to open Slack in desktop app"""
+        keyboard = Controller()
+        keyboard.press(Key.space)
+        keyboard.release(Key.space)
 
     def get_current_date_for_home_tab_update(self):
         """
