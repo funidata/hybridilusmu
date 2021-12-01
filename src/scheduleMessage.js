@@ -22,11 +22,7 @@ async function startScheduling({ app, usergroups, userCache }) {
         // We have to await on registrations, because they're needed for user fetching
         const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
         // Freshen up user cache to provide data for string generation
-        const userPromises = [];
-        for (let i = 0; i < registrations.length; i += 1) {
-            const uid = registrations[i];
-            userPromises.push(userCache.getCachedUser(uid));
-        }
+        const userPromises = registrations.map((uid) => userCache.getCachedUser(uid));
         // Wait for said freshening up to finish before continuing with message generation.
         // Otherwise we can get empty strings for all our users, unless they've already used the application
         // during this particular execution of the application. (Trust me, it's happened to me.)
