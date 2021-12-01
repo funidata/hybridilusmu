@@ -75,7 +75,7 @@ module.exports = {
                 // fall back to a mention string if user is not found
                 return `<@${userId}>`;
             }
-            return `${u.user.real_name || u.user.name}`;
+            return `${u.user.profile.real_name || u.user.profile.display_name}`;
         };
 
         return {
