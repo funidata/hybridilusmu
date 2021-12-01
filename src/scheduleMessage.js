@@ -8,7 +8,7 @@ const library = require('./responses');
 /**
 * Sends a scheduled message every weekday to all the channels the bot is in.
 */
-async function startScheduling({ app, usergroups }) {
+async function startScheduling({ app, usergroups, userCache }) {
     const rule = new schedule.RecurrenceRule();
     rule.tz = 'Etc/UTC';
     rule.dayOfWeek = [1, 2, 3, 4, 5];
@@ -19,21 +19,33 @@ async function startScheduling({ app, usergroups }) {
     schedule.scheduleJob(rule, async () => {
         const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
         const channels = await helper.getMemberChannelIds(app);
+        // freshen up user cache to provide data for string generation
+        registrations.forEach(async (uid) => {
+            userCache.getCachedUser(uid);
+        });
         usergroups.getUsergroupsForChannels(channels).forEach(async (obj) => {
             if (obj.usergroup_ids.length === 0) {
-                const message = library.registrationList(
-                    DateTime.now(),
-                    registrations,
+                const message = helper.replaceMentionsWithPlaintext(
+                    userCache.generatePlaintextString,
+                    usergroups.generatePlaintextString,
+                    library.registrationList(
+                        DateTime.now(),
+                        registrations,
+                    ),
                 );
                 helper.postMessage(app, obj.channel_id, message);
             } else {
                 obj.usergroup_ids.forEach(async (usergroupId) => {
-                    const message = library.registrationListWithUsergroup(
-                        DateTime.now(),
-                        registrations.filter(
-                            (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
+                    const message = helper.replaceMentionsWithPlaintext(
+                        userCache.generatePlaintextString,
+                        usergroups.generatePlaintextString,
+                        library.registrationListWithUsergroup(
+                            DateTime.now(),
+                            registrations.filter(
+                                (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
+                            ),
+                            usergroups.generateMentionString(usergroupId),
                         ),
-                        usergroups.generateMentionString(usergroupId),
                     );
                     helper.postMessage(app, obj.channel_id, message);
                 });

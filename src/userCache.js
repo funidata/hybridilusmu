@@ -15,6 +15,9 @@
  */
 const usercache = {};
 
+/** Maximum age of stored objects in cache */
+const OBJECT_AGE = 60000;
+
 module.exports = {
     enableUserCache: ({ app }) => {
         /**
@@ -23,7 +26,12 @@ module.exports = {
          * @returns {Object} The user object as originally returned by Slack
          */
         const getCachedUser = async (userId) => {
-            if (usercache[userId] && usercache[userId].date + 60000 > new Date().getTime()) {
+            // don't bother with undefineds and nulls and falses and empty strings and such
+            // these caused some api errors too at some point in earlier development
+            if (!userId) {
+                return null;
+            }
+            if (usercache[userId] && usercache[userId].date + OBJECT_AGE > Date.now()) {
                 console.log(`cache hit for user ${userId}`);
                 return usercache[userId].user;
             }
@@ -37,13 +45,22 @@ module.exports = {
             console.log(`caching user ${userId}`);
             usercache[userId] = {
                 user: user.user,
-                date: new Date().getTime(),
+                date: Date.now(),
             };
             return user.user;
         };
 
+        const generatePlaintextString = (userId) => {
+            const u = usercache[userId];
+            if (!u) {
+                return '';
+            }
+            return `${u.user.real_name}`;
+        };
+
         return {
             getCachedUser,
+            generatePlaintextString,
         };
     },
 };
