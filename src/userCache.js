@@ -60,7 +60,7 @@ module.exports = {
          *
          * You should call and wait on `getCachedUser(userId)` before calling this function.
          *
-         * @param {string} userId Slack user id
+         * @param {string} userId - Slack user id
          * @returns {string} User's real name or username. If user hasn't been cached,
          *                   falls back to generating a mention string (`<@${userId}>`).
          *
