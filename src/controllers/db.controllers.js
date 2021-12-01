@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const { sequelize } = require('../database');
 const db = require('../database');
 
@@ -200,7 +201,7 @@ exports.getDefaultSettingsForUser = async (userId) => {
         }));
     } catch (error) {
         console.log('Error while finding default registrations:', error);
-        return [];
+        return null;
     }
 };
 
@@ -227,12 +228,16 @@ exports.getDefaultSettingsForUser = async (userId) => {
         }));
     } catch (error) {
         console.log('Error while finding default registrations:', error);
-        return [];
+        return null;
     }
 };
 
 /**
- * Diibadaabadaa.
+ * Fetches all office registrations between the given dates.
+ * Returns an array, where one element is an object containing a Slack user ID, registration date and registration status.
+ * @param {String} startDate - Starting date in the ISO date format.
+ * @param {String} endDate - Ending date in the ISO date format.
+ * @returns {Array}
  */
 exports.getAllRegistrationsForDateInterval = async (startDate, endDate) => {
     try {
@@ -244,11 +249,81 @@ exports.getAllRegistrationsForDateInterval = async (startDate, endDate) => {
                     [Op.lte]: endDate,
                 },
             },
-            include: { model: Person, as: 'person' },
+            include: {
+                model: Person,
+                as: 'person',
+            },
         });
-        // const tuples = registrations.map((s) => [s.dataValues.person.dataValues.slackId, s.dataValues.officeDate, s.dataValues.atOffice]);
+        return registrations.map((s) => ({
+            slackId: s.dataValues.person.dataValues.slackId,
+            date: s.dataValues.officeDate,
+            status: s.dataValues.atOffice,
+        }));
     } catch (error) {
         console.log('Error while finding registrations:', error);
+        return null;
+    }
+};
+
+/**
+ * Fetches all office registrations between the given dates for given user.
+ * Returns an array, where one element is an object containing registration date and registration status.
+ * @param {String} startDate - Starting date in the ISO date format.
+ * @param {String} endDate - Ending date in the ISO date format.
+ * @returns {Array}
+ */
+exports.getRegistrationsForUserForDateInterval = async (userId, startDate, endDate) => {
+    try {
+        const registrations = await Signup.findAll({
+            attributes: ['officeDate', 'atOffice'],
+            where: {
+                officeDate: {
+                    [Op.gte]: startDate,
+                    [Op.lte]: endDate,
+                },
+            },
+            include: {
+                model: Person,
+                as: 'person',
+                where: {
+                    slackId: userId,
+                },
+            },
+        });
+        return registrations.map((s) => ({
+            date: s.dataValues.officeDate,
+            status: s.dataValues.atOffice,
+        }));
+    } catch (error) {
+        console.log('Error while finding registrations:', error);
+        return null;
+    }
+};
+
+/**
+ * Fetches all default office registrations.
+ * Returns an array, where one element is an object containing a Slack user ID and weekday.
+ * @returns {Array}
+ */
+exports.getAllDefaultOfficeSettings = async () => {
+    try {
+        const registrations = await Defaultsignup.findAll({
+            attributes: ['weekday'],
+            where: {
+                atOffice: true,
+            },
+            include: {
+                model: Person,
+                as: 'person',
+            },
+        });
+        return registrations.map((s) => ({
+            slackId: s.dataValues.person.dataValues.slackId,
+            weekday: s.dataValues.weekday,
+        }));
+    } catch (error) {
+        console.log('Error while finding registrations:', error);
+        return null;
     }
 };
 
@@ -275,7 +350,7 @@ exports.getAllRegistrationsForDate = async (date, atOffice = true) => {
         return registrations.map((s) => s.dataValues.slackId);
     } catch (error) {
         console.log('Error while finding registrations:', error);
-        return [];
+        return null;
     }
 };
 
@@ -302,7 +377,7 @@ exports.getAllDefaultRegistrationsForWeekday = async (weekday, atOffice = true) 
         return registrations.map((s) => s.dataValues.slackId);
     } catch (error) {
         console.log('Error while finding default registrations:', error);
-        return [];
+        return null;
     }
 };
 
@@ -380,7 +455,7 @@ exports.getAllRegistrationDatesForAUser = async (personId, atOffice = true) => {
         return registrations.map((s) => s.dataValues.officeDate);
     } catch (error) {
         console.log('Error while finding registrations:', error);
-        return [];
+        return null;
     }
 };
 

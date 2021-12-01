@@ -57,69 +57,97 @@ const getRegistrationsFor = async (date) => {
 /**
  * Returns a list of Slack user IDs of people who are at the office for every weekday
  * between firstDate and lastDate (inclusive).
- * Returns an array of arrays.
+ * Returns a dictionary of sets.
  * @param {string} firstDate - Date string in the ISO date format.
  * @param {string} lastDate - Date string in the ISO date format.
- * @returns {Array}
+ * @returns {Dictionary}
  */
 const getRegistrationsBetween = async (firstDate, lastDate) => {
-    // Toteutetaan tänne.
-    // KESKEN!
+    const normalRegistrations = await db.getAllRegistrationsForDateInterval(firstDate, lastDate);
+    const defaultRegistrations = await db.getAllDefaultOfficeSettings();
+    const defaultIds = {};
+    for (let i = 0; i < 5; i += 1) {
+        defaultIds[dfunc.weekdays[i]] = [];
+    }
+    defaultRegistrations.forEach((entry) => {
+        defaultIds[entry.weekday].push(entry.slackId);
+    });
+    const result = {};
+    let date = DateTime.fromISO(firstDate);
+    const endDate = DateTime.fromISO(lastDate);
+    while (date <= endDate) {
+        if (dfunc.isWeekday(date)) {
+            const isoDate = date.toISODate();
+            result[isoDate] = new Set();
+            defaultIds[dfunc.getWeekday(date)].forEach((slackId) => {
+                result[isoDate].add(slackId);
+            });
+        }
+        date = date.plus({ days: 1 });
+    }
+    normalRegistrations.forEach((entry) => {
+        if (entry.status) {
+            result[entry.date].add(entry.slackId);
+        } else if (result[entry.date].has(entry.slackId)) {
+            result[entry.date].delete(entry.slackId);
+        }
+    });
+    return result;
 };
 
 /**
- * Returns a list of values (true, false, undefined) for everyweek day,
- * representing given users default registration settings.
- * List is ordered from Monday to Friday and contains the following information for every day:
- * - weekday: Name of the weekday as in "Maanantai".
- * - status: (true, false, none)
- *      True means office, false remote and none that there is no setting for that weekday.
+ * Returns a dictionary where key is weekday as in "Maanantai" and value tells
+ * the default settings status for the given user.
+ * True means office, false remote and null that there is no setting for that weekday.
  * @param {string} userId - Slack user ID.
  * @param {string} firstDate - Date string in the ISO date format.
  * @param {string} lastDate - Date string in the ISO date format.
- * @returns {Array}
+ * @returns {Dictionary}
  */
 const getDefaultSettingsForUser = async (userId) => {
     const unorderedSettings = await db.getDefaultSettingsForUser(userId);
-    let result = [];
-    for (let i = 0; i < 5; i++) {
+    const result = {};
+    for (let i = 0; i < 5; i += 1) {
         let found = false;
         unorderedSettings.every((entry) => {
             if (entry.weekday === dfunc.weekdays[i]) {
-                result.push(entry);
+                result[entry.weekday] = entry.status;
                 found = true;
                 return false;
             }
             return true;
         });
-        if (!found) result.push({
-            weekday: dfunc.weekdays[i], 
-            status: null,
-        });
+        if (!found) {
+            result[dfunc.weekdays[i]] = null;
+        }
     }
     return result;
 };
 
 /**
- * Returns a array of objects, representing the users registration status for that day.
- * List is sorted from firstDate to lastDate and for everyday the object contains the following information:
- * - status : (default, normal or none)
- *      Shows the type of registration to be shown for this day, none if neither default nor normal registration is present.
- * - value: (true, false)
- *      If status is default or normal, value will be set. True means office and false remote.
+ * Returns a dictionary, where keys are ISO Date strings of days starting from @fistDate and ending at @lastDate (inclusive).
+ * The value for each day tells the normal registration status for the given user for that day.
+ * True means office, false remote and null that there is no normal registration for that day.
  * @param {string} userId - Slack user ID.
  * @param {string} firstDate - Date string in the ISO date format.
  * @param {string} lastDate - Date string in the ISO date format.
- * @returns {Array}
+ * @returns {Dictionary}
  */
 const getRegistrationsForUserBetween = async (userId, firstDate, lastDate) => {
-    // Toteutetaan tänne.
-    // 1. Hae normaalit ilmoittautumiset väliltä (firstDate -> lastDate) (tee tätä varten oma funktio).
-    // 2. Hae käyttäjän oletusasetukset funktiolla getDefaultSettingsForUser.
-    // 3. Käy läpi normaalit ilmoittautumiset ja jos jollekin päivälle ei ole, lisää oletusilmoittautuminen ja
-    // jos ei ole, lisää merkitse statukseksi none.
-    // 4. Palauta näin muodostettu lista.
-    // KESKEN!
+    const userRegs = await db.getRegistrationsForUserForDateInterval(userId, firstDate, lastDate);
+    const result = {};
+    let date = DateTime.fromISO(firstDate);
+    const endDate = DateTime.fromISO(lastDate);
+    while (date <= endDate) {
+        if (dfunc.isWeekday(date)) {
+            result[date.toISODate()] = null;
+        }
+        date = date.plus({ days: 1 });
+    }
+    userRegs.forEach((entry) => {
+        result[entry.date] = entry.status;
+    });
+    return result;
 };
 
 /**
@@ -169,6 +197,8 @@ module.exports = {
     changeDefaultRegistration,
     getDefaultSettingsForUser,
     getRegistrationsFor,
+    getRegistrationsBetween,
+    getRegistrationsForUserBetween,
     userAtOffice,
     userAtOfficeByDefault,
     userIsRemote,
