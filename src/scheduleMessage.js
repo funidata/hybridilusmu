@@ -17,10 +17,12 @@ async function startScheduling({ app, usergroups, userCache }) {
     // rule.second = [0, 15, 30, 45];
     console.log('Scheduling posts to every public channel the bot is a member of every weekday at hour', rule.hour, rule.tz);
     schedule.scheduleJob(rule, async () => {
-        const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
-        const channels = await helper.getMemberChannelIds(app);
-        // Freshen up user cache to provide data for string generation
         const promises = [];
+        // Parallelize channel fetching
+        promises.push(helper.getMemberChannelIds(app)); // [0]
+        // We have to await on registrations, because they're needed for user fetching
+        const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
+        // Freshen up user cache to provide data for string generation
         for (let i = 0; i < registrations.length; i += 1) {
             const uid = registrations[i];
             promises.push(userCache.getCachedUser(uid));
@@ -28,7 +30,9 @@ async function startScheduling({ app, usergroups, userCache }) {
         // Wait for said freshening up to finish before continuing with message generation.
         // Otherwise we can get empty strings for all our users, unless they've already used the application
         // during this particular execution of the application. (Trust me, it's happened to me.)
-        await Promise.all(promises);
+        const promiseResults = await Promise.all(promises);
+        // Read our channels from the appropriate location in the promiseResults array
+        const channels = promiseResults[0];
         usergroups.getUsergroupsForChannels(channels).forEach(async (obj) => {
             if (obj.usergroup_ids.length === 0) {
                 const message = helper.replaceMentionsWithPlaintext(
