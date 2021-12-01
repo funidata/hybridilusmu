@@ -19,10 +19,16 @@ async function startScheduling({ app, usergroups, userCache }) {
     schedule.scheduleJob(rule, async () => {
         const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
         const channels = await helper.getMemberChannelIds(app);
-        // freshen up user cache to provide data for string generation
-        registrations.forEach(async (uid) => {
-            userCache.getCachedUser(uid);
-        });
+        // Freshen up user cache to provide data for string generation
+        const promises = [];
+        for (let i = 0; i < registrations.length; i += 1) {
+            const uid = registrations[i];
+            promises.push(userCache.getCachedUser(uid));
+        }
+        // Wait for said freshening up to finish before continuing with message generation.
+        // Otherwise we can get empty strings for all our users, unless they've already used the application
+        // during this particular execution of the application. (Trust me, it's happened to me.)
+        await Promise.all(promises);
         usergroups.getUsergroupsForChannels(channels).forEach(async (obj) => {
             if (obj.usergroup_ids.length === 0) {
                 const message = helper.replaceMentionsWithPlaintext(

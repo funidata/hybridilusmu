@@ -35,19 +35,24 @@ module.exports = {
                 console.log(`cache hit for user ${userId}`);
                 return usercache[userId].user;
             }
-            const user = await app.client.users.info({ user: userId });
-            // something went wrong
-            if (!user.ok) {
-                console.log(`users.info failed for uid ${userId}`);
-                return null;
+            try {
+                const user = await app.client.users.info({ user: userId });
+                // something went wrong
+                if (!user.ok) {
+                    console.log(`users.info failed for uid ${userId}`);
+                    return null;
+                }
+                // success
+                console.log(`caching user ${userId}`);
+                usercache[userId] = {
+                    user: user.user,
+                    date: Date.now(),
+                };
+                return user.user;
+            } catch (err) {
+                console.log(`users.info failed for uid ${userId}: ${err}`);
             }
-            // success
-            console.log(`caching user ${userId}`);
-            usercache[userId] = {
-                user: user.user,
-                date: Date.now(),
-            };
-            return user.user;
+            return null;
         };
 
         const generatePlaintextString = (userId) => {
@@ -55,7 +60,7 @@ module.exports = {
             if (!u) {
                 return '';
             }
-            return `${u.user.real_name}`;
+            return `${u.user.real_name || u.user.name}`;
         };
 
         return {
