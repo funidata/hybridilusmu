@@ -55,10 +55,25 @@ module.exports = {
             return null;
         };
 
+        /**
+         * Generates a plain text string for the Slack user in question.
+         *
+         * You should call and wait on `getCachedUser(userId)` before calling this function.
+         *
+         * @param {string} userId Slack user id
+         * @returns {string} User's real name or username. If user hasn't been cached,
+         *                   falls back to generating a mention string (`<@${userId}>`).
+         *
+         * @see getCachedUser
+         */
         const generatePlaintextString = (userId) => {
+            if (!userId) {
+                return '';
+            }
             const u = usercache[userId];
             if (!u) {
-                return '';
+                // fall back to a mention string if user is not found
+                return `<@${userId}>`;
             }
             return `${u.user.real_name || u.user.name}`;
         };
