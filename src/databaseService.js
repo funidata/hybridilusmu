@@ -54,6 +54,24 @@ const getRegistrationsFor = async (date) => {
     return Array.from(officeIds);
 };
 
+const addAllJobs = async (jobs) => {
+    return await db.addAllJobs(jobs);
+};
+
+/**
+ * Adds or updates the timing of the automated message for the given channel.
+ * @param {string} channelId - Slack channel ID.
+ * @param {string} time - Time string in the ISO date format.
+ */
+const addJob = async (channelId, time) => {
+    return await db.addJob(channelId, time);
+};
+
+const getAllJobs = async () => {
+    return await db.getAllJobs();
+};
+
+
 /**
  * Returns true, if user's registration for the given day is the same as @atOffice.
  * @param {string} userId - Slack user ID.
@@ -98,6 +116,9 @@ module.exports = {
     changeRegistration,
     changeDefaultRegistration,
     getRegistrationsFor,
+    addAllJobs,
+    addJob,
+    getAllJobs,
     userAtOffice,
     userIsRemote,
     userAtOfficeByDefault,

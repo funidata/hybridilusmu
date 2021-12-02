@@ -5,13 +5,13 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false,
         },
         time: {
-            type: Sequelize.STRING,
+            type: Sequelize.TIME,
             allowNull: true,
         },
     }, {
         indexes: [
             {
-                // enforce slack id uniqueness
+                // enforce channel id uniqueness
                 fields: ['channel_id'],
                 unique: true,
             },

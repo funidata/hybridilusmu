@@ -208,4 +208,34 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
             console.log(error);
         }
     });
+
+    /**
+    * Listens to a slash-command and changes the time at which the automated message is posted to the current channel.
+    */
+    app.command(`/${COMMAND_PREFIX}tilaa`, async ({ command, ack }) => {
+        try {
+            await ack();
+            const input = command.text;
+            const channelId = command.channel_id;
+            const userId = command.user_id;
+            if (help(input, channelId, userId, library.explainTilaa)) return;
+            let response = library.demandTime();
+            const parameters = argify(input);
+            if (!enoughParameters(
+                1,
+                parameters.length,
+                channelId,
+                userId,
+                library.demandTime,
+            )) { return; }
+            let timeString = parameters[0];
+            const time = dfunc.parseTime(timeString);
+            await service.addJob(channelId, time);
+            response = library.automatedMessageRescheduled(time);
+            helper.postEphemeralMessage(app, channelId, userId, response);
+        } catch (error) {
+            console.log('Tapahtui virhe :(');
+            console.log(error);
+        }
+    });
 };

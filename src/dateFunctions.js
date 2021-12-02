@@ -164,6 +164,25 @@ const parseDate = (input, today) => {
     return date;
 };
 
+/**
+ * Returns a Luxon Date-object representing the given string or a 0-day -object,
+ * if the string is not of accepted format.
+ * Accepted forms are:
+ * 7:07
+ * 07:07
+ * 7.07
+ * 07.07
+ * 7
+ * @param {string} input - String to be parsed.
+ */
+const parseTime = (input) => {
+    let time = DateTime.fromFormat(input, 'T'); // 7:07, 07:07
+    if (!time.isValid()) time = DateTime.fromFormat(input, 'H.m'); // 7.07, 07.07
+    if (!time.isValid()) time = DateTime.fromFormat(input, 'H'); // 7
+    if (!time.isValid()) return time;
+    return `${time.hour}:${time.minute}`;
+};
+
 module.exports = {
     getWeekday,
     inThePast,
@@ -173,6 +192,7 @@ module.exports = {
     listNWeekdays,
     matchWeekday,
     parseDate,
+    parseTime,
     toPrettyFormat,
     weekdays,
 };

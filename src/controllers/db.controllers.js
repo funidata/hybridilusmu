@@ -4,6 +4,7 @@ const db = require('../database');
 const { Person } = db;
 const { Signup } = db;
 const { Defaultsignup } = db;
+const { Job } = db;
 
 const getUser = async (userId, transaction) => {
     const userQuery = await Person.findOrCreate({
@@ -229,3 +230,53 @@ exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
         return undefined;
     }
 };
+
+// should overwrite everything
+exports.resetAllJobs = (jobs) => {
+    try {
+        const result = await sequelize.transaction(async (t) => {
+            await Job.destroy({
+                where: {},
+                transaction: t,
+            })
+
+            return await Job.bulkCreate(jobs, {
+                transaction: t,
+            })
+        });
+        return result;
+    } catch (err) {
+        console.log('Error while resetting all jobs ', err);
+        return undefined;
+    }
+};
+
+// should not overwrite anything
+exports.addAllJobs = (jobs) => Job.bulkCreate({
+    records: jobs
+})
+    .then((jobs) => jobs)
+    .catch((err) => {
+        console.log('Error while adding jobs ', err);
+    });
+
+exports.addJob = (channelId, time) => Job.upsert({
+    channel_id: channelId,
+    time: time
+})
+    .then((job) => job)
+    .catch((err) => {
+        console.log('Error while creating a job ', err);
+    });
+
+exports.getJob = (channel_id) => Job.findByPk(channel_id)
+    .then((job) => job)
+    .catch((err) => {
+        console.log('Error while finding job ', err);
+    });
+
+exports.getAllJobs = () => Job.findAll()
+    .then((jobs) => jobs)
+    .catch((err) => {
+        console.log('Error while finding jobs ', err);
+    });

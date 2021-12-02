@@ -1,4 +1,5 @@
 const home = require('./home');
+const scheduleMessage = require('./scheduleMessage');
 
 exports.enableEventListeners = ({ app, usergroups }) => {
     /**
@@ -49,5 +50,20 @@ exports.enableEventListeners = ({ app, usergroups }) => {
         const ret = usergroups.processMembersChangedEvent(event);
         const shorthand = usergroups.generatePlaintextString(id);
         console.log(`ug ${shorthand} <${id}>: ${type}, returning ${ret}`);
+    });
+
+    /**
+     * Event listener for channel member join events
+     */
+    app.event('member_joined_channel', async ({ event, client }) => {
+        try {
+            // if the bot joins a channel, then an automatic message is scheduled for that channel with the default time
+            if (event.user.id === client.user.id && ) { // something like this
+                scheduleMessage.scheduleMessage(event.channel.id, app, usergroups);
+            }
+        }
+        catch (error) {
+            console.error(error);
+        }
     });
 };

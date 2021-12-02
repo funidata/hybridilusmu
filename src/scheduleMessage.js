@@ -12,65 +12,59 @@ const jobs = new Map();
 */
 async function startScheduling({ app, usergroups }) {
     
+    /*
+    TODO:
+    populate the db table with all channels the bot is a member of
+    add middleware that responds when the bot is added to a new channel by calling a function that schedules a new job
 
-    // TODO now
-    // modify controllers, db and service to accommodate everything here
-    // create the slash command to use the rescheduling function
-    // message posting
+    change the model name to ChannelJob or AutomatedMessage? or add a job id and make it pk instead of channel_id?
+    change tz to Helsinki and default hour to 6 AM
+    change the name of this function to something like scheduleAllMessages
+    change the name of this file to something like schedule
 
-    // TODO later
-    // populate the db table with all channels the bot is a member of
-    // add middleware that responds when the bot is added to a new channel by calling a function that schedules a new job
+    additional feature: configure the default time with a slash-command. save it to the db with either a special entry in the Job table (sketchy) or a dedicated settings table
+    */
 
-    // TODO last
-    // change tz to Helsinki and default hour to 6 AM
-    // change the name of this function to something like scheduleAllMessages
-    // change the name of this file to something like schedule
+    const channels = await helper.getMemberChannelIds(app);
+    service.addAllJobs(channels); // add all those channels that are not in the db yet
 
-
-    // iterate through the jobs in the db
-    service.getJobs().forEach(function(hour, channelId){
-        // set the specified time or default
-        const rule = new schedule.RecurrenceRule();
-        rule.tz = 'Etc/UTC';
-        rule.dayOfWeek = [1, 2, 3, 4, 5];
-        rule.hour = hour === null ? 4 : hour;
-        rule.minute = 0;
-
-        // create and schedule a job for each
-        const job = schedule.scheduleJob(rule, function(){
-            // post message to the given channelId like below
-
-        });
-        // add the job to the map so that we can reschedule it later
-        jobs.set(channelId, job)
+    // console.log('Scheduling daily posts to every public channel the bot is a member of');
+    console.log('Scheduling every Job found in the db');
+    service.getAllJobs().forEach(function(hour, channelId){
+        scheduleMessage(channelId, hour, registrations, app, usergroups)
     })
+}
 
+async function scheduleMessage({ channelId, hour = 4, app, usergroups }) {
+    // update the job's db representation to the given time
+    service.addJob(channelId, hour)
 
-
-    
-
-
-
+    // schedule the job to the given or default time
     const rule = new schedule.RecurrenceRule();
     rule.tz = 'Etc/UTC';
     rule.dayOfWeek = [1, 2, 3, 4, 5];
-    rule.hour = 4;
+    rule.hour = hour;
     rule.minute = 0;
     // rule.second = [0, 15, 30, 45];
-    console.log('Scheduling posts to every public channel the bot is a member of every weekday at hour', rule.hour, rule.tz);
-    schedule.scheduleJob(rule, async () => {
-        const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
-        const channels = await helper.getMemberChannelIds(app);
-        usergroups.getUsergroupsForChannels(channels).forEach(async (obj) => {
-            if (obj.usergroup_ids.length === 0) {
+
+    // find the job by the given channel id
+    const foundJob = jobs.get(channelId)
+
+    // unnecessary, just use the default parameter. huh, no? given parameter would work, but it would just make this more difficult to read
+    if (foundJob) {
+        foundJob.reschedule(rule)
+    } else {
+        const job = schedule.scheduleJob(rule, async () => {
+            const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
+            const usergroupIds = usergroups.getUsergroupsForChannel(channelId)
+            if (usergroupIds.length === 0) {
                 const message = library.registrationList(
                     DateTime.now(),
                     registrations,
                 );
-                helper.postMessage(app, obj.channel_id, message);
+                helper.postMessage(app, channelId, message);
             } else {
-                obj.usergroup_ids.forEach(async (usergroupId) => {
+                usergroupIds.forEach(async (usergroupId) => {
                     const message = library.registrationListWithUsergroup(
                         DateTime.now(),
                         registrations.filter(
@@ -78,35 +72,12 @@ async function startScheduling({ app, usergroups }) {
                         ),
                         usergroups.generateMentionString(usergroupId),
                     );
-                    helper.postMessage(app, obj.channel_id, message);
+                    helper.postMessage(app, channelId, message);
                 });
             }
         });
-    });
-}
-
-async function scheduleMessage({ channelId, hour }) {
-
-    // update the job's db representation to the given time
-    service.setJob(channelId, hour)
-
-    // schedule the job to the given time
-    const rule = new schedule.RecurrenceRule();
-    rule.tz = 'Etc/UTC';
-    rule.dayOfWeek = [1, 2, 3, 4, 5];
-    rule.hour = hour;
-    rule.minute = 0;
-
-    // find the job by the given channel_id
-    const job = jobs.get(channelId)
-
-    if (job) {
-        job.reschedule(rule)
-    } else {
-        job = schedule.scheduleJob(rule, function(){
-            // post message to the given channelId like above
-
-        });
+        // add the job to the map so that we can reschedule it later
+        jobs.set(channelId, job)
     }
 }
 
