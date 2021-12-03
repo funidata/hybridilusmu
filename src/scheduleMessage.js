@@ -7,37 +7,25 @@ const library = require('./responses');
 
 const jobs = new Map();
 
-/**
-* Sends a scheduled message every weekday to all the channels the bot is in.
-*/
-async function startScheduling({ app, usergroups }) {
-    
+async function scheduleMessage({
+    channelId, hour = 4, app, usergroups,
+}) {
     /*
     TODO:
     populate the db table with all channels the bot is a member of
-    add middleware that responds when the bot is added to a new channel by calling a function that schedules a new job
+    add listener that responds when the bot is added to a new channel by calling a function that schedules a new job
 
     change the model name to ChannelJob or AutomatedMessage? or add a job id and make it pk instead of channel_id?
     change tz to Helsinki and default hour to 6 AM
-    change the name of this function to something like scheduleAllMessages
+    rename startScheduling to something like scheduleAllMessages
     change the name of this file to something like schedule
 
-    additional feature: configure the default time with a slash-command. save it to the db with either a special entry in the Job table (sketchy) or a dedicated settings table
+    additional feature:
+    configure the default time with a slash-command.
+    save it to the db with either a special entry in the Job table (sketchy) or a dedicated settings table
     */
-
-    const channels = await helper.getMemberChannelIds(app);
-    service.addAllJobs(channels); // add all those channels that are not in the db yet
-
-    // console.log('Scheduling daily posts to every public channel the bot is a member of');
-    console.log('Scheduling every Job found in the db');
-    service.getAllJobs().forEach(function(hour, channelId){
-        scheduleMessage(channelId, hour, registrations, app, usergroups)
-    })
-}
-
-async function scheduleMessage({ channelId, hour = 4, app, usergroups }) {
     // update the job's db representation to the given time
-    service.addJob(channelId, hour)
+    service.addJob(channelId, hour);
 
     // schedule the job to the given or default time
     const rule = new schedule.RecurrenceRule();
@@ -48,15 +36,14 @@ async function scheduleMessage({ channelId, hour = 4, app, usergroups }) {
     // rule.second = [0, 15, 30, 45];
 
     // find the job by the given channel id
-    const foundJob = jobs.get(channelId)
+    const foundJob = jobs.get(channelId);
 
-    // unnecessary, just use the default parameter. huh, no? given parameter would work, but it would just make this more difficult to read
     if (foundJob) {
-        foundJob.reschedule(rule)
+        foundJob.reschedule(rule);
     } else {
         const job = schedule.scheduleJob(rule, async () => {
             const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
-            const usergroupIds = usergroups.getUsergroupsForChannel(channelId)
+            const usergroupIds = usergroups.getUsergroupsForChannel(channelId);
             if (usergroupIds.length === 0) {
                 const message = library.registrationList(
                     DateTime.now(),
@@ -77,8 +64,22 @@ async function scheduleMessage({ channelId, hour = 4, app, usergroups }) {
             }
         });
         // add the job to the map so that we can reschedule it later
-        jobs.set(channelId, job)
+        jobs.set(channelId, job);
     }
+}
+
+/**
+* Sends a scheduled message every weekday to all the channels the bot is in.
+*/
+async function startScheduling({ app, usergroups }) {
+    const channels = await helper.getMemberChannelIds(app);
+    service.addAllJobs(channels); // add all those channels that are not in the db yet
+
+    // console.log('Scheduling daily posts to every public channel the bot is a member of');
+    console.log('Scheduling every Job found in the db');
+    service.getAllJobs().forEach((hour, channelId) => {
+        scheduleMessage(channelId, hour, app, usergroups);
+    });
 }
 
 /**
@@ -103,5 +104,5 @@ const scheduleUsergroupReadings = async ({ app, usergroups }) => {
 module.exports = {
     startScheduling,
     scheduleMessage,
-    scheduleUsergroupReadings
+    scheduleUsergroupReadings,
 };

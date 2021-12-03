@@ -228,7 +228,7 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
                 userId,
                 library.demandTime,
             )) { return; }
-            let timeString = parameters[0];
+            const timeString = parameters[0];
             const time = dfunc.parseTime(timeString);
             await service.addJob(channelId, time);
             response = library.automatedMessageRescheduled(time);
