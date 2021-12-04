@@ -1,5 +1,3 @@
-const { DateTime } = require('luxon');
-
 /**
 * Returns a list of all the channels the bot is a member of.
 */
@@ -18,6 +16,12 @@ async function postEphemeralMessage(app, channelId, userId, message) {
     if (conversation.channel.is_member || conversation.channel.is_im) {
         await app.client.chat.postEphemeral({
             channel: channelId,
+            user: userId,
+            text: message,
+        });
+    } else {
+        await app.client.chat.postEphemeral({
+            channel: userId,
             user: userId,
             text: message,
         });

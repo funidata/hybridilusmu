@@ -258,7 +258,7 @@ const usergroupsUsersListFailedPayload = {
     error: 'no_such_subteam',
 };
 
-describe('usergroups: Plumbing', function () {
+describe('usergroups: Plumbing', function usergroupPlumbingTests() {
     this.beforeEach(() => {
         usergroups._.clearData();
     });
@@ -276,7 +276,7 @@ describe('usergroups: Plumbing', function () {
     });
 });
 
-describe('usergroups: Populate from API call', function () {
+describe('usergroups: Populate from API call', function usergroupAPITests() {
     this.beforeEach(() => {
         usergroups._.clearData();
     });
@@ -356,7 +356,7 @@ describe('usergroups: Populate from API call', function () {
     });
 });
 
-describe('usergroups: Event based population', function () {
+describe('usergroups: Event based population', function usergroupEventTests() {
     this.beforeEach(() => {
         usergroups._.clearData();
     });

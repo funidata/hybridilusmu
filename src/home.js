@@ -47,8 +47,14 @@ const getDefaultSettingsBlock = async (userId) => {
         else settingsBlock.push(mrkdwn(`*${weekday}sin*`));
         settingsBlock.push(
             actions([
-                button('Toimistolla', 'default_office_click', JSON.stringify(buttonValue), `${buttonValue.defaultAtOffice ? 'primary' : null}`),
-                button('Etänä', 'default_remote_click', JSON.stringify(buttonValue), `${buttonValue.defaultIsRemote ? 'primary' : null}`),
+                button('Toimistolla',
+                    'default_office_click',
+                    JSON.stringify(buttonValue),
+                    `${buttonValue.defaultAtOffice ? 'primary' : null}`),
+                button('Etänä',
+                    'default_remote_click',
+                    JSON.stringify(buttonValue),
+                    `${buttonValue.defaultIsRemote ? 'primary' : null}`),
             ]),
         );
     }
@@ -62,11 +68,12 @@ const getDefaultSettingsBlock = async (userId) => {
 const getUpdateBlock = async () => {
     const updateBlock = [];
     updateBlock.push(
-        plainText(`Tiedot päivitetty ${DateTime.now().setZone('Europe/Helsinki').setLocale('fi').toLocaleString(format)}`),
+        header('ILMOITTAUTUMISET :spiral_calendar_pad:'),
         actions([
-            button('Päivitä', 'update_click', 'updated'),
             button('Oletusasetukset', 'settings_click', 'updated'),
+            button('Päivitä', 'update_click', 'updated'),
         ]),
+        mrkdwn(`(_Tiedot päivitetty ${DateTime.now().setZone('Europe/Helsinki').setLocale('fi').toLocaleString(format)}_)`),
         divider(),
     );
     return updateBlock;
@@ -78,6 +85,7 @@ const getUpdateBlock = async () => {
  */
 const getRegistrationsBlock = async (userId) => {
     const registrationsBlock = [];
+    registrationsBlock.push(plainText(':writing_hand: = Käsin tehty ilmoittautuminen   :robot_face: = Oletusilmoittautuminen\n'));
     const dates = dfunc.listNWeekdays(DateTime.now(), SHOW_DAYS_UNTIL);
     for (let i = 0; i < dates.length; i += 1) {
         const date = dates[i];
@@ -91,13 +99,23 @@ const getRegistrationsBlock = async (userId) => {
             date,
             atOffice: await service.userAtOffice(userId, date), // eslint-disable-line
             isRemote: await service.userIsRemote(userId, date), // eslint-disable-line
+            atOfficeDefault: await service.userAtOfficeByDefault(userId, dfunc.getWeekday(DateTime.fromISO(date))), // eslint-disable-line
+            isRemoteDefault: await service.userIsRemoteByDefault(userId, dfunc.getWeekday(DateTime.fromISO(date))), // eslint-disable-line
         };
+        let officeColor = `${buttonValue.atOfficeDefault ? 'primary' : null}`;
+        let remoteColor = `${buttonValue.isRemoteDefault ? 'primary' : null}`;
+        let emoji = 'default';
+        if (buttonValue.atOffice || buttonValue.isRemote) {
+            officeColor = `${buttonValue.atOffice ? 'primary' : null}`;
+            remoteColor = `${buttonValue.isRemote ? 'primary' : null}`;
+            emoji = 'normal';
+        }
         registrationsBlock.push(
             mrkdwn(userIdList),
             plainText('Oma ilmoittautumiseni:'),
             actions([
-                button('Toimistolla', 'office_click', JSON.stringify(buttonValue), `${buttonValue.atOffice ? 'primary' : null}`),
-                button('Etänä', 'remote_click', JSON.stringify(buttonValue), `${buttonValue.isRemote ? 'primary' : null}`),
+                button('Toimistolla', 'office_click', JSON.stringify(buttonValue), officeColor, emoji),
+                button('Etänä', 'remote_click', JSON.stringify(buttonValue), remoteColor, emoji),
             ]),
             divider(),
         );
