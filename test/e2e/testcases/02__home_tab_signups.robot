@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation    Tests to verify home tab functionality for a user with member role
-Library    SeleniumLibrary
+Library    SeleniumLibrary    implicit_wait=10s
 Library    Screenshot
 Library    ./resources/HelpFunc.py
 Resource    ./resources/common.robot

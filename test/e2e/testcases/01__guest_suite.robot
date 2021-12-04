@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation    Tests to verify that user with guest role can not use the bot and gets correct error messages
-Library    SeleniumLibrary
+Library    SeleniumLibrary    implicit_wait=10s
 Library    Screenshot
 Library    ./resources/HelpFunc.py
 Resource    ./resources/common.robot
