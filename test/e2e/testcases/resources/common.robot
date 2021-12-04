@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation    Common keywords used across test suites
-Library    SeleniumLibrary
+Library    SeleniumLibrary    implicit_wait=10s
 Library    HelpFunc.py
 Resource    variables.robot
 Resource    elements.robot

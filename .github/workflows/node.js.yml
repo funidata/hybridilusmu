@@ -6,7 +6,7 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ e2e_workflow_alt ]
+    branches: [ robot_e2e ]
 
 jobs:
   build:
