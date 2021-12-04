@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation    Common keywords used across test suites
-Library    SeleniumLibrary
+Library    SeleniumLibrary    implicit_wait=10s
 Library    HelpFunc.py
 Resource    variables.robot
 Resource    elements.robot
@@ -50,5 +50,10 @@ Send List Command With Weekend Date Shortcut
     Sleep    1s
     Scroll Element Into View    ${latest_message}
     ${date}=    Get Date For Message Tab    ${day}
-    Element Should Contain    ${latest_message}    Kukaan ei ole toimistolla ${date} 
+    Element Should Contain    ${latest_message}    Kukaan ei ole toimistolla ${date}
+
+Regular Signup
+    [Arguments]    ${date}
+    Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[3]//button[@data-qa-action-id='office_click']
+    Click Element    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[3]//button[@data-qa-action-id='office_click']
     

@@ -62,4 +62,11 @@ class HelpFunc(object):
             now = now + timedelta(days = (1))
         return date_array
 
+    def get_next_working_day(self):
+        now = datetime.now()
+        while now.weekday() >= 5:
+            now = now + timedelta(days = (1))
+        date = "{dow} {day}.{month}".format(dow=Weekdays[now.weekday()], day = now.day, month = now.month)
+        return date
+
 

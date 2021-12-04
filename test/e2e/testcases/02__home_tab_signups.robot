@@ -20,3 +20,16 @@ Correct Dates
         Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${ITEM}')]
         Scroll Element Into View    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${ITEM}')]
     END
+
+Regular Signup For Next Working day
+    ${date}=    Get Next Working day
+    Scroll Element Into View    //div[@data-qa='block-kit-renderer']//div[5]
+    Element Should Contain    //div[@data-qa='block-kit-renderer']//div[5]    Kukaan ei ole ilmoittautunut toimistolle!
+    Regular Signup    ${date}
+    Sleep    2s
+    Element Should Contain    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[1]//span[1]    Toimistolla aikoo olla:
+    Page Should Contain Element    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[1]//span[1]//a[@data-stringify-label='@Jäsen Testikäyttäjä']
+    Regular Signup    ${date}
+
+
+
