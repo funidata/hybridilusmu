@@ -7,23 +7,15 @@ describe('Persons test', function () { // eslint-disable-line
         await db.sequelize.sync({ force: true });
     });
 
-    it('create user', async () => {
+    it('Create a person.', async () => {
         const person = await db.Person.create({
-            slack_id: 'XYZ',
-            real_name: 'Matti Meikalainen',
+            slackId: 'XYZ',
         });
         assert.equal(person.id, 1);
     });
-    it('should return correct username', async () => {
-        const person = await db.Person.findByPk(1);
-        assert.equal(person.real_name, 'Matti Meikalainen');
-    });
-    it('findUserId test', async () => {
-        const id = await controller.findUserId('XYZ');
+
+    it('getPersonId test', async () => {
+        const id = await controller.getPersonId('XYZ');
         assert.equal(1, id);
-    });
-    it('find slack_id', async () => {
-        const slackId = await controller.getSlackId(1);
-        assert.equal('XYZ', slackId);
     });
 });

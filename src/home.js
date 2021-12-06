@@ -36,12 +36,13 @@ const modalView = {
 const getDefaultSettingsBlock = async (userId) => {
     const settingsBlock = [];
     settingsBlock.push(mrkdwn('Oletusarvoisesti olen...'));
+    const settings = await service.getDefaultSettingsForUser(userId);
     for (let i = 0; i < DAYS_IN_WEEK; i += 1) {
         const weekday = dfunc.weekdays[i];
         const buttonValue = {
             weekday,
-            defaultAtOffice: await service.userAtOfficeByDefault(userId, weekday), // eslint-disable-line
-            defaultIsRemote: await service.userIsRemoteByDefault(userId, weekday), // eslint-disable-line
+            defaultAtOffice: settings[weekday] === null ? false : settings[weekday],
+            defaultIsRemote: settings[weekday] === null ? false : !settings[weekday],
         };
         if (weekday === 'Keskiviikko') settingsBlock.push(mrkdwn(`*${weekday}isin*`));
         else settingsBlock.push(mrkdwn(`*${weekday}sin*`));
@@ -87,20 +88,23 @@ const getRegistrationsBlock = async (userId) => {
     const registrationsBlock = [];
     registrationsBlock.push(plainText(':writing_hand: = Käsin tehty ilmoittautuminen   :robot_face: = Oletusilmoittautuminen\n'));
     const dates = dfunc.listNWeekdays(DateTime.now(), SHOW_DAYS_UNTIL);
+    const registrations = await service.getRegistrationsBetween(dates[0], dates[dates.length - 1]);
+    const defaultSettings = await service.getDefaultSettingsForUser(userId);
+    const userRegs = await service.getRegistrationsForUserBetween(userId, dates[0], dates[dates.length - 1]);
     for (let i = 0; i < dates.length; i += 1) {
         const date = dates[i];
         registrationsBlock.push(header(dfunc.toPrettyFormat(date)));
-        const registrations = await service.getRegistrationsFor(date); // eslint-disable-line
-        let userIdList = registrations.length === 0 ? 'Kukaan ei ole ilmoittautunut toimistolle!' : 'Toimistolla aikoo olla:\n';
-        registrations.forEach((user) => {
+        let userIdList = registrations[date].size === 0 ? 'Kukaan ei ole ilmoittautunut toimistolle!' : 'Toimistolla aikoo olla:\n';
+        registrations[date].forEach((user) => {
             userIdList += `<@${user}>\n`;
         });
+        const weekday = dfunc.getWeekday(DateTime.fromISO(date));
         const buttonValue = {
             date,
-            atOffice: await service.userAtOffice(userId, date), // eslint-disable-line
-            isRemote: await service.userIsRemote(userId, date), // eslint-disable-line
-            atOfficeDefault: await service.userAtOfficeByDefault(userId, dfunc.getWeekday(DateTime.fromISO(date))), // eslint-disable-line
-            isRemoteDefault: await service.userIsRemoteByDefault(userId, dfunc.getWeekday(DateTime.fromISO(date))), // eslint-disable-line
+            atOffice: userRegs[date] === null ? false : userRegs[date],
+            isRemote: userRegs[date] === null ? false : !userRegs[date],
+            atOfficeDefault: defaultSettings[weekday] === null ? false : defaultSettings[weekday],
+            isRemoteDefault: defaultSettings[weekday] === null ? false : !defaultSettings[weekday],
         };
         let officeColor = `${buttonValue.atOfficeDefault ? 'primary' : null}`;
         let remoteColor = `${buttonValue.isRemoteDefault ? 'primary' : null}`;

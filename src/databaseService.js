@@ -14,9 +14,9 @@ const dfunc = require('./dateFunctions');
  */
 const changeRegistration = async (userId, date, addRegistration, atOffice = true) => {
     if (addRegistration) {
-        await db.addSignupForUser(userId, date, atOffice);
+        await db.addRegistrationForUser(userId, date, atOffice);
     } else {
-        await db.removeSignup(userId, date);
+        await db.removeRegistration(userId, date);
     }
 };
 
@@ -32,9 +32,9 @@ const changeRegistration = async (userId, date, addRegistration, atOffice = true
  */
 const changeDefaultRegistration = async (userId, weekday, addRegistration, atOffice = true) => {
     if (addRegistration) {
-        await db.addDefaultSignupForUser(userId, weekday, atOffice);
+        await db.addDefaultRegistrationForUser(userId, weekday, atOffice);
     } else {
-        await db.removeDefaultSignup(userId, weekday);
+        await db.removeDefaultRegistration(userId, weekday);
     }
 };
 
@@ -43,15 +43,111 @@ const changeDefaultRegistration = async (userId, weekday, addRegistration, atOff
  * @param {string} date - Date string in the ISO date format.
  */
 const getRegistrationsFor = async (date) => {
-    const defaultOfficeIds = await db.getAllOfficeDefaultSignupsForAWeekday(
+    const defaultOfficeIds = await db.getAllDefaultRegistrationsForWeekday(
         dfunc.getWeekday(DateTime.fromISO(date)),
     );
-    const officeIds = new Set(await db.getAllOfficeSignupsForADate(date));
-    const remoteIds = new Set(await db.getAllOfficeSignupsForADate(date, false));
+    const officeIds = new Set(await db.getAllRegistrationsForDate(date));
+    const remoteIds = new Set(await db.getAllRegistrationsForDate(date, false));
     defaultOfficeIds.forEach((id) => {
         if (!remoteIds.has(id)) officeIds.add(id);
     });
     return Array.from(officeIds);
+};
+
+/**
+ * Returns a list of Slack user IDs of people who are at the office for every weekday
+ * between firstDate and lastDate (inclusive).
+ * Returns a dictionary of sets.
+ * @param {string} firstDate - Date string in the ISO date format.
+ * @param {string} lastDate - Date string in the ISO date format.
+ * @returns {Dictionary}
+ */
+const getRegistrationsBetween = async (firstDate, lastDate) => {
+    const normalRegistrations = await db.getAllRegistrationsForDateInterval(firstDate, lastDate);
+    const defaultRegistrations = await db.getAllDefaultOfficeSettings();
+    const defaultIds = {};
+    for (let i = 0; i < 5; i += 1) {
+        defaultIds[dfunc.weekdays[i]] = [];
+    }
+    defaultRegistrations.forEach((entry) => {
+        defaultIds[entry.weekday].push(entry.slackId);
+    });
+    const result = {};
+    let date = DateTime.fromISO(firstDate);
+    const endDate = DateTime.fromISO(lastDate);
+    while (date <= endDate) {
+        if (dfunc.isWeekday(date)) {
+            const isoDate = date.toISODate();
+            result[isoDate] = new Set();
+            defaultIds[dfunc.getWeekday(date)].forEach((slackId) => {
+                result[isoDate].add(slackId);
+            });
+        }
+        date = date.plus({ days: 1 });
+    }
+    normalRegistrations.forEach((entry) => {
+        if (entry.status) {
+            result[entry.date].add(entry.slackId);
+        } else if (result[entry.date].has(entry.slackId)) {
+            result[entry.date].delete(entry.slackId);
+        }
+    });
+    return result;
+};
+
+/**
+ * Returns a dictionary where key is weekday as in "Maanantai" and value tells
+ * the default settings status for the given user.
+ * True means office, false remote and null that there is no setting for that weekday.
+ * @param {string} userId - Slack user ID.
+ * @param {string} firstDate - Date string in the ISO date format.
+ * @param {string} lastDate - Date string in the ISO date format.
+ * @returns {Dictionary}
+ */
+const getDefaultSettingsForUser = async (userId) => {
+    const unorderedSettings = await db.getDefaultSettingsForUser(userId);
+    const result = {};
+    for (let i = 0; i < 5; i += 1) {
+        let found = false;
+        unorderedSettings.every((entry) => {
+            if (entry.weekday === dfunc.weekdays[i]) {
+                result[entry.weekday] = entry.status;
+                found = true;
+                return false;
+            }
+            return true;
+        });
+        if (!found) {
+            result[dfunc.weekdays[i]] = null;
+        }
+    }
+    return result;
+};
+
+/**
+ * Returns a dictionary, where keys are ISO Date strings of days starting from @fistDate and ending at @lastDate (inclusive).
+ * The value for each day tells the normal registration status for the given user for that day.
+ * True means office, false remote and null that there is no normal registration for that day.
+ * @param {string} userId - Slack user ID.
+ * @param {string} firstDate - Date string in the ISO date format.
+ * @param {string} lastDate - Date string in the ISO date format.
+ * @returns {Dictionary}
+ */
+const getRegistrationsForUserBetween = async (userId, firstDate, lastDate) => {
+    const userRegs = await db.getRegistrationsForUserForDateInterval(userId, firstDate, lastDate);
+    const result = {};
+    let date = DateTime.fromISO(firstDate);
+    const endDate = DateTime.fromISO(lastDate);
+    while (date <= endDate) {
+        if (dfunc.isWeekday(date)) {
+            result[date.toISODate()] = null;
+        }
+        date = date.plus({ days: 1 });
+    }
+    userRegs.forEach((entry) => {
+        result[entry.date] = entry.status;
+    });
+    return result;
 };
 
 /**
@@ -62,8 +158,9 @@ const getRegistrationsFor = async (date) => {
  * present at the office. False otherwise.
  */
 const userAtOffice = async (userId, date, atOffice = true) => {
-    const registration = await db.getOfficeSignupForUserAndDate(userId, date);
-    return registration && registration.at_office === atOffice;
+    const registration = await db.getUsersRegistrationForDate(userId, date);
+    if (registration === undefined) return false;
+    return registration.atOffice === atOffice;
 };
 
 /**
@@ -74,8 +171,9 @@ const userAtOffice = async (userId, date, atOffice = true) => {
  * present at the office by default. False otherwise.
  */
 const userAtOfficeByDefault = async (userId, weekday, atOffice = true) => {
-    const registration = await db.getOfficeDefaultSignupForUserAndWeekday(userId, weekday);
-    return registration && registration.at_office === atOffice;
+    const registration = await db.getUsersDefaultRegistrationForWeekday(userId, weekday);
+    if (registration === undefined) return false;
+    return registration.atOffice === atOffice;
 };
 
 /**
@@ -97,7 +195,10 @@ const userIsRemoteByDefault = async (userId, weekday) => (
 module.exports = {
     changeRegistration,
     changeDefaultRegistration,
+    getDefaultSettingsForUser,
     getRegistrationsFor,
+    getRegistrationsBetween,
+    getRegistrationsForUserBetween,
     userAtOffice,
     userAtOfficeByDefault,
     userIsRemote,

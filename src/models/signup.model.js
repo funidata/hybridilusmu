@@ -1,25 +1,10 @@
-module.exports = (sequelize, Sequelize) => {
-    const Signups = sequelize.define('Signups', {
-        office_date: {
-            type: Sequelize.DATEONLY,
-            allowNull: false,
-        },
-        at_office: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-        },
-    }, {
-        indexes: [
-            {
-                // just for speeding up date lookups
-                fields: ['office_date'],
-            },
-            {
-                // a two-field index to ensure uniqueness of signups
-                fields: ['office_date', 'PersonId'],
-                unique: true,
-            },
-        ],
-    });
-    return Signups;
-};
+module.exports = (sequelize, Sequelize) => sequelize.define('Signup', {
+    officeDate: {
+        type: Sequelize.DATEONLY,
+        allowNull: false,
+    },
+    atOffice: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+    },
+}, { timestamps: false });

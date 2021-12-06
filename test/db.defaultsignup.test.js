@@ -7,52 +7,50 @@ describe('Default signups test', function () { // eslint-disable-line
         await db.sequelize.sync({ force: true });
     });
 
-    it('create weekday default and assign to a user', async () => {
+    it('Create a default registration for a user.', async () => {
         const person = await db.Person.create({
-            slack_id: 'XYZ',
-            real_name: 'Matti Meikalainen',
+            slackId: 'XYZ',
         });
         await db.Defaultsignup.create({
             weekday: 'Maanantai',
-            at_office: true,
+            atOffice: true,
             PersonId: person.id,
         });
         const p1 = await db.Person.findByPk(1, {
-            include: ['defaultsignups'],
+            include: ['defaultsignup'],
         });
-        assert.equal(1, p1.defaultsignups.length);
+        assert.equal(1, p1.defaultsignup.length);
     });
-    it('find all default users for a weekday', async () => {
+
+    it('Find all default registrations for a weekday.', async () => {
         const person = await db.Person.create({
-            slack_id: 'ZZZ',
-            real_name: 'Maija Mehilainen',
+            slackId: 'ZZZ',
         });
         await db.Defaultsignup.create({
             weekday: 'Maanantai',
-            at_office: true,
+            atOffice: true,
             PersonId: person.id,
         });
-
-        const persons = await controller.getAllOfficeDefaultSignupsForAWeekday('Maanantai');
-
+        const persons = await controller.getAllDefaultRegistrationsForWeekday('Maanantai');
         assert.equal(2, persons.length);
     });
-    it('addDefaultSignupForUser test', async () => {
+
+    it('addDefaultRegistrationForUser test', async () => {
         let person = await db.Person.create({
-            slack_id: 'ABC',
-            real_name: 'Tyyppi Tyyppinen',
+            slackId: 'ABC',
         });
-        await controller.addDefaultSignupForUser('ABC', 'Tiistai', true);
+        await controller.addDefaultRegistrationForUser('ABC', 'Tiistai', true);
         person = await db.Person.findByPk(person.id, {
-            include: ['defaultsignups'],
+            include: ['defaultsignup'],
         });
-        assert.equal(1, person.defaultsignups.length);
+        assert.equal(1, person.defaultsignup.length);
     });
-    it('removeDefaultSignup test', async () => {
-        let signup = await controller.getOfficeDefaultSignupForUserAndWeekday('ABC', 'Tiistai');
+
+    it('removeDefaultRegistration test', async () => {
+        let signup = await controller.getUsersDefaultRegistrationForWeekday('ABC', 'Tiistai');
         assert.notEqual(undefined, signup);
-        await controller.removeDefaultSignup('ABC', 'Tiistai');
-        signup = await controller.getOfficeDefaultSignupForUserAndWeekday('ABC', 'Tiistai');
+        await controller.removeDefaultRegistration('ABC', 'Tiistai');
+        signup = await controller.getUsersDefaultRegistrationForWeekday('ABC', 'Tiistai');
         assert.equal(undefined, signup);
     });
 });
