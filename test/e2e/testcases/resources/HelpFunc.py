@@ -39,7 +39,7 @@ class HelpFunc(object):
         """
         now = datetime.now()
         if now.weekday() == short_weekdays.index(weekday):
-            date = "{dow}na {day}.{month}".format(dow=weekdays[short_weekdays.index(weekday)], day=now.day, month=now.month)
+            date = "tänään"
             return date
         else:
             future_date = now + timedelta(days = (short_weekdays.index(weekday) + 7 - now.weekday()) % 7)
@@ -68,5 +68,9 @@ class HelpFunc(object):
             now = now + timedelta(days = (1))
         date = "{dow} {day}.{month}".format(dow=Weekdays[now.weekday()], day = now.day, month = now.month)
         return date
+
+    def get_next_workday_info_element(self, date):
+        element = "//div[@data-qa='block-kit-renderer']//div[contains(h3, '{date}')]/following-sibling::div[1]//span[1]".format(date=date)
+        return element
 
 

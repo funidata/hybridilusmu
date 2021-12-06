@@ -24,41 +24,43 @@ Correct Dates
     END
 
 Regular Signup For Next Working Day
-    ${date}=    Get Next Working Day
-    Scroll Element Into View    //div[@data-qa='block-kit-renderer']//div[7]
-    Element Should Not Contain    //div[@data-qa='block-kit-renderer']//div[7]    @Jäsen Testikäyttäjä
-    Regular Office Signup    ${date}
+    ${DATE}=    Get Next Working Day
+    Set Suite Variable    ${DATE}    ${DATE}
+    ${next_workday_info}=    Get Next Workday Info Element    ${DATE}
+    Set Suite Variable    ${next_workday_info}    ${next_workday_info}
+    Scroll Element Into View    ${next_workday_info}
+    Element Should Not Contain    ${next_workday_info}    @Jäsen Testikäyttäjä
+    Regular Office Signup    ${DATE}
     Sleep    2s
-    Element Should Contain    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[1]//span[1]    Toimistolla aikoo olla:
-    Page Should Contain Element    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[1]//span[1]//a[@data-stringify-label='@Jäsen Testikäyttäjä']
-    Page Should Contain Element    //button[@data-qa-action-id='office_click']//img[@data-stringify-emoji=':writing_hand:']
-    Regular Office Signup    ${date}
+    Element Should Contain    ${next_workday_info}    Toimistolla aikoo olla:
+    Page Should Contain Element    ${next_workday_info}/a[@data-stringify-label='@Jäsen Testikäyttäjä']
+    Page Should Contain Element    ${office_button_writing_hand}
+    Regular Office Signup    ${DATE}
 
 Remote Signup For Next Working Day
     Update Home Tab View
-    ${date}=    Get Next Working Day
-    Scroll Element Into View    //div[@data-qa='block-kit-renderer']//div[7]
-    Regular Remote Signup    ${date}
+    Scroll Element Into View    ${next_workday_info}
+    Regular Remote Signup    ${DATE}
     Sleep    2s
-    Element Should Contain    //div[@data-qa='block-kit-renderer']//div[7]    Kukaan ei ole ilmoittautunut toimistolle!
-    Page Should Contain Element    //button[@data-qa-action-id='remote_click']//img[@data-stringify-emoji=':writing_hand:']
-    Regular Remote Signup    ${date}
+    Element Should Contain    ${next_workday_info}    Kukaan ei ole ilmoittautunut toimistolle!
+    Page Should Contain Element    ${remote_button_writing_hand}
+    Regular Remote Signup    ${DATE}
 
 Default Signup For Mondays
     Update Home Tab View
-    Click Element    //button[@data-qa-action-id='settings_click']
-    Wait Until Element Is Visible    //div[@data-qa='wizard_modal_body']/div[@data-qa='block-kit-renderer']/div[3]//button[@data-qa-action-id='default_office_click']
-    Click Element    //div[@data-qa='wizard_modal_body']/div[@data-qa='block-kit-renderer']/div[3]//button[@data-qa-action-id='default_office_click']
+    Click Element    ${default_settings_button}
+    Wait Until Element Is Visible    ${default_signup_monday_button}
+    Click Element    ${default_signup_monday_button}
     Sleep    2s
-    Click Element    //button[@data-qa='wizard_modal_back']
-    Element Should Contain    //div[@data-qa='block-kit-renderer']//div[contains(h3, 'Maanantai')]/following-sibling::div[1]    @Jäsen Testikäyttäjä
-    Page Should Contain Element    //div[@data-qa='block-kit-renderer']//div[contains(h3, 'Maanantai')]/following-sibling::div[3]//button[@data-qa-action-id='office_click']//img[@data-stringify-emoji=':robot_face:']
+    Click Element    ${close_default_settings_button}
+    Element Should Contain    ${monday_info}    @Jäsen Testikäyttäjä
+    Page Should Contain Element    ${office_button_robot_face}
 
 Default Remote Signup For Mondays
-    Click Element    //button[@data-qa-action-id='settings_click']
-    Wait Until Element Is Visible    //div[@data-qa='wizard_modal_body']/div[@data-qa='block-kit-renderer']/div[3]//button[@data-qa-action-id='default_remote_click']
-    Click Element    //div[@data-qa='wizard_modal_body']/div[@data-qa='block-kit-renderer']/div[3]//button[@data-qa-action-id='default_remote_click']
+    Click Element    ${default_settings_button}
+    Wait Until Element Is Visible    ${default_remote_signup_monday_button}
+    Click Element    ${default_remote_signup_monday_button}
     Sleep    2s
-    Click Element    //button[@data-qa='wizard_modal_back']
-    Element Should Not Contain    //div[@data-qa='block-kit-renderer']//div[contains(h3, 'Maanantai')]/following-sibling::div[1]    @Jäsen Testikäyttäjä
-    Page Should Contain Element    //div[@data-qa='block-kit-renderer']//div[contains(h3, 'Maanantai')]/following-sibling::div[3]//button[@data-qa-action-id='remote_click']//img[@data-stringify-emoji=':robot_face:']
+    Click Element    ${close_default_settings_button}
+    Element Should Not Contain    ${monday_info}    @Jäsen Testikäyttäjä
+    Page Should Contain Element    ${remote_button_robot_face}
