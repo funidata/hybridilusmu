@@ -12,6 +12,7 @@ ${messages_tab}    //button[@data-qa='messages']
 ${app_home}    //span[@data-qa='channel_sidebar_name_test-hybridilusmu']
 
 ${update_button}    //button[@data-qa-action-id='update_click']
+${update_text}    //div[@data-qa='block-kit-renderer']//div[3]
 ${office_button_writing_hand}    //button[@data-qa-action-id='office_click']//img[@data-stringify-emoji=':writing_hand:']
 ${office_button_robot_face}    //div[@data-qa='block-kit-renderer']//div[contains(h3, 'Maanantai')]/following-sibling::div[3]//button[@data-qa-action-id='office_click']//img[@data-stringify-emoji=':robot_face:']   
 ${remote_button_writing_hand}    //button[@data-qa-action-id='remote_click']//img[@data-stringify-emoji=':writing_hand:']

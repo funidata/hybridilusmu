@@ -70,7 +70,11 @@ class HelpFunc(object):
         return date
 
     def get_next_workday_info_element(self, date):
-        element = "//div[@data-qa='block-kit-renderer']//div[contains(h3, '{date}')]/following-sibling::div[1]//span[1]".format(date=date)
+        element = "//div[@data-qa='block-kit-renderer']//div[contains(h3, '{date}')]/following-sibling::div[1]".format(date=date)
+        return element
+
+    def get_next_workday_buttons_element(self, date):
+        element = "//div[@data-qa='block-kit-renderer']//div[contains(h3, '{date}')]/following-sibling::div[3]".format(date=date)
         return element
 
 

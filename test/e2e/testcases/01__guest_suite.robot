@@ -20,7 +20,7 @@ Use Slash Command In Guest Channel
     Set Global Variable    ${LIST_COMMAND}    /${COMMAND_PREFIX}listaa
     Input Text    ${message_input}    ${LIST_COMMAND} tänään
     Click Element    ${send_message_button}
-    Sleep    1s
+    Wait For Bot action
     Scroll Element Into View    ${latest_message}
     Element Should Contain    ${latest_message}    This command can't be used by guests in this workspace.  
 
@@ -33,10 +33,10 @@ Cannot See App Content
 
 Error Message In Message Tab
     Go To Message Tab
-    Sleep    1s
+    Wait For Bot action
     Element Should Contain    ${latest_message}    Pahoittelut, @Vieras Käyttäjä. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.
     Input Text    ${message_input}    ${LIST_COMMAND} tänään
     Click Element    ${send_message_button}
-    Sleep    1s
+    Wait For Bot action
     Scroll Element Into View    ${latest_message}
     Element Should Contain    ${latest_message}    This command can't be used by guests in this workspace.  

@@ -5,6 +5,7 @@ Library    Screenshot
 Library    ./resources/HelpFunc.py
 Resource    ./resources/common.robot
 Resource    ./resources/elements.robot
+Resource    ./resources/home_tab_res.robot
 
 Suite Setup    common.Open Slack In Browser And Login As User
 Suite Teardown    common.Close Test Browser
@@ -31,23 +32,23 @@ Add And Remove Regular Signup For Next Working Day
     Scroll Element Into View    ${next_workday_info}
     Element Should Not Contain    ${next_workday_info}    @Jäsen Testikäyttäjä
     Regular Office Signup    ${DATE}
-    Sleep    2s
+    Wait For Bot action
     Element Should Contain    ${next_workday_info}    Toimistolla aikoo olla:
-    Page Should Contain Element    ${next_workday_info}/a[@data-stringify-label='@Jäsen Testikäyttäjä']
+    Page Should Contain Element    ${next_workday_info}//a[@data-stringify-label='@Jäsen Testikäyttäjä']
     Page Should Contain Element    ${office_button_writing_hand}
     Regular Office Signup    ${DATE}
-    Sleep    2s
+    Wait For Bot action
     Element Should Not Contain    ${next_workday_info}    @Jäsen Testikäyttäjä
 
 Add And Remove Remote Signup For Next Working Day
     Update Home Tab View
     Scroll Element Into View    ${next_workday_info}
     Regular Remote Signup    ${DATE}
-    Sleep    2s
+    Wait For Bot action
     Element Should Contain    ${next_workday_info}    Kukaan ei ole ilmoittautunut toimistolle!
     Page Should Contain Element    ${remote_button_writing_hand}
     Regular Remote Signup    ${DATE}
-    Sleep    2s
+    Wait For Bot action
     Page Should Not Contain Element    ${remote_button_writing hand}
 
 Default Signup For Mondays
@@ -55,7 +56,7 @@ Default Signup For Mondays
     Click Element    ${default_settings_button}
     Wait Until Element Is Visible    ${default_signup_monday_button}
     Click Element    ${default_signup_monday_button}
-    Sleep    2s
+    Wait For Bot action
     Click Element    ${close_default_settings_button}
     Element Should Contain    ${monday_info}    @Jäsen Testikäyttäjä
     Page Should Contain Element    ${office_button_robot_face}
@@ -64,7 +65,7 @@ Default Remote Signup For Mondays
     Click Element    ${default_settings_button}
     Wait Until Element Is Visible    ${default_remote_signup_monday_button}
     Click Element    ${default_remote_signup_monday_button}
-    Sleep    2s
+    Wait For Bot action
     Click Element    ${close_default_settings_button}
     Element Should Not Contain    ${monday_info}    @Jäsen Testikäyttäjä
     Page Should Contain Element    ${remote_button_robot_face}

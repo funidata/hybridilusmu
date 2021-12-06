@@ -27,7 +27,10 @@ Open Slack In Browser And Login As Guest
     Go To    ${LOGIN URL}
 
 Close Test Browser
-    Close All Browsers 
+    Close All Browsers
+
+Wait For Bot action
+    Sleep    2s
 
 Go To Home Tab
     Wait Until Element Is Visible    ${app_home}
@@ -51,24 +54,6 @@ Send List Command With Weekend Date Shortcut
     Scroll Element Into View    ${latest_message}
     ${date}=    Get Date For Message Tab    ${day}
     Element Should Contain    ${latest_message}    Kukaan ei ole toimistolla ${date}
-
-Regular Office Signup
-    [Arguments]    ${date}
-    Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[3]//button[@data-qa-action-id='office_click']
-    Click Element    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[3]//button[@data-qa-action-id='office_click']
-
-Regular Remote Signup
-    [Arguments]    ${date}
-    Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[3]//button[@data-qa-action-id='remote_click']
-    Click Element    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[3]//button[@data-qa-action-id='remote_click']
-
-Update Home Tab View
-    Wait Until Element Is Visible    ${update_button}
-    Click Element    ${update_button}
-    ${date}=    Get Current Date For Home Tab Update
-    Sleep    2s
-    Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[3]
-    Element Should Contain    //div[@data-qa='block-kit-renderer']//div[3]    ${date}
 
 
     
