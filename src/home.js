@@ -94,7 +94,9 @@ const getRegistrationsBlock = async (userId) => {
     for (let i = 0; i < dates.length; i += 1) {
         const date = dates[i];
         registrationsBlock.push(header(dfunc.toPrettyFormat(date)));
-        let userIdList = registrations[date].size === 0 ? 'Kukaan ei ole ilmoittautunut toimistolle!' : 'Toimistolla aikoo olla:\n';
+        let userIdList = registrations[date].size === 0
+            ? 'Kukaan ei ole ilmoittautunut toimistolle!'
+            : 'Toimistolla aikoo olla:\n';
         registrations[date].forEach((user) => {
             userIdList += `<@${user}>\n`;
         });

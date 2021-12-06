@@ -128,7 +128,8 @@ exports.addDefaultRegistrationForUser = async (userId, weekday, atOffice) => {
                     transaction: t,
                 });
             } else {
-                console.log('Error! The database seems to have more than one default registration for the same user with the same day.');
+                console.log('Error!');
+                console.log('The database seems to have more than one default registration for the same user with the same day.');
             }
         });
     } catch (error) {
