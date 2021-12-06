@@ -23,7 +23,7 @@ Correct Dates
         Scroll Element Into View    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${ITEM}')]
     END
 
-Regular Signup For Next Working Day
+Add And Remove Regular Signup For Next Working Day
     ${DATE}=    Get Next Working Day
     Set Suite Variable    ${DATE}    ${DATE}
     ${next_workday_info}=    Get Next Workday Info Element    ${DATE}
@@ -36,8 +36,10 @@ Regular Signup For Next Working Day
     Page Should Contain Element    ${next_workday_info}/a[@data-stringify-label='@Jäsen Testikäyttäjä']
     Page Should Contain Element    ${office_button_writing_hand}
     Regular Office Signup    ${DATE}
+    Sleep    2s
+    Element Should Not Contain    ${next_workday_info}    @Jäsen Testikäyttäjä
 
-Remote Signup For Next Working Day
+Add And Remove Remote Signup For Next Working Day
     Update Home Tab View
     Scroll Element Into View    ${next_workday_info}
     Regular Remote Signup    ${DATE}
@@ -45,6 +47,8 @@ Remote Signup For Next Working Day
     Element Should Contain    ${next_workday_info}    Kukaan ei ole ilmoittautunut toimistolle!
     Page Should Contain Element    ${remote_button_writing_hand}
     Regular Remote Signup    ${DATE}
+    Sleep    2s
+    Page Should Not Contain Element    ${remote_button_writing hand}
 
 Default Signup For Mondays
     Update Home Tab View
