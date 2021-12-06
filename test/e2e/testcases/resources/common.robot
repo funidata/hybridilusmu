@@ -52,8 +52,20 @@ Send List Command With Weekend Date Shortcut
     ${date}=    Get Date For Message Tab    ${day}
     Element Should Contain    ${latest_message}    Kukaan ei ole toimistolla ${date}
 
-Regular Signup
+Regular Office Signup
     [Arguments]    ${date}
     Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[3]//button[@data-qa-action-id='office_click']
     Click Element    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[3]//button[@data-qa-action-id='office_click']
+
+Regular Remote Signup
+    [Arguments]    ${date}
+    Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[3]//button[@data-qa-action-id='remote_click']
+    Click Element    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[3]//button[@data-qa-action-id='remote_click']
+
+Update Home Tab View
+    Wait Until Element Is Visible    ${update_button}
+    Click Element    ${update_button}
+    ${date}=    Get Current Date For Home Tab Update
+    Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[3]
+    Element Should Contain    //div[@data-qa='block-kit-renderer']//div[3]    ${date}
     

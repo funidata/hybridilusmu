@@ -4,6 +4,7 @@ Library    SeleniumLibrary    implicit_wait=10s
 Library    Screenshot
 Library    ./resources/HelpFunc.py
 Resource    ./resources/common.robot
+Resource    ./resources/elements.robot
 
 Suite Setup    common.Open Slack In Browser And Login As User
 Suite Teardown    common.Close Test Browser
@@ -14,22 +15,36 @@ Can Open Home Tab
     Go To Home Tab
 
 Correct Dates
-    Wait Until Element Is Visible    //button[@data-qa-action-id='update_click']
+    Update Home Tab View
+    Wait Until Element Is Visible    ${update_button}
     @{DATES}=    Get Dates For Home Tab Signups
     FOR    ${ITEM}    IN    @{DATES}
         Wait Until Element Is Visible    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${ITEM}')]
         Scroll Element Into View    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${ITEM}')]
     END
 
-Regular Signup For Next Working day
-    ${date}=    Get Next Working day
-    Scroll Element Into View    //div[@data-qa='block-kit-renderer']//div[5]
-    Element Should Contain    //div[@data-qa='block-kit-renderer']//div[5]    Kukaan ei ole ilmoittautunut toimistolle!
-    Regular Signup    ${date}
+Regular Signup For Next Working Day
+    ${date}=    Get Next Working Day
+    Scroll Element Into View    //div[@data-qa='block-kit-renderer']//div[7]
+    Element Should Contain    //div[@data-qa='block-kit-renderer']//div[7]    Kukaan ei ole ilmoittautunut toimistolle!
+    Regular Office Signup    ${date}
     Sleep    2s
     Element Should Contain    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[1]//span[1]    Toimistolla aikoo olla:
     Page Should Contain Element    //div[@data-qa='block-kit-renderer']//div[contains(h3, '${date}')]/following-sibling::div[1]//span[1]//a[@data-stringify-label='@Jäsen Testikäyttäjä']
-    Regular Signup    ${date}
+    Regular Office Signup    ${date}
 
+Remote Signup For Next Working Day
+    Update Home Tab View
+    ${date}=    Get Next Working Day
+    Scroll Element Into View    //div[@data-qa='block-kit-renderer']//div[7]
+    Regular Remote Signup    ${date}
+    Sleep    2s
+    Element Should Contain    //div[@data-qa='block-kit-renderer']//div[7]    Kukaan ei ole ilmoittautunut toimistolle!
+    Page Should Contain Element    //button[@data-qa-action-id='remote_click']//img[@data-stringify-emoji=':writing_hand:']
+    Regular Remote Signup    ${date}
+
+Default Signup For Wednesdays
+    Update Home Tab View
+    Click Element    //button[@data-qa-action-id='settings_click']
 
 
