@@ -57,6 +57,7 @@ jobs:
           # The default PostgreSQL port
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
     - run: npm run report-coverage
+<<<<<<< HEAD
 
   e2e_test:
     environment: E2E testing
@@ -143,3 +144,6 @@ jobs:
         COMMIT_SHA: ${{ github.SHA }}
         REPOSITORY: ${{ env.REPOSITORY_NAME }}
         REPORT_PATH: ${{ github.workspace }}/test/e2e/results
+    # Run eslint as the very last step so as to primarily test functionality in this workflow
+    - name: eslint
+      run: npm run eslint

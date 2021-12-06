@@ -14,8 +14,9 @@ module.exports = {
     },
     rules: {
         indent: ['error', 4],
-        'no-unused-vars': ['warn', { vars: 'all', args: 'after-used', ignoreRestSiblings: false }],
+        'no-unused-vars': ['error', { vars: 'all', args: 'after-used', ignoreRestSiblings: false }],
         'no-console': 'off',
         'no-empty': ['error', { allowEmptyCatch: true }],
+        'max-len': ['error', { code: 130 }],
     },
 };
