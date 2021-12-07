@@ -7,4 +7,7 @@ module.exports = (sequelize, Sequelize) => sequelize.define('Signup', {
         type: Sequelize.BOOLEAN,
         allowNull: false,
     },
-}, { timestamps: false });
+}, {
+    indexes: [{ fields: ['officeDate'] }],
+    timestamps: false,
+});
