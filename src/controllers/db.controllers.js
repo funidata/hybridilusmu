@@ -232,17 +232,17 @@ exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
 };
 
 // should overwrite everything
-exports.resetAllJobs = (jobs) => {
+exports.resetAllJobs = async (jobs) => {
     try {
         const result = await sequelize.transaction(async (t) => {
             await Job.destroy({
                 where: {},
                 transaction: t,
-            })
+            });
 
-            return await Job.bulkCreate(jobs, {
+            return Job.bulkCreate(jobs, {
                 transaction: t,
-            })
+            });
         });
         return result;
     } catch (err) {
@@ -252,31 +252,41 @@ exports.resetAllJobs = (jobs) => {
 };
 
 // should not overwrite anything
-exports.addAllJobs = (jobs) => Job.bulkCreate({
-    records: jobs
-})
-    .then((jobs) => jobs)
-    .catch((err) => {
-        console.log('Error while adding jobs ', err);
-    });
+exports.addAllJobs = async (jobs) => {
+    try {
+        return await Job.bulkCreate(jobs);
+    } catch (err) {
+        console.log('Error while adding all jobs ', err);
+        return undefined;
+    }
+};
 
-exports.addJob = (channelId, time) => Job.upsert({
-    channel_id: channelId,
-    time: time
-})
-    .then((job) => job)
-    .catch((err) => {
+exports.addJob = async (channelId, time) => {
+    try {
+        return await Job.upsert({
+            channel_id: channelId,
+            time,
+        });
+    } catch (err) {
         console.log('Error while creating a job ', err);
-    });
+        return undefined;
+    }
+};
 
-exports.getJob = (channel_id) => Job.findByPk(channel_id)
-    .then((job) => job)
-    .catch((err) => {
+exports.getJob = async (channelId) => {
+    try {
+        return await Job.findByPk(channelId);
+    } catch (err) {
         console.log('Error while finding job ', err);
-    });
+        return undefined;
+    }
+};
 
-exports.getAllJobs = () => Job.findAll()
-    .then((jobs) => jobs)
-    .catch((err) => {
+exports.getAllJobs = async () => {
+    try {
+        return await Job.findAll();
+    } catch (err) {
         console.log('Error while finding jobs ', err);
-    });
+        return undefined;
+    }
+};
