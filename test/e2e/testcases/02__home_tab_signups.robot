@@ -45,7 +45,7 @@ Add And Remove Remote Signup For Next Working Day
     Scroll Element Into View    ${next_workday_info}
     Regular Remote Signup    ${DATE}
     Wait For Bot action
-    Element Should Contain    ${next_workday_info}    Kukaan ei ole ilmoittautunut toimistolle!
+    Element Should Not Contain    ${next_workday_info}    @Jäsen Testikäyttäjä
     Page Should Contain Element    ${remote_button_writing_hand}
     Regular Remote Signup    ${DATE}
     Wait For Bot action

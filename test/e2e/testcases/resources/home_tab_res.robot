@@ -1,5 +1,5 @@
 *** Settings ***
-Documentation    Common keywords used across test suites
+Documentation    Keywords for testing the home tab of app home
 Library    SeleniumLibrary    implicit_wait=10s
 Library    HelpFunc.py
 Resource    variables.robot

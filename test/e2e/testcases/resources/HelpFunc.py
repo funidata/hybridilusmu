@@ -43,7 +43,7 @@ class HelpFunc(object):
             return date
         else:
             future_date = now + timedelta(days = (short_weekdays.index(weekday) + 7 - now.weekday()) % 7)
-            date = "{dow}na {day}.{month}".format(dow=weekdays[short_weekdays.index(weekday)], day=future_date.day, month=future_date.month)
+            date = "{dow}na {day}.{month}.".format(dow=weekdays[short_weekdays.index(weekday)], day=future_date.day, month=future_date.month)
             return date
 
     def get_dates_for_home_tab_signups(self):
@@ -77,4 +77,24 @@ class HelpFunc(object):
         element = "//div[@data-qa='block-kit-renderer']//div[contains(h3, '{date}')]/following-sibling::div[3]".format(date=date)
         return element
 
+    def get_next_workday_short(self):
+        now = datetime.now() + timedelta(days = (1))
+        while now.weekday() >= 5:
+            now = now + timedelta(days = (1))
+        date = "{day}.{month}.".format(day=now.day, month=now.month)
+        return date
+
+    def get_next_working_day_long(self):
+        now = datetime.now() + timedelta(days = (1))
+        while now.weekday() >= 5:
+            now = now + timedelta(days = (1))
+        date = "{dow}na {day}.{month}.".format(dow=weekdays[now.weekday()], day=now.day, month=now.month)
+        return date
+    
+    def get_next_monday(self):
+        now = datetime.now()
+        while now.weekday() > 0:
+            now = now + timedelta(days = (1))
+        date = "{day}.{month}.".format(day=now.day, month=now.month)
+        return date
 
