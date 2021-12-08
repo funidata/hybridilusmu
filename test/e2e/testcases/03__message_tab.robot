@@ -65,3 +65,9 @@ Add And Remove Default Office Signup By Slash Command
     Element Should Not Contain    ${latest_message}    @Jäsen Testikäyttäjä
 
 Add Default Remote Signup By Slash Command
+    Go To Message Tab
+    Send Default Signup Command    ma    etä
+    Element Should Contain    ${latest_message}    Oletusilmoittautuminen lisätty - maanantaisin etänä.
+    ${NEXT_MONDAY}=    Get Next Monday
+    Send List Command    ${NEXT_MONDAY}
+    Element Should Not Contain    ${latest_message}    @Jäsen Testikäyttäjä
