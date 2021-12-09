@@ -63,6 +63,10 @@ class HelpFunc(object):
         return date_array
 
     def get_next_working_day(self):
+        """
+        Return the next workday in form of Maanantai 1.1.
+        Needed for finding the next workday elements on home tab
+        """
         now = datetime.now()
         while now.weekday() >= 5:
             now = now + timedelta(days = (1))
@@ -70,21 +74,37 @@ class HelpFunc(object):
         return date
 
     def get_next_workday_info_element(self, date):
+        """
+        Return the XPath of the info part of the next workday
+        date --- next working day in form of Maanantai 1.1.
+        """
         element = "//div[@data-qa='block-kit-renderer']//div[contains(h3, '{date}')]/following-sibling::div[1]".format(date=date)
         return element
 
     def get_next_workday_buttons_element(self, date):
+        """
+        Return the XPath of the buttons part of the next workday
+        date --- next working day in form of Maanantai 1.1.
+        """
         element = "//div[@data-qa='block-kit-renderer']//div[contains(h3, '{date}')]/following-sibling::div[3]".format(date=date)
         return element
 
     def get_next_workday_short(self):
+        """
+        Returns the date of the next workday in a form of 1.1.
+        Needed for sending slash commands
+        """
         now = datetime.now() + timedelta(days = (1))
         while now.weekday() >= 5:
             now = now + timedelta(days = (1))
         date = "{day}.{month}.".format(day=now.day, month=now.month)
         return date
 
-    def get_next_working_day_long(self):
+    def get_next_workday_long(self):
+        """
+        Returns the date of the next workday in a form of Maanantaina 1.1.
+        Needed for checking the answers to slash commands 
+        """
         now = datetime.now() + timedelta(days = (1))
         while now.weekday() >= 5:
             now = now + timedelta(days = (1))
@@ -92,6 +112,10 @@ class HelpFunc(object):
         return date
     
     def get_next_monday(self):
+        """
+        Returns the date of next monday in a form of 1.1.
+        Needed for testing the default signups by slash commands
+        """
         now = datetime.now()
         while now.weekday() > 0:
             now = now + timedelta(days = (1))
