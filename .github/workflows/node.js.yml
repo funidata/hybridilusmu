@@ -59,6 +59,9 @@ jobs:
           # The default PostgreSQL port
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
     - run: npm run report-coverage
+    # Run eslint as the very last step so as to primarily test functionality in this workflow
+    - name: eslint
+      run: npm run eslint
 
   e2e_test:
     environment: E2E testing
@@ -122,8 +125,12 @@ jobs:
         browser: chrome
         robot_tests_dir: test/e2e/testcases
         robot_reports_dir: test/e2e/results
-        robot_options: "--variable USER_EMAIL:${{ secrets.E2E_SLACK_EMAIL }} --variable USER_PASSWORD:${{ secrets.E2E_SLACK_PASSWORD }}
-          --variable GUEST_EMAIL:${{ secrets.E2E_GUEST_SLACK_EMAIL }} --variable GUEST_PASSWORD:${{ secrets.E2E_GUEST_SLACK_PASSWORD }} --variable COMMAND_PREFIX:${{ secrets.TEST_COMMAND_PREFIX }}"
+        robot_options: |
+          --variable USER_EMAIL:${{ secrets.E2E_SLACK_EMAIL }}
+          --variable USER_PASSWORD:${{ secrets.E2E_SLACK_PASSWORD }}
+          --variable GUEST_EMAIL:${{ secrets.E2E_GUEST_SLACK_EMAIL }}
+          --variable GUEST_PASSWORD:${{ secrets.E2E_GUEST_SLACK_PASSWORD }}
+          --variable COMMAND_PREFIX:${{ secrets.TEST_COMMAND_PREFIX }}
     - name: Upload test results
       uses: actions/upload-artifact@v1
       if: always()
@@ -141,10 +148,7 @@ jobs:
       if: ${{ github.event_name == 'push' }}
       env:
         GH_ACCESS_TOKEN: ${{ github.TOKEN }}
-        REPO_OWNER: ${{ github.REPOSITORY_OwNER }}
+        REPO_OWNER: ${{ github.REPOSITORY_OWNER }}
         COMMIT_SHA: ${{ github.SHA }}
         REPOSITORY: ${{ env.REPOSITORY_NAME }}
         REPORT_PATH: ${{ github.workspace }}/test/e2e/results
-    # Run eslint as the very last step so as to primarily test functionality in this workflow
-    - name: eslint
-      run: npm run eslint
