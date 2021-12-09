@@ -206,32 +206,6 @@ exports.getDefaultSettingsForUser = async (userId) => {
     }
 };
 
-/**
- * Returns a list of users default settings.
- * Notice, that this list is not ordered according to the weekdays
- * and does not contain weekdays, which there is no entry.
- */
-exports.getDefaultSettingsForUser = async (userId) => {
-    try {
-        const defaultSettings = await Defaultsignup.findAll({
-            attributes: ['weekday', 'atOffice'],
-            include: {
-                model: Person,
-                as: 'person',
-                where: {
-                    slackId: userId,
-                },
-            },
-        });
-        return defaultSettings.map((s) => ({
-            weekday: s.dataValues.weekday,
-            status: s.dataValues.atOffice,
-        }));
-    } catch (error) {
-        console.log('Error while finding default registrations:', error);
-        return null;
-    }
-};
 
 /**
  * Fetches all office registrations between the given dates.

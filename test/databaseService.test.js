@@ -130,3 +130,25 @@ describe('GetRegistrationsFor Tests', function () { // eslint-disable-line
         assert.equal(1, registrations.length);
     });
 });
+
+describe('GetRegistrationsBetween Tests', function () {
+    this.beforeAll(async () => {
+        await database.sequelize.sync({ force: true });
+    });
+    
+    it('Adding a normal registration and a default registration increases participant count by 2.', async () => {
+        await service.changeRegistration('userId1', '2021-10-21', true, true);
+        let registrations = await service.getRegistrationsFor('2021-10-21');
+        assert.equal(1, registrations.length);
+        await service.changeDefaultRegistration('userId2', 'Torstai', true, true);
+        registrations = await service.getRegistrationsFor('2021-10-21');
+        assert.equal(2, registrations.length);
+
+        // Poistetaan äskeiset ilmoittautumiset
+        await service.changeRegistration('userId1', '2021-10-21', false);
+        await service.changeDefaultRegistration('userId2', 'Torstai', false);
+        registrations = await service.getRegistrationsFor('2021-10-21');
+        assert.equal(0, registrations.length);
+    });
+    
+});
