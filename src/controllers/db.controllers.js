@@ -234,15 +234,14 @@ exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
 // should overwrite everything
 exports.resetAllJobs = async (jobs) => {
     try {
-        console.log(jobs);
+        // console.log(jobs);
         const result = await sequelize.transaction(async (t) => {
             await Job.destroy({
                 where: {},
                 transaction: t,
             });
 
-            return Job.bulkCreate({
-                records: jobs,
+            return Job.bulkCreate(jobs, {
                 transaction: t,
             });
         });
@@ -256,9 +255,9 @@ exports.resetAllJobs = async (jobs) => {
 // should not overwrite anything
 exports.addAllJobs = async (jobs) => {
     try {
-        console.log(jobs);
-        return await Job.bulkCreate({
-            records: jobs,
+        // console.log(jobs);
+        return Job.bulkCreate(jobs, {
+            updateOnDuplicate: ['channel_id'],
         });
     } catch (err) {
         console.log('Error while adding all jobs ', err);
@@ -289,7 +288,21 @@ exports.getJob = async (channelId) => {
 
 exports.getAllJobs = async () => {
     try {
-        return await Job.findAll();
+        const result = await Job.findAll();
+        return result.map((r) => ({
+            channelId: r.dataValues.channel_id,
+            hour: r.dataValues.time,
+        }));
+        /*
+        const result = await Job.findAll();
+        return result.map((job) => job.dataValues);
+        /*
+        let res;
+        await Job.findAll().then((jobs) => {
+            res = jobs;
+        });
+        return res;
+        */
     } catch (err) {
         console.log('Error while finding jobs ', err);
         return undefined;

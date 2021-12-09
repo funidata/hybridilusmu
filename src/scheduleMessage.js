@@ -8,7 +8,7 @@ const library = require('./responses');
 const jobs = new Map();
 
 async function scheduleMessage({
-    channelId, hour = 4, app, usergroups,
+    channelId, hour = 4, app, usergroups, // TODO: minutes
 }) {
     /*
     TODO:
@@ -25,7 +25,6 @@ async function scheduleMessage({
     save it to the db with either a special entry in the Job table (sketchy) or a dedicated settings table
     */
     // update the job's db representation to the given time
-    service.addJob(channelId, hour);
 
     // schedule the job to the given or default time
     const rule = new schedule.RecurrenceRule();
@@ -35,24 +34,26 @@ async function scheduleMessage({
     // rule.minute = 0;
     rule.second = [0, 15, 30, 45];
 
-    console.log(rule);
+    // console.log(rule);
 
     // find the job by the given channel id
     const foundJob = jobs.get(channelId);
 
-    console.log(foundJob);
+    // console.log(foundJob);
 
     if (foundJob) {
+        service.addJob(channelId, hour); // only when updating
         foundJob.reschedule(rule);
     } else {
         const job = schedule.scheduleJob(rule, async () => {
             const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
-            const usergroupIds = usergroups.getUsergroupsForChannel(channelId);
+            const usergroupIds = await usergroups.getUsergroupsForChannel(channelId);
             if (usergroupIds.length === 0) {
                 const message = library.registrationList(
                     DateTime.now(),
                     registrations,
                 );
+                // console.log(channelId);
                 helper.postMessage(app, channelId, message);
             } else {
                 usergroupIds.forEach(async (usergroupId) => {
@@ -63,6 +64,7 @@ async function scheduleMessage({
                         ),
                         usergroups.generateMentionString(usergroupId),
                     );
+                    // console.log(channelId);
                     helper.postMessage(app, channelId, message);
                 });
             }
@@ -78,20 +80,28 @@ async function scheduleMessage({
 * Sends a scheduled message every weekday to all the channels the bot is in.
 */
 async function startScheduling({ app, usergroups }) {
-    const channels = await helper.getMemberChannelIds(app);
-    console.log(channels);
-    service.addAllJobs(channels).then((res) => console.log(res)); // add all those channels that are not in the db yet
+    let channels = await helper.getMemberChannelIds(app);
+    // console.log(channels);
+    channels = channels.map((channel) => ({
+        channel_id: channel,
+    }));
+    // console.log(channels);
+    await service.addAllJobs(channels); // add all those channels that are not in the db yet
 
     // console.log('Scheduling daily posts to every public channel the bot is a member of');
     console.log('Scheduling every Job found in the db');
     await service.getAllJobs().then((dbJobs) => {
-        console.log(dbJobs);
+        // console.log(dbJobs);
 
-        dbJobs.forEach((hour, channelId) => {
-            console.log(hour, channelId);
-
-            scheduleMessage(channelId, hour, app, usergroups);
-        });
+        dbJobs.forEach(((job) => {
+            // console.log(job);
+            const { channelId } = job;
+            const hour = job.time || 4; // will not work when not hour
+            // console.log(channelId);
+            scheduleMessage({
+                channelId, hour, app, usergroups,
+            });
+        }));
     });
 }
 

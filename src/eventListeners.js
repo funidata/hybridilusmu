@@ -1,5 +1,5 @@
 const home = require('./home');
-// const scheduleMessage = require('./scheduleMessage');
+const scheduleMessage = require('./scheduleMessage');
 
 exports.enableEventListeners = ({ app, usergroups }) => {
     /**
@@ -55,17 +55,28 @@ exports.enableEventListeners = ({ app, usergroups }) => {
     /**
      * Event listener for channel member join events
      */
-    /*
-    app.event('member_joined_channel', async ({ event, client }) => {
+    app.event('member_joined_channel', async ({ auth, event }) => {
         try {
             // if the bot joins a channel, then an automatic message is scheduled for that channel with the default time
-            if (event.user.id === client.user.id && ) { // something like this
+            if (event.user.id === auth.user.id) { // something like this
                 scheduleMessage.scheduleMessage(event.channel.id, app, usergroups);
             }
-        }
-        catch (error) {
+        } catch (error) {
             console.error(error);
         }
     });
-    */
+
+    /**
+     * Event listener for channel member left events
+     */
+    app.event('member_left_channel', async ({ auth, event }) => {
+        try {
+            // if the bot joins a channel, then an automatic message is scheduled for that channel with the default time
+            if (event.user.id === auth.user.id) { // something like this
+                scheduleMessage.unScheduleMessage(event.channel.id, app, usergroups);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    });
 };
