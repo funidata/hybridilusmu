@@ -15,8 +15,9 @@ async function startScheduling({ app, usergroups, userCache }) {
     rule.hour = 4;
     rule.minute = 0;
     // rule.second = [0, 15, 30, 45];
-    console.log('Scheduling posts to every public channel the bot is a member of every weekday at hour', rule.hour, rule.tz);
+    console.log(`scheduling posts every weekday at ${rule.hour}h ${rule.minute}m (${rule.tz})`);
     schedule.scheduleJob(rule, async () => {
+        console.log('delivering scheduled posts');
         // Parallelize channel fetching
         const channelPromise = helper.getMemberChannelIds(app);
         // We have to await on registrations, because they're needed for user fetching
@@ -31,27 +32,21 @@ async function startScheduling({ app, usergroups, userCache }) {
         const channels = await channelPromise;
         usergroups.getUsergroupsForChannels(channels).forEach(async (obj) => {
             if (obj.usergroup_ids.length === 0) {
-                const message = helper.replaceMentionsWithPlaintext(
+                const message = library.registrationList(
+                    DateTime.now(),
+                    registrations,
                     userCache.generatePlaintextString,
-                    usergroups.generatePlaintextString,
-                    library.registrationList(
-                        DateTime.now(),
-                        registrations,
-                    ),
                 );
                 helper.postMessage(app, obj.channel_id, message);
             } else {
                 obj.usergroup_ids.forEach(async (usergroupId) => {
-                    const message = helper.replaceMentionsWithPlaintext(
-                        userCache.generatePlaintextString,
-                        usergroups.generatePlaintextString,
-                        library.registrationListWithUsergroup(
-                            DateTime.now(),
-                            registrations.filter(
-                                (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
-                            ),
-                            usergroups.generateMentionString(usergroupId),
+                    const message = library.registrationListWithUsergroup(
+                        DateTime.now(),
+                        registrations.filter(
+                            (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
                         ),
+                        usergroups.generatePlaintextString(usergroupId),
+                        userCache.generatePlaintextString,
                     );
                     helper.postMessage(app, obj.channel_id, message);
                 });
