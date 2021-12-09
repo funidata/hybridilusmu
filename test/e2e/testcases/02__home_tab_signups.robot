@@ -35,7 +35,9 @@ Add And Remove Regular Signup For Next Working Day
     Wait For Bot action
     Element Should Contain    ${next_workday_info}    Toimistolla aikoo olla:
     Page Should Contain Element    ${next_workday_info}//a[@data-stringify-label='@Jäsen Testikäyttäjä']
-    Page Should Contain Element    ${office_button_writing_hand}
+    ${next_workday_buttons}=    Get Next Workday Buttons Element    ${DATE}
+    Set Suite Variable    ${next_workday_buttons}    ${next_workday_buttons}
+    Page Should Contain Element    ${next_workday_buttons}${office_button_writing_hand}
     Regular Office Signup    ${DATE}
     Wait For Bot action
     Element Should Not Contain    ${next_workday_info}    @Jäsen Testikäyttäjä
@@ -46,10 +48,10 @@ Add And Remove Remote Signup For Next Working Day
     Regular Remote Signup    ${DATE}
     Wait For Bot action
     Element Should Not Contain    ${next_workday_info}    @Jäsen Testikäyttäjä
-    Page Should Contain Element    ${remote_button_writing_hand}
+    Page Should Contain Element    ${next_workday_buttons}${remote_button_writing_hand}
     Regular Remote Signup    ${DATE}
     Wait For Bot action
-    Page Should Not Contain Element    ${remote_button_writing hand}
+    Page Should Not Contain Element    ${next_workday_buttons}${remote_button_writing hand}
 
 Default Signup For Mondays
     Update Home Tab View

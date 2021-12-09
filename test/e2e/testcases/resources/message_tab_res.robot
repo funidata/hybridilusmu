@@ -14,7 +14,7 @@ Send Signup Command
     Wait For Bot action
     ${PRESENT}=    Run Keyword And Return Status    Element Should Be Visible   ${new_messages_button}
     Run Keyword If    ${PRESENT}    Click Element    ${new_messages_button}
-    Wait For Bot action
+    Sleep    1s
     Scroll Element Into View    ${latest_message}
 
 Send List Command
@@ -24,7 +24,20 @@ Send List Command
     Wait For Bot action
     ${PRESENT}=    Run Keyword And Return Status    Element Should Be Visible   ${new_messages_button}
     Run Keyword If    ${PRESENT}    Click Element    ${new_messages_button}
+    Sleep    1s
+    Scroll Element Into View    ${latest_message}
+
+Send List Command With Team
+    [Arguments]    ${date}    ${team}
+    Input Text    ${message_input}    /${COMMAND_PREFIX}listaa ${date}
+    Press Keys    ${message_input}    SPACE
+    Press Keys    ${message_input}    @testgrou
+    Click Element    //div[@class='c-base_list_entity__primary_content']
+    Click Element    ${send_message_button}
     Wait For Bot action
+    ${PRESENT}=    Run Keyword And Return Status    Element Should Be Visible   ${new_messages_button}
+    Run Keyword If    ${PRESENT}    Click Element    ${new_messages_button}
+    Sleep    1s
     Scroll Element Into View    ${latest_message}
 
 Send Remove Signup Command
@@ -34,7 +47,7 @@ Send Remove Signup Command
     Wait For Bot action
     ${PRESENT}=    Run Keyword And Return Status    Element Should Be Visible   ${new_messages_button}
     Run Keyword If    ${PRESENT}    Click Element    ${new_messages_button}
-    Wait For Bot action
+    Sleep    1s
     Scroll Element Into View    ${latest_message}
 
 Send Default Signup Command
@@ -44,7 +57,7 @@ Send Default Signup Command
     Wait For Bot action
     ${PRESENT}=    Run Keyword And Return Status    Element Should Be Visible   ${new_messages_button}
     Run Keyword If    ${PRESENT}    Click Element    ${new_messages_button}
-    Wait For Bot action
+    Sleep    1s
     Scroll Element Into View    ${latest_message}
 
 Send Remove Default Signup Command
@@ -54,5 +67,5 @@ Send Remove Default Signup Command
     Wait For Bot action
     ${PRESENT}=    Run Keyword And Return Status    Element Should Be Visible   ${new_messages_button}
     Run Keyword If    ${PRESENT}    Click Element    ${new_messages_button}
-    Wait For Bot action
+    Sleep    1s
     Scroll Element Into View    ${latest_message}

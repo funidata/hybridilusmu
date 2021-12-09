@@ -34,7 +34,7 @@ Add And Remove Office Signup By Slash Command
     ${DATE_LONG}=    Get Next Working Day Long
     Element Should Contain    ${latest_message}    Ilmoittautuminen lisätty - ${DATE_LONG} toimistolla.
     Send List Command    ${DATE}
-    Element Should Contain    ${latest_message}    ${DATE} toimistolla on:
+    Element Should Contain    ${latest_message}    ${DATE} toimistolla
     Element Should Contain    ${latest_message}    @Jäsen Testikäyttäjä
     Send Remove Signup Command    ${DATE}
     Element Should Contain    ${latest_message}    Ilmoittautuminen poistettu
@@ -70,4 +70,17 @@ Add Default Remote Signup By Slash Command
     Element Should Contain    ${latest_message}    Oletusilmoittautuminen lisätty - maanantaisin etänä.
     ${NEXT_MONDAY}=    Get Next Monday
     Send List Command    ${NEXT_MONDAY}
+    Element Should Not Contain    ${latest_message}    @Jäsen Testikäyttäjä
+
+List Team Member Signups
+    Go To Message Tab
+    ${DATE}=    Get Next Workday Short
+    Send Signup Command    ${DATE}    toimisto
+    ${DATE_LONG}=    Get Next Working Day Long
+    Element Should Contain    ${latest_message}    Ilmoittautuminen lisätty - ${DATE_LONG} toimistolla.
+    Send List Command With Team    ${DATE}    @testgroup 
+    Element Should Contain    ${latest_message}    ${DATE} tiimistä @testgroup on toimistolla:
+    Element Should Contain    ${latest_message}    @Jäsen Testikäyttäjä
+    Send Remove Signup Command    ${DATE}
+    Send List Command With Team    ${DATE}    @testgroup
     Element Should Not Contain    ${latest_message}    @Jäsen Testikäyttäjä
