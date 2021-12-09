@@ -22,7 +22,7 @@ describe('Default signups test', function () { // eslint-disable-line
         assert.equal(1, p1.defaultsignup.length);
     });
 
-    it('Find all default registrations for a weekday.', async () => {
+    it('Find all default office registrations for a weekday.', async () => {
         const person = await db.Person.create({
             slackId: 'ZZZ',
         });
@@ -31,7 +31,7 @@ describe('Default signups test', function () { // eslint-disable-line
             atOffice: true,
             PersonId: person.id,
         });
-        const persons = await controller.getAllDefaultRegistrationsForWeekday('Maanantai');
+        const persons = await controller.getAllDefaultOfficeRegistrationsForWeekday('Maanantai');
         assert.equal(2, persons.length);
     });
 

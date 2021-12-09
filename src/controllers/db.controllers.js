@@ -206,7 +206,6 @@ exports.getDefaultSettingsForUser = async (userId) => {
     }
 };
 
-
 /**
  * Fetches all office registrations between the given dates.
  * Returns an array, where one element is an object containing a Slack user ID, registration date and registration status.
@@ -303,26 +302,27 @@ exports.getAllDefaultOfficeSettings = async () => {
 };
 
 /**
- * Fetches all normal registrations for the given date,
- * either office or remote registrations depending on the value of @atOffice.
+ * Fetches all normal registrations for the given date.
  * @param {String} date - Date in the ISO date format.
- * @param {Boolean} atOffice - True, if we fetch office registrations and false, if we fetch remote registrations.
  * @returns {Array}
  */
-exports.getAllRegistrationsForDate = async (date, atOffice = true) => {
+exports.getAllRegistrationsForDate = async (date) => {
     try {
-        const registrations = await Person.findAll({
-            attributes: ['slackId'],
+        const registrations = await Signup.findAll({
+            attributes: ['atOffice'],
+            where: {
+                officeDate: date,
+            },
             include: {
-                model: Signup,
-                as: 'signup',
-                where: {
-                    officeDate: date,
-                    atOffice,
-                },
+                model: Person,
+                as: 'person',
+                attributes: ['slackId'],
             },
         });
-        return registrations.map((s) => s.dataValues.slackId);
+        return registrations.map((s) => ({
+            slackId: s.dataValues.person.dataValues.slackId,
+            status: s.dataValues.atOffice,
+        }));
     } catch (error) {
         console.log('Error while finding registrations:', error);
         return null;
@@ -330,13 +330,11 @@ exports.getAllRegistrationsForDate = async (date, atOffice = true) => {
 };
 
 /**
- * Fetches all default registrations for the given weekday,
- * either office or remote registrations depending on the value of @atOffice.
+ * Fetches all default office registrations for the given weekday.
  * @param {String} date - Date in the ISO date format.
- * @param {Boolean} atOffice - True, if we fetch office registrations and false, if we fetch remote registrations.
  * @returns {Array}
  */
-exports.getAllDefaultRegistrationsForWeekday = async (weekday, atOffice = true) => {
+exports.getAllDefaultOfficeRegistrationsForWeekday = async (weekday) => {
     try {
         const registrations = await Person.findAll({
             attributes: ['slackId'],
@@ -345,7 +343,7 @@ exports.getAllDefaultRegistrationsForWeekday = async (weekday, atOffice = true) 
                 as: 'defaultsignup',
                 where: {
                     weekday,
-                    atOffice,
+                    atOffice: true,
                 },
             },
         });

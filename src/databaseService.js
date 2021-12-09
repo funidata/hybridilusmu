@@ -43,15 +43,15 @@ const changeDefaultRegistration = async (userId, weekday, addRegistration, atOff
  * @param {string} date - Date string in the ISO date format.
  */
 const getRegistrationsFor = async (date) => {
-    const defaultOfficeIds = await db.getAllDefaultRegistrationsForWeekday(
+    const result = new Set(await db.getAllDefaultOfficeRegistrationsForWeekday(
         dfunc.getWeekday(DateTime.fromISO(date)),
-    );
-    const officeIds = new Set(await db.getAllRegistrationsForDate(date));
-    const remoteIds = new Set(await db.getAllRegistrationsForDate(date, false));
-    defaultOfficeIds.forEach((id) => {
-        if (!remoteIds.has(id)) officeIds.add(id);
+    ));
+    const registrations = await db.getAllRegistrationsForDate(date);
+    registrations.forEach((obj) => {
+        if (obj.status === true) result.add(obj.slackId);
+        else result.delete(obj.slackId);
     });
-    return Array.from(officeIds);
+    return Array.from(result);
 };
 
 /**

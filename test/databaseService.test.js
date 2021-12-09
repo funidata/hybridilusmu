@@ -13,56 +13,56 @@ describe('ChangeRegistration Tests', function () { // eslint-disable-line
 
     it('Adding a normal registration works.', async () => {
         let registrations = await db.getAllRegistrationsForDate('2021-10-21');
-        assert.equal(0, registrations.length);
+        assert.equal(registrations.length, 0);
         await service.changeRegistration('userId', '2021-10-21', true, true);
         registrations = await db.getAllRegistrationsForDate('2021-10-21');
-        assert.equal(1, registrations.length);
+        assert.equal(registrations.length, 1);
     });
 
     it('Removing a normal registration works.', async () => {
         let registrations = await db.getAllRegistrationsForDate('2021-10-21');
-        assert.equal(1, registrations.length);
+        assert.equal(registrations.length, 1);
         await service.changeRegistration('userId', '2021-10-21', false);
         registrations = await db.getAllRegistrationsForDate('2021-10-21');
-        assert.equal(0, registrations.length);
+        assert.equal(registrations.length, 0);
     });
 
     it('Changing a normal registration works.', async () => {
         let registrations = await db.getAllRegistrationsForDate('2021-10-21');
-        assert.equal(0, registrations.length);
+        assert.equal(registrations.length, 0);
         await service.changeRegistration('userId', '2021-10-21', true, true);
         registrations = await db.getAllRegistrationsForDate('2021-10-21');
-        assert.equal(1, registrations.length);
+        assert.equal(registrations.length, 1);
         await service.changeRegistration('userId', '2021-10-21', true, false);
-        registrations = await db.getAllRegistrationsForDate('2021-10-21');
-        assert.equal(0, registrations.length);
+        registrations = await service.getRegistrationsFor('2021-10-21');
+        assert.equal(registrations.length, 0);
     });
 
     it('Adding a default registration works.', async () => {
-        let registrations = await db.getAllDefaultRegistrationsForWeekday('Torstai');
-        assert.equal(0, registrations.length);
+        let registrations = await db.getAllDefaultOfficeRegistrationsForWeekday('Torstai');
+        assert.equal(registrations.length, 0);
         await service.changeDefaultRegistration('userId', 'Torstai', true, true);
-        registrations = await db.getAllDefaultRegistrationsForWeekday('Torstai');
-        assert.equal(1, registrations.length);
+        registrations = await db.getAllDefaultOfficeRegistrationsForWeekday('Torstai');
+        assert.equal(registrations.length, 1);
     });
 
     it('Removing a default registration works.', async () => {
-        let registrations = await db.getAllDefaultRegistrationsForWeekday('Torstai');
-        assert.equal(1, registrations.length);
+        let registrations = await db.getAllDefaultOfficeRegistrationsForWeekday('Torstai');
+        assert.equal(registrations.length, 1);
         await service.changeDefaultRegistration('userId', 'Torstai', false);
-        registrations = await db.getAllDefaultRegistrationsForWeekday('Torstai');
-        assert.equal(0, registrations.length);
+        registrations = await db.getAllDefaultOfficeRegistrationsForWeekday('Torstai');
+        assert.equal(registrations.length, 0);
     });
 
     it('Changing a default registration works.', async () => {
-        let registrations = await db.getAllDefaultRegistrationsForWeekday('Torstai');
-        assert.equal(0, registrations.length);
+        let registrations = await db.getAllDefaultOfficeRegistrationsForWeekday('Torstai');
+        assert.equal(registrations.length, 0);
         await service.changeDefaultRegistration('userId', 'Torstai', true, true);
-        registrations = await db.getAllDefaultRegistrationsForWeekday('Torstai');
-        assert.equal(1, registrations.length);
+        registrations = await db.getAllDefaultOfficeRegistrationsForWeekday('Torstai');
+        assert.equal(registrations.length, 1);
         await service.changeDefaultRegistration('userId', 'Torstai', true, false);
-        registrations = await db.getAllDefaultRegistrationsForWeekday('Torstai');
-        assert.equal(0, registrations.length);
+        registrations = await db.getAllDefaultOfficeRegistrationsForWeekday('Torstai');
+        assert.equal(registrations.length, 0);
     });
 });
 
