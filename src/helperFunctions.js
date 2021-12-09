@@ -61,59 +61,9 @@ const readUsergroupsFromCleanSlate = async ({ app, usergroups }) => {
     }
 };
 
-/**
- * Turns Slack mentions in a string to plain text representations thereof.
- *
- * @param {function} userFormatter - User id formatter, like `(uid) => doThings(userCache, uid)`
- * @param {function} usergroupFormatter - Usergroup id formatter, like `(ugid) => doOtherThings(usergroups, ugid)`
- * @param {string} str - The string to replace the mentions in
- * @returns {string} String with mentions turned into plain text
- */
-const replaceMentionsWithPlaintext = (userFormatter, usergroupFormatter, str) => {
-    let ret = '';
-    let inspect = str;
-    let next = -1;
-    const takeExpr = (skip = 0) => {
-        const skipN = typeof skip === 'string' ? skip.length : skip;
-        const endPos = inspect.indexOf('>');
-        if (endPos < 0) {
-            return false;
-        }
-        const expr = inspect.substr(skipN, endPos - skipN);
-        inspect = inspect.substr(endPos + 1);
-        const barPos = expr.indexOf('|');
-        if (barPos >= 0) {
-            return expr.substr(0, barPos);
-        }
-        return expr;
-    };
-    while (inspect.length > 0) {
-        next = inspect.indexOf('<');
-        if (next < 0) {
-            next = inspect.length;
-        }
-        ret += inspect.substr(0, next);
-        inspect = inspect.substr(next + 1);
-        if (inspect.startsWith('@')) {
-            // unroll user mention
-            const uId = takeExpr('@');
-            ret += userFormatter(uId);
-        } else if (inspect.startsWith('!subteam^')) {
-            // unroll usergroup mention
-            const ugId = takeExpr('!subteam^');
-            ret += usergroupFormatter(ugId);
-        } else if (inspect.length > 0) {
-            // this instance of '<' didn't match user or subteam
-            ret += '<';
-        }
-    }
-    return ret;
-};
-
 module.exports = {
     getMemberChannelIds,
     postEphemeralMessage,
     postMessage,
     readUsergroupsFromCleanSlate,
-    replaceMentionsWithPlaintext,
 };
