@@ -311,7 +311,7 @@ exports.getAllRegistrationsForDate = async (date) => {
         const registrations = await Signup.findAll({
             attributes: ['atOffice'],
             where: {
-                officeDate: date
+                officeDate: date,
             },
             include: {
                 model: Person,

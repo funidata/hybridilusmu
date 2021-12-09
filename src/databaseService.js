@@ -43,7 +43,7 @@ const changeDefaultRegistration = async (userId, weekday, addRegistration, atOff
  * @param {string} date - Date string in the ISO date format.
  */
 const getRegistrationsFor = async (date) => {
-    const result = new Set (await db.getAllDefaultOfficeRegistrationsForWeekday(
+    const result = new Set(await db.getAllDefaultOfficeRegistrationsForWeekday(
         dfunc.getWeekday(DateTime.fromISO(date)),
     ));
     const registrations = await db.getAllRegistrationsForDate(date);
