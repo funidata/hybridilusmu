@@ -40,11 +40,12 @@ async function startScheduling({ app, usergroups, userCache }) {
                 helper.postMessage(app, obj.channel_id, message);
             } else {
                 obj.usergroup_ids.forEach(async (usergroupId) => {
+                    const filteredRegistrations = registrations.filter(
+                        (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
+                    );
                     const message = library.registrationListWithUsergroup(
                         DateTime.now(),
-                        registrations.filter(
-                            (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
-                        ),
+                        filteredRegistrations,
                         usergroups.generatePlaintextString(usergroupId),
                         userCache.generatePlaintextString,
                     );

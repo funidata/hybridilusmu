@@ -14,19 +14,20 @@ async function postEphemeralMessage(app, channelId, userId, message) {
     // Tarkistetaan, onko sovellus kutsuttu kanavalle tai onko kyseessä yksityisviesti
     const conversation = await app.client.conversations.info({ channel: channelId });
     if (conversation.channel.is_member || conversation.channel.is_im) {
-        await app.client.chat.postEphemeral({
+        return app.client.chat.postEphemeral({
             channel: channelId,
             user: userId,
             text: message,
         });
     }
+    return false;
 }
 
 /**
 * Posts a message to the given channel.
 */
 async function postMessage(app, channelId, message) {
-    await app.client.chat.postMessage({
+    return app.client.chat.postMessage({
         channel: channelId,
         text: message,
     });
