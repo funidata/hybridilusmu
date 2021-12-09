@@ -54,6 +54,8 @@ const getRegistrationsFor = async (date) => {
     return Array.from(officeIds);
 };
 
+const resetAllJobs = async (jobs) => db.resetAllJobs(jobs);
+
 const addAllJobs = async (jobs) => db.addAllJobs(jobs);
 
 /**
@@ -109,6 +111,7 @@ module.exports = {
     changeRegistration,
     changeDefaultRegistration,
     getRegistrationsFor,
+    resetAllJobs,
     addAllJobs,
     addJob,
     getAllJobs,

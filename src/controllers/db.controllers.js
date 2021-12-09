@@ -234,13 +234,15 @@ exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
 // should overwrite everything
 exports.resetAllJobs = async (jobs) => {
     try {
+        console.log(jobs);
         const result = await sequelize.transaction(async (t) => {
             await Job.destroy({
                 where: {},
                 transaction: t,
             });
 
-            return Job.bulkCreate(jobs, {
+            return Job.bulkCreate({
+                records: jobs,
                 transaction: t,
             });
         });
@@ -254,7 +256,10 @@ exports.resetAllJobs = async (jobs) => {
 // should not overwrite anything
 exports.addAllJobs = async (jobs) => {
     try {
-        return await Job.bulkCreate(jobs);
+        console.log(jobs);
+        return await Job.bulkCreate({
+            records: jobs,
+        });
     } catch (err) {
         console.log('Error while adding all jobs ', err);
         return undefined;

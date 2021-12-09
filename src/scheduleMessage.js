@@ -31,12 +31,16 @@ async function scheduleMessage({
     const rule = new schedule.RecurrenceRule();
     rule.tz = 'Etc/UTC';
     rule.dayOfWeek = [1, 2, 3, 4, 5];
-    rule.hour = hour;
-    rule.minute = 0;
-    // rule.second = [0, 15, 30, 45];
+    // rule.hour = hour;
+    // rule.minute = 0;
+    rule.second = [0, 15, 30, 45];
+
+    console.log(rule);
 
     // find the job by the given channel id
     const foundJob = jobs.get(channelId);
+
+    console.log(foundJob);
 
     if (foundJob) {
         foundJob.reschedule(rule);
@@ -65,6 +69,8 @@ async function scheduleMessage({
         });
         // add the job to the map so that we can reschedule it later
         jobs.set(channelId, job);
+
+        console.log(job);
     }
 }
 
@@ -73,12 +79,19 @@ async function scheduleMessage({
 */
 async function startScheduling({ app, usergroups }) {
     const channels = await helper.getMemberChannelIds(app);
-    service.addAllJobs(channels); // add all those channels that are not in the db yet
+    console.log(channels);
+    service.addAllJobs(channels).then((res) => console.log(res)); // add all those channels that are not in the db yet
 
     // console.log('Scheduling daily posts to every public channel the bot is a member of');
     console.log('Scheduling every Job found in the db');
-    service.getAllJobs().forEach((hour, channelId) => {
-        scheduleMessage(channelId, hour, app, usergroups);
+    await service.getAllJobs().then((dbJobs) => {
+        console.log(dbJobs);
+
+        dbJobs.forEach((hour, channelId) => {
+            console.log(hour, channelId);
+
+            scheduleMessage(channelId, hour, app, usergroups);
+        });
     });
 }
 
