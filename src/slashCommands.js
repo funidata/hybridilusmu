@@ -98,9 +98,7 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
             if (date.isValid) {
                 if (args.length === 2) { // Usergroup mention mukana
                     const ugId = usergroups.parseMentionString(args[1]);
-                    if (ugId === false) {
-                        response = library.usergroupNotFound();
-                    } else {
+                    if (ugId !== false) {
                         const usergroupFilter = (uid) => usergroups.isUserInUsergroup(uid, ugId);
                         const registrations = (
                             await service.getRegistrationsFor(date.toISODate())

@@ -1,5 +1,11 @@
+**/__pycache__
+*.lcov
 .env*
 .git
 .github
 .nyc_output
 .vscode
+coverage
+node_modules/
+test/e2e/results/
+test/e2e/testcases/site-packages/
