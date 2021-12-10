@@ -27,15 +27,6 @@ async function unScheduleMessage({ channelId }) {
 async function scheduleMessage({
     channelId, time, app, usergroups,
 }) {
-    /*
-    rename the model to ChannelJob or AutomatedMessage? or add a job id and make it pk instead of channel_id?
-    rename startScheduling to something like scheduleAllMessages
-    rename this file to something like schedule
-
-    additional feature:
-    configure the default time with a slash-command.
-    save it to the db with either a special entry in the Job table (sketchy) or a dedicated settings table
-    */
     const rule = new schedule.RecurrenceRule();
     rule.tz = 'Europe/Helsinki';
     rule.dayOfWeek = [1, 2, 3, 4, 5];
