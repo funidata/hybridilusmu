@@ -55,11 +55,12 @@ exports.enableEventListeners = ({ app, usergroups }) => {
     /**
      * Event listener for channel member join events
      */
-    app.event('member_joined_channel', async ({ auth, event }) => {
+    app.event('member_joined_channel', async ({ event }) => {
         try {
             // if the bot joins a channel, then an automatic message is scheduled for that channel with the default time
-            if (event.user.id === auth.user.id) { // something like this
-                scheduleMessage.scheduleMessage(event.channel.id, app, usergroups);
+            if (app.client.auth.test.bot_id === event.bot) {
+                const channelId = event.channel;
+                scheduleMessage.scheduleMessage({ channelId, app, usergroups });
             }
         } catch (error) {
             console.error(error);
@@ -68,12 +69,22 @@ exports.enableEventListeners = ({ app, usergroups }) => {
 
     /**
      * Event listener for channel member left events
+     * Doesn't work, here's why:
+     * "This event is supported as a bot user subscription in the Events API.
+     * Workspace event subscriptions are also available for tokens
+     * holding at least one of the channels:read or groups:read scopes.
+     * Which events your app will receive depends on the scopes and their context.
+     * For instance, you'll only receive member_left_channel events
+     * for private channels if your app has the groups:read permission."
      */
-    app.event('member_left_channel', async ({ auth, event }) => {
+    app.event('member_left_channel', async ({ event }) => {
         try {
-            // if the bot joins a channel, then an automatic message is scheduled for that channel with the default time
-            if (event.user.id === auth.user.id) { // something like this
-                scheduleMessage.unScheduleMessage(event.channel.id, app, usergroups);
+            console.log('someone left channel', event.channel);
+            // if the bot joins a channel, then the automatic message is removed for that channel
+            if (app.client.auth.test.bot_id === event.bot) { // something like this
+                console.log('it was me!');
+                const { channelId } = event.channel;
+                scheduleMessage.unScheduleMessage({ channelId });
             }
         } catch (error) {
             console.error(error);

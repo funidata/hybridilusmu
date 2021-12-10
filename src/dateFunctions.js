@@ -177,10 +177,15 @@ const parseDate = (input, today) => {
  */
 const parseTime = (input) => {
     let time = DateTime.fromFormat(input, 'T'); // 7:07, 07:07
-    if (!time.isValid()) time = DateTime.fromFormat(input, 'H.m'); // 7.07, 07.07
-    if (!time.isValid()) time = DateTime.fromFormat(input, 'H'); // 7
-    if (!time.isValid()) return time;
-    return `${time.hour}:${time.minute}`;
+    if (!time.isValid) time = DateTime.fromFormat(input, 'H.m.s'); // 7.07.07, 07.07.07
+    if (!time.isValid) time = DateTime.fromFormat(input, 'H.m'); // 7.07, 07.07
+    if (!time.isValid) time = DateTime.fromFormat(input, 'H'); // 7
+    if (!time.isValid) return undefined;
+    return time.setZone('Europe/Helsinki', { keepLocalTime: true });
+    // time = time.replace('T', ' ');
+    // console.log(time);
+    // return time;
+    // return `${time.hour}:${time.minute}`;
 };
 
 module.exports = {

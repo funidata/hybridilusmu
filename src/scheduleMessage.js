@@ -7,8 +7,17 @@ const library = require('./responses');
 
 const jobs = new Map();
 
+async function unScheduleMessage({ channelId }) {
+    const foundJob = jobs.get(channelId);
+    if (foundJob) {
+        service.removeJob(channelId);
+        foundJob.cancel();
+    }
+    console.log('unscheduled from', channelId); // channelId undefined, why?
+}
+
 async function scheduleMessage({
-    channelId, hour = 4, app, usergroups, // TODO: minutes
+    channelId, time, app, usergroups,
 }) {
     /*
     TODO:
@@ -28,12 +37,14 @@ async function scheduleMessage({
 
     // schedule the job to the given or default time
     const rule = new schedule.RecurrenceRule();
-    rule.tz = 'Etc/UTC';
+    rule.tz = 'Europe/Helsinki';
     rule.dayOfWeek = [1, 2, 3, 4, 5];
-    // rule.hour = hour;
-    // rule.minute = 0;
-    rule.second = [0, 15, 30, 45];
+    // rule.hour = time ? time.hour : 6;
+    // rule.minute = time ? time.minute : 0;
+    rule.second = [0, 15, 30, 45]; // for testing
 
+    // console.log(channelId);
+    // console.log(time);
     // console.log(rule);
 
     // find the job by the given channel id
@@ -41,38 +52,51 @@ async function scheduleMessage({
 
     // console.log(foundJob);
 
-    if (foundJob) {
-        service.addJob(channelId, hour); // only when updating
+    if (foundJob) { // update
+        // let timeString;
+        // if (time) timeString = DateTime.fromSQL(time);
+        service.addJob(channelId, time ? DateTime.fromSQL(time) : null);
         foundJob.reschedule(rule);
-    } else {
+        // console.log('invocation at', foundJob.nextInvocation());
+    } else { // create
         const job = schedule.scheduleJob(rule, async () => {
-            const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
-            const usergroupIds = await usergroups.getUsergroupsForChannel(channelId);
-            if (usergroupIds.length === 0) {
-                const message = library.registrationList(
-                    DateTime.now(),
-                    registrations,
-                );
-                // console.log(channelId);
-                helper.postMessage(app, channelId, message);
-            } else {
-                usergroupIds.forEach(async (usergroupId) => {
-                    const message = library.registrationListWithUsergroup(
+            try {
+                // app.client is undefined when the bot is added to channel, why?
+                const channels = await helper.getMemberChannelIds(app);
+                if (!channels.includes(channelId)) {
+                    unScheduleMessage({ channelId });
+                    return;
+                }
+                const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
+                const usergroupIds = await usergroups.getUsergroupsForChannel(channelId);
+                if (usergroupIds.length === 0) {
+                    const message = library.registrationList(
                         DateTime.now(),
-                        registrations.filter(
-                            (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
-                        ),
-                        usergroups.generateMentionString(usergroupId),
+                        registrations,
                     );
                     // console.log(channelId);
                     helper.postMessage(app, channelId, message);
-                });
+                } else {
+                    usergroupIds.forEach(async (usergroupId) => {
+                        const message = library.registrationListWithUsergroup(
+                            DateTime.now(),
+                            registrations.filter(
+                                (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
+                            ),
+                            usergroups.generateMentionString(usergroupId),
+                        );
+                        // console.log(channelId);
+                        helper.postMessage(app, channelId, message);
+                    });
+                }
+            } catch (error) {
+                console.log(error);
             }
         });
         // add the job to the map so that we can reschedule it later
         jobs.set(channelId, job);
 
-        console.log(job);
+        // console.log('invocation at', job.nextInvocation());
     }
 }
 
@@ -93,15 +117,18 @@ async function startScheduling({ app, usergroups }) {
     await service.getAllJobs().then((dbJobs) => {
         // console.log(dbJobs);
 
-        dbJobs.forEach(((job) => {
+        dbJobs.forEach((job) => {
             // console.log(job);
-            const { channelId } = job;
-            const hour = job.time || 4; // will not work when not hour
-            // console.log(channelId);
+            // console.log(dfunc.parseTime(job.time));
+            // console.log(DateTime.fromSQL(job.time));
+            const channelId = job.channelId; // eslint-disable-line prefer-destructuring
+            let time;
+            if (job.time) time = DateTime.fromSQL(job.time);
+            // console.log(time);
             scheduleMessage({
-                channelId, hour, app, usergroups,
+                channelId, time, app, usergroups,
             });
-        }));
+        });
     });
 }
 
@@ -125,6 +152,7 @@ const scheduleUsergroupReadings = async ({ app, usergroups }) => {
 };
 
 module.exports = {
+    unScheduleMessage,
     startScheduling,
     scheduleMessage,
     scheduleUsergroupReadings,

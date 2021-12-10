@@ -231,6 +231,19 @@ exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
     }
 };
 
+exports.removeJob = async (channelId) => {
+    try {
+        await Job.destroy({
+            where: {
+                channel_id: channelId,
+            },
+        });
+        console.log('removed job', channelId);
+    } catch (err) {
+        console.log('Error while removing job ', err);
+    }
+};
+
 // should overwrite everything
 exports.resetAllJobs = async (jobs) => {
     try {
@@ -291,18 +304,8 @@ exports.getAllJobs = async () => {
         const result = await Job.findAll();
         return result.map((r) => ({
             channelId: r.dataValues.channel_id,
-            hour: r.dataValues.time,
+            time: r.dataValues.time,
         }));
-        /*
-        const result = await Job.findAll();
-        return result.map((job) => job.dataValues);
-        /*
-        let res;
-        await Job.findAll().then((jobs) => {
-            res = jobs;
-        });
-        return res;
-        */
     } catch (err) {
         console.log('Error while finding jobs ', err);
         return undefined;

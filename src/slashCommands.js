@@ -4,6 +4,7 @@ const dfunc = require('./dateFunctions');
 const helper = require('./helperFunctions');
 const service = require('./databaseService');
 const library = require('./responses');
+const schedule = require('./scheduleMessage');
 
 /**
  * An optional prefix for our slash-commands. When set to e.g. 'h',
@@ -230,9 +231,15 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
             )) { return; }
             const timeString = parameters[0];
             const time = dfunc.parseTime(timeString);
-            await service.addJob(channelId, time);
-            response = library.automatedMessageRescheduled(time);
-            helper.postEphemeralMessage(app, channelId, userId, response);
+            // console.log(time);
+            if (time.isValid) {
+                schedule.scheduleMessage({ channelId, time });
+                response = library.automatedMessageRescheduled(time.toLocaleString(DateTime.TIME_24_SIMPLE));
+                helper.postMessage(app, channelId, response);
+            } else {
+                response = library.demandTime();
+                helper.postEphemeralMessage(app, channelId, userId, response);
+            }
         } catch (error) {
             console.log('Tapahtui virhe :(');
             console.log(error);
