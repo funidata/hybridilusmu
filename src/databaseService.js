@@ -76,9 +76,9 @@ const getRegistrationsBetween = async (firstDate, lastDate) => {
     let date = DateTime.fromISO(firstDate);
     const endDate = DateTime.fromISO(lastDate);
     while (date <= endDate) {
+        const isoDate = date.toISODate();
+        result[isoDate] = new Set();
         if (dfunc.isWeekday(date)) {
-            const isoDate = date.toISODate();
-            result[isoDate] = new Set();
             defaultIds[dfunc.getWeekday(date)].forEach((slackId) => {
                 result[isoDate].add(slackId);
             });

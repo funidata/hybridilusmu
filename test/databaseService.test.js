@@ -1,7 +1,9 @@
+const { DateTime } = require('luxon');
 const assert = require('assert');
 const database = require('../src/database');
 const db = require('../src/controllers/db.controllers');
 const service = require('../src/databaseService');
+const dfunc = require('../src/dateFunctions');
 
 describe('ChangeRegistration Tests', function () { // eslint-disable-line
     this.beforeAll(async () => {
@@ -77,78 +79,131 @@ describe('GetRegistrationsFor Tests', function () { // eslint-disable-line
     it('Adding a normal registration and a default registration increases participant count by 2.', async () => {
         await service.changeRegistration('userId1', '2021-10-21', true, true);
         let registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(1, registrations.length);
+        assert.equal(registrations.length, 1);
         await service.changeDefaultRegistration('userId2', 'Torstai', true, true);
         registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(2, registrations.length);
+        assert.equal(registrations.length, 2);
 
         // Poistetaan äskeiset ilmoittautumiset
         await service.changeRegistration('userId1', '2021-10-21', false);
         await service.changeDefaultRegistration('userId2', 'Torstai', false);
         registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(0, registrations.length);
+        assert.equal(registrations.length, 0);
     });
 
     it('Adding a normal registration that matches with default registration, does not change anything.', async () => {
         await service.changeDefaultRegistration('userId', 'Torstai', true, true);
         let registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(1, registrations.length);
+        assert.equal(registrations.length, 1);
         await service.changeRegistration('userId', '2021-10-21', true, true);
         registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(1, registrations.length);
+        assert.equal(registrations.length, 1);
     });
 
     it('Adding a normal registration with different value overwrites the default registration.', async () => {
         await service.changeRegistration('userId', '2021-10-21', true, false);
         const registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(0, registrations.length);
+        assert.equal(registrations.length, 0);
     });
 
     it('Changing default registration does not overwrite an already made normal registration.', async () => {
         await service.changeRegistration('userId', '2021-10-21', true, true);
         let registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(1, registrations.length);
+        assert.equal(registrations.length, 1);
         await service.changeDefaultRegistration('userId', 'Torstai', true, false);
         registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(1, registrations.length);
+        assert.equal(registrations.length, 1);
     });
 
     it('Removing default registration does not remove an already made normal registration.', async () => {
         await service.changeDefaultRegistration('userId', 'Torstai', false);
         let registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(1, registrations.length);
+        assert.equal(registrations.length, 1);
 
         // Poistetaan taas ilmoittautumiset
         await service.changeRegistration('userId', '2021-10-21', false);
         registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(0, registrations.length);
+        assert.equal(registrations.length, 0);
     });
 
     it('Default registration registers if there is no normal registration for that day.', async () => {
         await service.changeDefaultRegistration('userId', 'Torstai', true, true);
         const registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(1, registrations.length);
+        assert.equal(registrations.length, 1);
     });
 });
 
-describe('GetRegistrationsBetween Tests', function () {
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
+describe('Database service tests', function () {
+    const dic = {};
+    
     this.beforeAll(async () => {
         await database.sequelize.sync({ force: true });
     });
     
-    it('Adding a normal registration and a default registration increases participant count by 2.', async () => {
-        await service.changeRegistration('userId1', '2021-10-21', true, true);
-        let registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(1, registrations.length);
-        await service.changeDefaultRegistration('userId2', 'Torstai', true, true);
-        registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(2, registrations.length);
-
-        // Poistetaan äskeiset ilmoittautumiset
-        await service.changeRegistration('userId1', '2021-10-21', false);
-        await service.changeDefaultRegistration('userId2', 'Torstai', false);
-        registrations = await service.getRegistrationsFor('2021-10-21');
-        assert.equal(0, registrations.length);
+    it('Populate database', async () => {
+        let date = DateTime.fromISO('2021-12-13');
+        let endDate = DateTime.fromISO('2021-12-24');
+        while (date <= endDate) {
+            const isoDate = date.toISODate();
+            dic[isoDate] = new Set();
+            if (dfunc.isWeekday(date)) {
+                for (let i = 0; i < 5; i++) {
+                    let rand = getRandomInt(3);
+                    let dontadd = false;
+                    if (rand == 0) {
+                        await service.changeRegistration('userId'+i, isoDate, true, true);
+                        dic[isoDate].add('userId'+i);
+                    } else if (rand == 1) {
+                        await service.changeRegistration('userId'+i, isoDate, true, false);
+                        dontadd = true;
+                    }
+                    rand = getRandomInt(3);
+                    if (rand == 0) {
+                        await service.changeDefaultRegistration('userId'+i, dfunc.getWeekday(date), true, true);
+                        if (!dontadd) {
+                            dic[isoDate].add('userId'+i);
+                        }
+                    } else if (rand == 1) {
+                        await service.changeDefaultRegistration('userId'+i, dfunc.getWeekday(date), true, false);
+                    }
+                }
+            }
+            date = date.plus({ days: 1 });
+        }
+    });
+    
+    it('GetRegistrationsBetween Tests', async () => {
+        for (let i = 0; i < 5; i++) {
+            let startInd = getRandomInt(11);
+            let endInd = getRandomInt(11);
+            if (startInd > endInd) {
+                startInd = startInd ^ endInd;
+                endInd = startInd ^ endInd;
+                startInd = startInd ^ endInd;
+            }
+            date = DateTime.fromISO('2021-12-13').plus({ days: startInd });
+            endDate = DateTime.fromISO('2021-12-13').plus({ days: endInd });
+            const result = await service.getRegistrationsBetween(date.toISODate(), endDate.toISODate());
+            while (date <= endDate) {
+                const isoDate = date.toISODate();
+                for (let j = 0; j < 5; j++) {
+                    assert.equal(result[isoDate].has('usedId'+j), dic[isoDate].has('usedId'+j));
+                }
+                date = date.plus({ days: 1 });
+            }
+        }
+    });
+    
+    it('getDefaultSettingsForUser Tests', async () => {
+        
+    });
+    
+    it('getRegistrationsForUserBetween Tests', async () => {
+        
     });
     
 });
