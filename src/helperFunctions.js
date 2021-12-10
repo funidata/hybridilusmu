@@ -19,6 +19,12 @@ async function postEphemeralMessage(app, channelId, userId, message) {
             user: userId,
             text: message,
         });
+    } else {
+        await app.client.chat.postEphemeral({
+            channel: userId,
+            user: userId,
+            text: message,
+        });
     }
 }
 
