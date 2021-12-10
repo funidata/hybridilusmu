@@ -21,8 +21,8 @@ async function unScheduleMessage({ channelId }) {
  * Creates or updates both entires in both the Map and the database.
  * @param {String} channelId
  * @param {DateTime} time Optional. Only the time part is used.
- * @param {*} app Optional. Needed only when creating a job.
- * @param {*} usergroups Optional. Needed only when creating a job.
+ * @param app Optional. Needed only when creating a job.
+ * @param usergroups Optional. Needed only when creating a job.
  */
 async function scheduleMessage({
     channelId, time, app, usergroups,
@@ -39,9 +39,9 @@ async function scheduleMessage({
     const rule = new schedule.RecurrenceRule();
     rule.tz = 'Europe/Helsinki';
     rule.dayOfWeek = [1, 2, 3, 4, 5];
-    // rule.hour = time ? time.hour : 6; // use given or default time
-    // rule.minute = time ? time.minute : 0;
-    rule.second = [0, 15, 30, 45]; // for testing
+    rule.hour = time ? time.hour : 6; // use given or default time
+    rule.minute = time ? time.minute : 0;
+    // rule.second = [0, 15, 30, 45]; // for testing
 
     const foundJob = jobs.get(channelId);
     if (foundJob) { // update job
@@ -50,6 +50,7 @@ async function scheduleMessage({
     } else { // create job
         const job = schedule.scheduleJob(rule, async () => {
             const channels = await helper.getMemberChannelIds(app);
+            // remove job from channel the bot is no longer a member of
             if (!channels.includes(channelId)) {
                 unScheduleMessage({ channelId });
                 return;

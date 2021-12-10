@@ -59,9 +59,9 @@ const removeJob = async (channelId) => db.removeJob(channelId);
 const addAllJobs = async (jobs) => db.addAllJobs(jobs);
 
 /**
- * Adds or updates the timing of the automated message for the given channel.
+ * Adds or updates the timing of the daily message for the given channel.
  * @param {string} channelId - Slack channel ID.
- * @param {string} time - Time string in the ISO date format.
+ * @param {string} time - Optional. Time string in the ISO date format.
  */
 const addJob = async (channelId, time) => db.addJob(channelId, time);
 

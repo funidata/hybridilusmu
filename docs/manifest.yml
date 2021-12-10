@@ -24,7 +24,7 @@ features:
       usage_hint: "[def] <päivä>"
     - command: /tilaa
       description: Ajasta kanavan viesti
-      usage_hint: "[def] <kellonaika>"
+      usage_hint: "<kellonaika>"
       should_escape: false
 oauth_config:
   scopes:
