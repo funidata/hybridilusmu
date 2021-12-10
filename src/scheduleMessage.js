@@ -12,119 +12,88 @@ async function unScheduleMessage({ channelId }) {
     if (foundJob) {
         service.removeJob(channelId);
         foundJob.cancel();
+        console.log('unscheduled from', channelId);
     }
-    console.log('unscheduled from', channelId); // channelId undefined, why?
 }
 
+/**
+ * Schedules a job to send a daily message to the given channel at the given or default time.
+ * Creates or updates both entires in both the Map and the database.
+ * @param {String} channelId
+ * @param {DateTime} time Optional. Only the time part is used.
+ * @param {*} app Optional. Needed only when creating a job.
+ * @param {*} usergroups Optional. Needed only when creating a job.
+ */
 async function scheduleMessage({
     channelId, time, app, usergroups,
 }) {
     /*
-    TODO:
-    populate the db table with all channels the bot is a member of
-    add listener that responds when the bot is added to a new channel by calling a function that schedules a new job
-
-    change the model name to ChannelJob or AutomatedMessage? or add a job id and make it pk instead of channel_id?
-    change tz to Helsinki and default hour to 6 AM
+    rename the model to ChannelJob or AutomatedMessage? or add a job id and make it pk instead of channel_id?
     rename startScheduling to something like scheduleAllMessages
-    change the name of this file to something like schedule
+    rename this file to something like schedule
 
     additional feature:
     configure the default time with a slash-command.
     save it to the db with either a special entry in the Job table (sketchy) or a dedicated settings table
     */
-    // update the job's db representation to the given time
-
-    // schedule the job to the given or default time
     const rule = new schedule.RecurrenceRule();
     rule.tz = 'Europe/Helsinki';
     rule.dayOfWeek = [1, 2, 3, 4, 5];
-    // rule.hour = time ? time.hour : 6;
+    // rule.hour = time ? time.hour : 6; // use given or default time
     // rule.minute = time ? time.minute : 0;
     rule.second = [0, 15, 30, 45]; // for testing
 
-    // console.log(channelId);
-    // console.log(time);
-    // console.log(rule);
-
-    // find the job by the given channel id
     const foundJob = jobs.get(channelId);
-
-    // console.log(foundJob);
-
-    if (foundJob) { // update
-        // let timeString;
-        // if (time) timeString = DateTime.fromSQL(time);
+    if (foundJob) { // update job
         service.addJob(channelId, time ? DateTime.fromSQL(time) : null);
         foundJob.reschedule(rule);
-        // console.log('invocation at', foundJob.nextInvocation());
-    } else { // create
+    } else { // create job
         const job = schedule.scheduleJob(rule, async () => {
-            try {
-                // app.client is undefined when the bot is added to channel, why?
-                const channels = await helper.getMemberChannelIds(app);
-                if (!channels.includes(channelId)) {
-                    unScheduleMessage({ channelId });
-                    return;
-                }
-                const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
-                const usergroupIds = await usergroups.getUsergroupsForChannel(channelId);
-                if (usergroupIds.length === 0) {
-                    const message = library.registrationList(
+            const channels = await helper.getMemberChannelIds(app);
+            if (!channels.includes(channelId)) {
+                unScheduleMessage({ channelId });
+                return;
+            }
+            const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
+            const usergroupIds = await usergroups.getUsergroupsForChannel(channelId);
+            if (usergroupIds.length === 0) {
+                const message = library.registrationList(
+                    DateTime.now(),
+                    registrations,
+                );
+                helper.postMessage(app, channelId, message);
+            } else {
+                usergroupIds.forEach(async (usergroupId) => {
+                    const message = library.registrationListWithUsergroup(
                         DateTime.now(),
-                        registrations,
+                        registrations.filter(
+                            (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
+                        ),
+                        usergroups.generateMentionString(usergroupId),
                     );
-                    // console.log(channelId);
                     helper.postMessage(app, channelId, message);
-                } else {
-                    usergroupIds.forEach(async (usergroupId) => {
-                        const message = library.registrationListWithUsergroup(
-                            DateTime.now(),
-                            registrations.filter(
-                                (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
-                            ),
-                            usergroups.generateMentionString(usergroupId),
-                        );
-                        // console.log(channelId);
-                        helper.postMessage(app, channelId, message);
-                    });
-                }
-            } catch (error) {
-                console.log(error);
+                });
             }
         });
         // add the job to the map so that we can reschedule it later
         jobs.set(channelId, job);
-
-        // console.log('invocation at', job.nextInvocation());
     }
 }
 
 /**
-* Sends a scheduled message every weekday to all the channels the bot is in.
+* Schedules jobs to send a daily message to every channel the bot is a member of.
 */
 async function startScheduling({ app, usergroups }) {
     let channels = await helper.getMemberChannelIds(app);
-    // console.log(channels);
     channels = channels.map((channel) => ({
         channel_id: channel,
     }));
-    // console.log(channels);
     await service.addAllJobs(channels); // add all those channels that are not in the db yet
-
-    // console.log('Scheduling daily posts to every public channel the bot is a member of');
-    console.log('Scheduling every Job found in the db');
+    console.log('Scheduling every Job found in the database');
     await service.getAllJobs().then((dbJobs) => {
-        // console.log(dbJobs);
-
         dbJobs.forEach((job) => {
-            // console.log(job);
-            // console.log(dfunc.parseTime(job.time));
-            // console.log(DateTime.fromSQL(job.time));
             const channelId = job.channelId; // eslint-disable-line prefer-destructuring
-            let time;
-            if (job.time) time = DateTime.fromSQL(job.time);
-            // console.log(time);
+            const time = job.time ? DateTime.fromSQL(job.time) : null;
             scheduleMessage({
                 channelId, time, app, usergroups,
             });

@@ -205,7 +205,6 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
             }
             helper.postEphemeralMessage(app, channelId, userId, response);
         } catch (error) {
-            console.log('Tapahtui virhe :(');
             console.log(error);
         }
     });
@@ -231,7 +230,6 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
             )) { return; }
             const timeString = parameters[0];
             const time = dfunc.parseTime(timeString);
-            // console.log(time);
             if (time.isValid) {
                 schedule.scheduleMessage({ channelId, time });
                 response = library.automatedMessageRescheduled(time.toLocaleString(DateTime.TIME_24_SIMPLE));
@@ -241,7 +239,6 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
                 helper.postEphemeralMessage(app, channelId, userId, response);
             }
         } catch (error) {
-            console.log('Tapahtui virhe :(');
             console.log(error);
         }
     });

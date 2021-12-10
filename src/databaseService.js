@@ -56,8 +56,6 @@ const getRegistrationsFor = async (date) => {
 
 const removeJob = async (channelId) => db.removeJob(channelId);
 
-const resetAllJobs = async (jobs) => db.resetAllJobs(jobs);
-
 const addAllJobs = async (jobs) => db.addAllJobs(jobs);
 
 /**
@@ -114,7 +112,6 @@ module.exports = {
     changeDefaultRegistration,
     getRegistrationsFor,
     removeJob,
-    resetAllJobs,
     addAllJobs,
     addJob,
     getAllJobs,

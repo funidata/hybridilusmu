@@ -165,7 +165,7 @@ const parseDate = (input, today) => {
 };
 
 /**
- * Returns a Luxon Date-object representing the given string or a 0-day -object,
+ * Returns a Luxon Date-object representing the given string or undefined,
  * if the string is not of accepted format.
  * Accepted forms are:
  * 7:07
@@ -177,15 +177,10 @@ const parseDate = (input, today) => {
  */
 const parseTime = (input) => {
     let time = DateTime.fromFormat(input, 'T'); // 7:07, 07:07
-    if (!time.isValid) time = DateTime.fromFormat(input, 'H.m.s'); // 7.07.07, 07.07.07
     if (!time.isValid) time = DateTime.fromFormat(input, 'H.m'); // 7.07, 07.07
     if (!time.isValid) time = DateTime.fromFormat(input, 'H'); // 7
     if (!time.isValid) return undefined;
     return time.setZone('Europe/Helsinki', { keepLocalTime: true });
-    // time = time.replace('T', ' ');
-    // console.log(time);
-    // return time;
-    // return `${time.hour}:${time.minute}`;
 };
 
 module.exports = {

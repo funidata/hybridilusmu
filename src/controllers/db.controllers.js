@@ -238,39 +238,18 @@ exports.removeJob = async (channelId) => {
                 channel_id: channelId,
             },
         });
-        console.log('removed job', channelId);
     } catch (err) {
         console.log('Error while removing job ', err);
     }
 };
 
-// should overwrite everything
-exports.resetAllJobs = async (jobs) => {
-    try {
-        // console.log(jobs);
-        const result = await sequelize.transaction(async (t) => {
-            await Job.destroy({
-                where: {},
-                transaction: t,
-            });
-
-            return Job.bulkCreate(jobs, {
-                transaction: t,
-            });
-        });
-        return result;
-    } catch (err) {
-        console.log('Error while resetting all jobs ', err);
-        return undefined;
-    }
-};
-
-// should not overwrite anything
+/**
+ * Add only those given jobs which are not already in the database.
+ */
 exports.addAllJobs = async (jobs) => {
     try {
-        // console.log(jobs);
         return Job.bulkCreate(jobs, {
-            updateOnDuplicate: ['channel_id'],
+            updateOnDuplicate: ['channel_id'], // don't mind about existing Jobs
         });
     } catch (err) {
         console.log('Error while adding all jobs ', err);
@@ -294,7 +273,7 @@ exports.getJob = async (channelId) => {
     try {
         return await Job.findByPk(channelId);
     } catch (err) {
-        console.log('Error while finding job ', err);
+        console.log('Error while finding a job ', err);
         return undefined;
     }
 };
