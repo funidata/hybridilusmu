@@ -134,76 +134,109 @@ describe('GetRegistrationsFor Tests', function () { // eslint-disable-line
 });
 
 function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
+    return Math.floor(Math.random() * max);
 }
 
-describe('Database service tests', function () {
-    const dic = {};
-    
+describe('Database service tests', function () { // eslint-disable-line
+    const signupTrueDic = {};
+    const signupFalseDic = {};
+    const defaultTrueDic = {};
+    const defaultFalseDic = {};
+
     this.beforeAll(async () => {
         await database.sequelize.sync({ force: true });
     });
-    
+
     it('Populate database', async () => {
         let date = DateTime.fromISO('2021-12-13');
-        let endDate = DateTime.fromISO('2021-12-24');
+        const endDate = DateTime.fromISO('2021-12-17');
         while (date <= endDate) {
             const isoDate = date.toISODate();
-            dic[isoDate] = new Set();
+            signupTrueDic[isoDate] = new Set();
+            signupFalseDic[isoDate] = new Set();
+            defaultTrueDic[dfunc.getWeekday(date)] = new Set();
+            defaultFalseDic[dfunc.getWeekday(date)] = new Set();
             if (dfunc.isWeekday(date)) {
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 5; i += 1) {
                     let rand = getRandomInt(3);
-                    let dontadd = false;
-                    if (rand == 0) {
-                        await service.changeRegistration('userId'+i, isoDate, true, true);
-                        dic[isoDate].add('userId'+i);
-                    } else if (rand == 1) {
-                        await service.changeRegistration('userId'+i, isoDate, true, false);
-                        dontadd = true;
+                    if (rand === 0) {
+                        await service.changeRegistration(`userId${i}`, isoDate, true, true); // eslint-disable-line
+                        signupTrueDic[isoDate].add(`userId${i}`);
+                    } else if (rand === 1) {
+                        await service.changeRegistration(`userId${i}`, isoDate, true, false); // eslint-disable-line
+                        signupFalseDic[isoDate].add(`userId${i}`);
                     }
                     rand = getRandomInt(3);
-                    if (rand == 0) {
-                        await service.changeDefaultRegistration('userId'+i, dfunc.getWeekday(date), true, true);
-                        if (!dontadd) {
-                            dic[isoDate].add('userId'+i);
-                        }
-                    } else if (rand == 1) {
-                        await service.changeDefaultRegistration('userId'+i, dfunc.getWeekday(date), true, false);
+                    // Arvotaan oletusasetukset myös
+                    if (rand === 0) {
+                        await service.changeDefaultRegistration(`userId${i}`, dfunc.getWeekday(date), true, true); // eslint-disable-line
+                        defaultTrueDic[dfunc.getWeekday(date)].add(`userId${i}`);
+                    } else if (rand === 1) {
+                        await service.changeDefaultRegistration(`userId${i}`, dfunc.getWeekday(date), true, false); // eslint-disable-line
+                        defaultFalseDic[dfunc.getWeekday(date)].add(`userId${i}`);
                     }
                 }
             }
             date = date.plus({ days: 1 });
         }
     });
-    
+
     it('GetRegistrationsBetween Tests', async () => {
-        for (let i = 0; i < 5; i++) {
-            let startInd = getRandomInt(11);
-            let endInd = getRandomInt(11);
+        for (let i = 0; i < 5; i += 1) {
+            let startInd = getRandomInt(5);
+            let endInd = getRandomInt(5);
             if (startInd > endInd) {
-                startInd = startInd ^ endInd;
-                endInd = startInd ^ endInd;
-                startInd = startInd ^ endInd;
+                [startInd, endInd] = [endInd, startInd];
             }
-            date = DateTime.fromISO('2021-12-13').plus({ days: startInd });
-            endDate = DateTime.fromISO('2021-12-13').plus({ days: endInd });
-            const result = await service.getRegistrationsBetween(date.toISODate(), endDate.toISODate());
+            let date = DateTime.fromISO('2021-12-13').plus({ days: startInd });
+            const endDate = DateTime.fromISO('2021-12-13').plus({ days: endInd });
+            const result = await service.getRegistrationsBetween(date.toISODate(), endDate.toISODate()); // eslint-disable-line
             while (date <= endDate) {
                 const isoDate = date.toISODate();
-                for (let j = 0; j < 5; j++) {
-                    assert.equal(result[isoDate].has('usedId'+j), dic[isoDate].has('usedId'+j));
+                for (let j = 0; j < 5; j += 1) {
+                    const atOffice = signupTrueDic[isoDate].has(`userId${j}`)
+                    || (!signupFalseDic[isoDate].has(`userId${j}`) && defaultTrueDic[dfunc.getWeekday(date)].has(`userId${j}`));
+                    assert.equal(result[isoDate].has(`userId${j}`), atOffice);
                 }
                 date = date.plus({ days: 1 });
             }
         }
     });
-    
+
     it('getDefaultSettingsForUser Tests', async () => {
-        
+        for (let i = 0; i < 5; i += 1) {
+            const result = await service.getDefaultSettingsForUser(`userId${i}`); // eslint-disable-line
+            let date = DateTime.fromISO('2021-12-13');
+            const endDate = DateTime.fromISO('2021-12-17');
+            while (date <= endDate) {
+                let atOffice = null;
+                if (defaultTrueDic[dfunc.getWeekday(date)].has(`userId${i}`)) {
+                    atOffice = true;
+                } else if (defaultFalseDic[dfunc.getWeekday(date)].has(`userId${i}`)) {
+                    atOffice = false;
+                }
+                assert.equal(result[dfunc.getWeekday(date)], atOffice);
+                date = date.plus({ days: 1 });
+            }
+        }
     });
-    
+
     it('getRegistrationsForUserBetween Tests', async () => {
-        
+        for (let i = 0; i < 5; i += 1) {
+            const result = await service.getRegistrationsForUserBetween(`userId${i}`, '2021-12-13', '2021-12-17'); // eslint-disable-line
+            let date = DateTime.fromISO('2021-12-13');
+            const endDate = DateTime.fromISO('2021-12-17');
+            while (date <= endDate) {
+                const isoDate = date.toISODate();
+                let atOffice = null;
+                if (signupTrueDic[isoDate].has(`userId${i}`)) {
+                    atOffice = true;
+                } else if (signupFalseDic[isoDate].has(`userId${i}`)) {
+                    atOffice = false;
+                }
+                assert.equal(result[isoDate], atOffice);
+                date = date.plus({ days: 1 });
+            }
+        }
     });
-    
 });
