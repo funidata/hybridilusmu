@@ -2,8 +2,6 @@ const assert = require('assert');
 const { DateTime } = require('luxon');
 const dfunc = require('../src/dateFunctions');
 
-const RECORD_LIMIT = 180;
-
 describe('List N Weekdays Test', () => {
     it('Calculate starting from Monday, 6 days', () => {
         const wantedResult = [
@@ -74,28 +72,6 @@ describe('Parse Date Tests', () => {
         assert.equal(dfunc.parseDate('14.12.', today).toString(),
             DateTime.local(2021, 12, 14).toString());
     });
-    it('Asking far away into the future', () => {
-        const today = DateTime.local(2021, 10, 1);
-        assert.equal(dfunc.parseDate('3.12.', today).toString(),
-            DateTime.local(2021, 12, 3).toString());
-    });
-    it('Asking even further away into the future', () => {
-        const today = DateTime.local(2021, 10, 1);
-        assert.equal(dfunc.parseDate('1.2.', today).toString(),
-            DateTime.local(2022, 2, 1).toString());
-    });
-    it('Asking about the past', () => {
-        const today = DateTime.local(2021, 10, 13);
-        assert.equal(dfunc.parseDate('1.10.', today).toString(),
-            DateTime.local(2021, 10, 1).toString());
-    });
-    it('Asking beyond the RECORD_LIMIT', () => {
-        const today = DateTime.local(2021, 10, 13);
-        const pastDay = today.minus({ days: (RECORD_LIMIT + 1) });
-        const input = `${pastDay.day}.${pastDay.month}.`;
-        assert.equal(dfunc.parseDate(input, today).toString(),
-            pastDay.plus({ years: 1 }).toString());
-    });
     it('Today', () => {
         const today = DateTime.local(2021, 10, 22);
         assert.equal(dfunc.parseDate('Tänään', today).toString(),
@@ -119,6 +95,44 @@ describe('Parse Date Tests', () => {
     });
     it('Input does not match regex 2', () => {
         assert.equal(dfunc.parseDate('1.1.2020', DateTime.now()).toString(), DateTime.fromObject({ day: 0 }).toString());
+    });
+});
+
+describe('Date interpretation tests', () => {
+    it('Asking about the future 1', () => {
+        const today = DateTime.local(2021, 10, 1);
+        assert.equal(dfunc.parseDate('3.12.', today).toString(),
+            DateTime.local(2021, 12, 3).toString());
+    });
+    it('Asking about the future 2', () => {
+        const today = DateTime.local(2021, 3, 20);
+        assert.equal(dfunc.parseDate('12.7.', today).toString(),
+            DateTime.local(2021, 7, 12).toString());
+    });
+    it('Asking about the future 3 - asking about next year.', () => {
+        const today = DateTime.local(2021, 10, 1);
+        assert.equal(dfunc.parseDate('1.2.', today).toString(),
+            DateTime.local(2022, 2, 1).toString());
+    });
+    it('Asking about the future 4 - asking about next year.', () => {
+        const today = DateTime.local(2021, 12, 30);
+        assert.equal(dfunc.parseDate('1.1.', today).toString(),
+            DateTime.local(2022, 1, 1).toString());
+    });
+    it('Asking about the past 1', () => {
+        const today = DateTime.local(2021, 10, 13);
+        assert.equal(dfunc.parseDate('1.10.', today).toString(),
+            DateTime.local(2021, 10, 1).toString());
+    });
+    it('Asking about the past 2', () => {
+        const today = DateTime.local(2021, 10, 1);
+        assert.equal(dfunc.parseDate('1.6.', today).toString(),
+            DateTime.local(2021, 6, 1).toString());
+    });
+    it('Asking about the past 3 - asking about previous year.', () => {
+        const today = DateTime.local(2021, 1, 1);
+        assert.equal(dfunc.parseDate('30.12.', today).toString(),
+            DateTime.local(2020, 12, 30).toString());
     });
 });
 
