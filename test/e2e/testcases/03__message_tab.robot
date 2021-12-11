@@ -45,13 +45,6 @@ Add And Remove Office Signup By Slash Command
     Send List Command    ${DATE_SHORT}
     Element Should Not Contain    ${latest_message}    @Jäsen Testikäyttäjä
 
-Add Remote Signup By Slash Command
-    Go To Message Tab
-    Send Signup Command    ${DATE_SHORT}    etä
-    Element Should Contain    ${latest_message}    Ilmoittautuminen lisätty - ${DATE_LONG} etänä.
-    Send List Command    ${DATE_SHORT}
-    Element Should Not Contain    ${latest_message}    @Jäsen Testikäyttäjä
-
 Add And Remove Default Office Signup By Slash Command
     Go To Message Tab
     Send Default Signup Command    ma    toimisto
@@ -59,11 +52,18 @@ Add And Remove Default Office Signup By Slash Command
     ${NEXT_MONDAY}=    Get Next Monday
     Set Suite Variable    ${NEXT_MONDAY}    ${NEXT_MONDAY}
     Send List Command    ${NEXT_MONDAY}
-    Element Should Contain    ${latest_message}    ${NEXT_MONDAY} toimistolla on:
+    Element Should Contain    ${latest_message}    ${NEXT_MONDAY} toimistolla
     Element Should Contain    ${latest_message}    @Jäsen Testikäyttäjä
     Send Remove Default Signup Command    ma
     Element Should Contain    ${latest_message}    Oletusilmoittautuminen poistettu maanantailta
     Send List Command    ${NEXT_MONDAY}
+    Element Should Not Contain    ${latest_message}    @Jäsen Testikäyttäjä
+
+Add Remote Signup By Slash Command
+    Go To Message Tab
+    Send Signup Command    ${DATE_SHORT}    etä
+    Element Should Contain    ${latest_message}    Ilmoittautuminen lisätty - ${DATE_LONG} etänä.
+    Send List Command    ${DATE_SHORT}
     Element Should Not Contain    ${latest_message}    @Jäsen Testikäyttäjä
 
 Add Default Remote Signup By Slash Command
@@ -78,7 +78,7 @@ List Team Member Signups
     Send Signup Command    ${DATE_SHORT}    toimisto
     Element Should Contain    ${latest_message}    Ilmoittautuminen lisätty - ${DATE_LONG} toimistolla.
     Send List Command With Team    ${DATE_SHORT}    @testgroup 
-    Element Should Contain    ${latest_message}    ${DATE_SHORT} tiimistä @testgroup on toimistolla:
+    Element Should Contain    ${latest_message}    ${DATE_SHORT} tiimistä @testgroup
     Element Should Contain    ${latest_message}    @Jäsen Testikäyttäjä
     Send Remove Signup Command    ${DATE_SHORT}
     Send List Command With Team    ${DATE_SHORT}    @testgroup
