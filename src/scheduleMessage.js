@@ -36,7 +36,7 @@ async function scheduleMessage({
 
     const foundJob = jobs.get(channelId);
     if (foundJob) { // update job
-        service.addJob(channelId, time ? DateTime.fromSQL(time) : null);
+        service.addJob(channelId, time ? time.toISOTime() : null);
         foundJob.reschedule(rule);
     } else { // create job
         const job = schedule.scheduleJob(rule, async () => {

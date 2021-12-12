@@ -23,7 +23,7 @@ features:
       description: Poistaa ilmoittautumisen
       usage_hint: "[def] <päivä>"
     - command: /tilaa
-      description: Ajasta kanavan viesti
+      description: Ajastaa kanavan viestin
       usage_hint: "<kellonaika>"
       should_escape: false
 oauth_config:
