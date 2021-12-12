@@ -11,6 +11,8 @@ const SHOW_DAYS_UNTIL = 10;
 const DAYS_IN_WEEK = 5;
 const format = { ...DateTime.DATETIME_MED, month: 'long' };
 
+const modals = new Map();
+
 /**
  * Defines the default settings modal's title
  * and what text is displayed as tooltip on the closing 'X' button.
@@ -18,7 +20,6 @@ const format = { ...DateTime.DATETIME_MED, month: 'long' };
  */
 const modalView = {
     type: 'modal',
-    external_id: 'default_modal',
     title: {
         type: 'plain_text',
         text: 'Oletusasetukset',
@@ -146,10 +147,12 @@ const update = async (client, userId) => {
  */
 const openView = async (client, userId, triggerId) => {
     const block = await getDefaultSettingsBlock(userId);
-    await client.views.open({
+    const res = await client.views.open({
         trigger_id: triggerId,
         view: { ...modalView, blocks: block },
     });
+
+    modals.set(userId, res.view.id);
 };
 
 /**
@@ -158,7 +161,7 @@ const openView = async (client, userId, triggerId) => {
 const updateView = async (client, userId) => {
     const block = await getDefaultSettingsBlock(userId);
     await client.views.update({
-        external_id: 'default_modal',
+        view_id: modals.get(userId),
         view: { ...modalView, blocks: block },
     });
 };
