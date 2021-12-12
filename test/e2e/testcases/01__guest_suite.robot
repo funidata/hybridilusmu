@@ -33,11 +33,7 @@ Cannot See App Content
 
 Error Message In Message Tab
     Go To Message Tab
-<<<<<<< HEAD
     Wait For Bot action
-=======
-    Sleep    2s
->>>>>>> master
     Element Should Contain    ${latest_message}    Pahoittelut, @Vieras Käyttäjä. Olet vieraskäyttäjä tässä Slack-työtilassa, joten et voi käyttää tätä bottia.
     Input Text    ${message_input}    ${LIST_COMMAND} tänään
     Click Element    ${send_message_button}
