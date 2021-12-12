@@ -5,6 +5,7 @@ node_modules/
 coverage
 *.lcov
 .vscode
+venv/
 test/e2e/results/
 !test/e2e/results/.keep
 **/__pycache__

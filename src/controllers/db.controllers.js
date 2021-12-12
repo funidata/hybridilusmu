@@ -4,6 +4,7 @@ const db = require('../database');
 const { Person } = db;
 const { Signup } = db;
 const { Defaultsignup } = db;
+const { Job } = db;
 
 const getUser = async (userId, transaction) => {
     const userQuery = await Person.findOrCreate({
@@ -226,6 +227,66 @@ exports.getOfficeDefaultSignupForUserAndWeekday = async (userId, weekday) => {
         return result;
     } catch (err) {
         console.log('Error while finding default signups ', err);
+        return undefined;
+    }
+};
+
+exports.removeJob = async (channelId) => {
+    try {
+        await Job.destroy({
+            where: {
+                channel_id: channelId,
+            },
+        });
+    } catch (err) {
+        console.log('Error while removing job ', err);
+    }
+};
+
+/**
+ * Add only those given jobs which are not already in the database.
+ */
+exports.addAllJobs = async (jobs) => {
+    try {
+        return Job.bulkCreate(jobs, {
+            updateOnDuplicate: ['channel_id'], // don't mind about existing Jobs
+        });
+    } catch (err) {
+        console.log('Error while adding all jobs ', err);
+        return undefined;
+    }
+};
+
+exports.addJob = async (channelId, time) => {
+    try {
+        return await Job.upsert({
+            channel_id: channelId,
+            time,
+        });
+    } catch (err) {
+        console.log('Error while creating a job ', err);
+        return undefined;
+    }
+};
+
+exports.getJob = async (channelId) => {
+    try {
+        return await Job.findByPk(channelId);
+    } catch (err) {
+        console.log('Error while finding a job ', err);
+        return undefined;
+    }
+};
+
+exports.getAllJobs = async () => {
+    try {
+        const result = await Job.findAll();
+        return result.map((r) => ({
+            channelId: r.dataValues.channel_id,
+            time: r.dataValues.time,
+        }));
+    } catch (err) {
+        console.log('Error while finding jobs ', err);
         return undefined;
     }
 };

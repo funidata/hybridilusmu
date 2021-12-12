@@ -54,6 +54,19 @@ const getRegistrationsFor = async (date) => {
     return Array.from(officeIds);
 };
 
+const removeJob = async (channelId) => db.removeJob(channelId);
+
+const addAllJobs = async (jobs) => db.addAllJobs(jobs);
+
+/**
+ * Adds or updates the timing of the daily message for the given channel.
+ * @param {string} channelId - Slack channel ID.
+ * @param {string} time - Optional. Time string in the ISO date format.
+ */
+const addJob = async (channelId, time) => db.addJob(channelId, time);
+
+const getAllJobs = async () => db.getAllJobs();
+
 /**
  * Returns true, if user's registration for the given day is the same as @atOffice.
  * @param {string} userId - Slack user ID.
@@ -98,6 +111,10 @@ module.exports = {
     changeRegistration,
     changeDefaultRegistration,
     getRegistrationsFor,
+    removeJob,
+    addAllJobs,
+    addJob,
+    getAllJobs,
     userAtOffice,
     userAtOfficeByDefault,
     userIsRemote,
