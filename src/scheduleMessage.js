@@ -8,32 +8,46 @@ const library = require('./responses');
 /**
 * Sends a scheduled message every weekday to all the channels the bot is in.
 */
-async function startScheduling({ app, usergroups }) {
+async function startScheduling({ app, usergroups, userCache }) {
     const rule = new schedule.RecurrenceRule();
     rule.tz = 'Etc/UTC';
     rule.dayOfWeek = [1, 2, 3, 4, 5];
     rule.hour = 4;
     rule.minute = 0;
     // rule.second = [0, 15, 30, 45];
-    console.log('Scheduling posts to every public channel the bot is a member of every weekday at hour', rule.hour, rule.tz);
+    console.log(`scheduling posts every weekday at ${rule.hour}h ${rule.minute}m (${rule.tz})`);
     schedule.scheduleJob(rule, async () => {
+        console.log('delivering scheduled posts');
+        // Parallelize channel fetching
+        const channelPromise = helper.getMemberChannelIds(app);
+        // We have to await on registrations, because they're needed for user fetching
         const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
-        const channels = await helper.getMemberChannelIds(app);
+        // Freshen up user cache to provide data for string generation
+        const userPromises = registrations.map((uid) => userCache.getCachedUser(uid));
+        // Wait for said freshening up to finish before continuing with message generation.
+        // Otherwise we can get empty strings for all our users, unless they've already used the application
+        // during this particular execution of the application. (Trust me, it's happened to me.)
+        await Promise.all(userPromises);
+        // Read our channels from its promise
+        const channels = await channelPromise;
         usergroups.getUsergroupsForChannels(channels).forEach(async (obj) => {
             if (obj.usergroup_ids.length === 0) {
                 const message = library.registrationList(
                     DateTime.now(),
                     registrations,
+                    userCache.generatePlaintextString,
                 );
                 helper.postMessage(app, obj.channel_id, message);
             } else {
                 obj.usergroup_ids.forEach(async (usergroupId) => {
+                    const filteredRegistrations = registrations.filter(
+                        (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
+                    );
                     const message = library.registrationListWithUsergroup(
                         DateTime.now(),
-                        registrations.filter(
-                            (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
-                        ),
-                        usergroups.generateMentionString(usergroupId),
+                        filteredRegistrations,
+                        usergroups.generatePlaintextString(usergroupId),
+                        userCache.generatePlaintextString,
                     );
                     helper.postMessage(app, obj.channel_id, message);
                 });
