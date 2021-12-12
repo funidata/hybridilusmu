@@ -25,7 +25,7 @@ async function unScheduleMessage({ channelId }) {
  * @param usergroups Optional. Needed only when creating a job.
  */
 async function scheduleMessage({
-    channelId, time, app, usergroups,
+    channelId, time, app, usergroups, userCache,
 }) {
     const rule = new schedule.RecurrenceRule();
     rule.tz = 'Europe/Helsinki';
@@ -40,6 +40,7 @@ async function scheduleMessage({
         foundJob.reschedule(rule);
     } else { // create job
         const job = schedule.scheduleJob(rule, async () => {
+            console.log('delivering scheduled posts');
             // Parallelize channel fetching
             const channelPromise = helper.getMemberChannelIds(app);
             const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
@@ -53,29 +54,28 @@ async function scheduleMessage({
                 unScheduleMessage({ channelId });
                 return;
             }
-            usergroups.getUsergroupsForChannels(channels).forEach(async (obj) => {
-                if (obj.usergroup_ids.length === 0) {
-                    const message = library.registrationList(
+            const usergroupIds = await usergroups.getUsergroupsForChannel(channelId);
+            if (usergroupIds.length === 0) {
+                const message = library.registrationList(
+                    DateTime.now(),
+                    registrations,
+                    userCache.generatePlaintextString,
+                );
+                helper.postMessage(app, channelId, message);
+            } else {
+                usergroupIds.forEach(async (usergroupId) => {
+                    const filteredRegistrations = registrations.filter(
+                        (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
+                    );
+                    const message = library.registrationListWithUsergroup(
                         DateTime.now(),
-                        registrations,
+                        filteredRegistrations,
+                        usergroups.generatePlaintextString(usergroupId),
                         userCache.generatePlaintextString,
                     );
-                    helper.postMessage(app, obj.channel_id, message);
-                } else {
-                    obj.usergroup_ids.forEach(async (usergroupId) => {
-                        const filteredRegistrations = registrations.filter(
-                            (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
-                        );
-                        const message = library.registrationListWithUsergroup(
-                            DateTime.now(),
-                            filteredRegistrations,
-                            usergroups.generatePlaintextString(usergroupId),
-                            userCache.generatePlaintextString,
-                        );
-                        helper.postMessage(app, obj.channel_id, message);
-                    });
-                }
-            });
+                    helper.postMessage(app, channelId, message);
+                });
+            }
         });
         // add the job to the map so that we can reschedule it later
         jobs.set(channelId, job);
@@ -85,7 +85,7 @@ async function scheduleMessage({
 /**
 * Schedules jobs to send a daily message to every channel the bot is a member of.
 */
-async function startScheduling({ app, usergroups }) {
+async function startScheduling({ app, usergroups, userCache }) {
     let channels = await helper.getMemberChannelIds(app);
     channels = channels.map((channel) => ({
         channel_id: channel,
@@ -97,7 +97,7 @@ async function startScheduling({ app, usergroups }) {
             const channelId = job.channelId; // eslint-disable-line prefer-destructuring
             const time = job.time ? DateTime.fromSQL(job.time) : null;
             scheduleMessage({
-                channelId, time, app, usergroups,
+                channelId, time, app, usergroups, userCache,
             });
         });
     });
