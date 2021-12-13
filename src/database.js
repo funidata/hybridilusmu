@@ -23,8 +23,8 @@ db.Signup = require('./models/signup.model')(sequelize, Sequelize);
 db.Defaultsignup = require('./models/defaultsignup.model')(sequelize, Sequelize);
 db.Job = require('./models/job.model')(sequelize, Sequelize);
 
-db.Person.hasMany(db.Signup, { as: 'signups' });
-db.Person.hasMany(db.Defaultsignup, { as: 'defaultsignups' });
+db.Person.hasMany(db.Signup, { as: 'signup' });
+db.Person.hasMany(db.Defaultsignup, { as: 'defaultsignup' });
 
 db.Signup.belongsTo(db.Person, {
     foreignKey: 'PersonId',
