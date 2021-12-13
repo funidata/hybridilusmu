@@ -33,7 +33,7 @@ const argify = (text) => {
         .filter((str) => str.trim().length > 0);
 };
 
-exports.enableSlashCommands = ({ app, usergroups }) => {
+exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
     /**
     * Checks if user gave 'help' as a parameter to a command.
     * If yes, posts instructions on how to use that command.
@@ -229,7 +229,13 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
             const timeString = parameters[0];
             const time = dfunc.parseTime(timeString);
             if (time.isValid) {
-                schedule.scheduleMessage({ channelId, time });
+                schedule.scheduleMessage({
+                    channelId,
+                    time,
+                    app,
+                    usergroups,
+                    userCache,
+                });
                 response = library.automatedMessageRescheduled(time.toLocaleString(DateTime.TIME_24_SIMPLE));
                 helper.postMessage(app, channelId, response);
             } else {
