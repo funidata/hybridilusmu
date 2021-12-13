@@ -236,7 +236,7 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
                     usergroups,
                     userCache,
                 });
-                response = library.automatedMessageRescheduled(time.toLocaleString(DateTime.TIME_24_SIMPLE));
+                response = library.automatedMessageRescheduled(time.setLocale('fi').toLocaleString(DateTime.TIME_24_SIMPLE));
                 helper.postMessage(app, channelId, response);
             } else {
                 response = library.demandTime();
