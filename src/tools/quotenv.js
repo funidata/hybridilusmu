@@ -69,6 +69,7 @@ const checkEnv = (varsToCheck) => {
 };
 
 module.exports = {
+    checkStr,
     checkEnv,
     checkEnvSilent,
 };
