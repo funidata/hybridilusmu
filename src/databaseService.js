@@ -174,8 +174,4 @@ module.exports = {
     addAllJobs,
     addJob,
     getAllJobs,
-    userAtOffice,
-    userAtOfficeByDefault,
-    userIsRemote,
-    userIsRemoteByDefault,
 };
