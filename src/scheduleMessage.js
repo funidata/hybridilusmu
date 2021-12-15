@@ -48,7 +48,7 @@ async function scheduleMessage({
             // Freshen up user cache to provide data for string generation
             const userPromises = registrations.map((uid) => userCache.getCachedUser(uid));
             await Promise.all(userPromises);
-            // Read our channels from its promise
+            // Read our membership info from its promise
             const isMember = await memberPromise;
             // remove job from channel the bot is no longer a member of
             if (!isMember) {
