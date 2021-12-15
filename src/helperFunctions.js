@@ -11,7 +11,7 @@ async function getMemberChannelIds(app) {
  * Returns whether we're a channel member or not
  * @param {*} app - Slack app instance
  * @param {*} channelId - Slack channel id
- * @returns {boolean} Whether we're a member of the channel or not
+ * @returns {Promise.<boolean>} Whether we're a member of the channel or not
  */
 const isBotChannelMember = async (app, channelId) => {
     try {
