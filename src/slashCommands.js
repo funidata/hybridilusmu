@@ -224,7 +224,8 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
                     app,
                     channelId,
                     userId,
-                    library.subscribeFailedNotInChannel(command.channel_name));
+                    library.subscribeFailedNotInChannel(command.channel_name),
+                );
                 return;
             }
 

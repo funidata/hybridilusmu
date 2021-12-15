@@ -277,5 +277,5 @@ module.exports = {
     registrationList,
     registrationListWithUsergroup,
     usergroupNotFound,
-    subscribeFailedNotInChannel
+    subscribeFailedNotInChannel,
 };
