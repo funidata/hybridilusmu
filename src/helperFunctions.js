@@ -2,7 +2,7 @@
 * Returns a list of all the channels the bot is a member of.
 */
 async function getMemberChannelIds(app) {
-    return (await app.client.conversations.list()).channels
+    return (await app.client.conversations.list({ types: 'public_channel,private_channel' })).channels
         .filter((c) => c.is_member)
         .map((c) => c.id);
 }
