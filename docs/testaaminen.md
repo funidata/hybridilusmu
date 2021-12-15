@@ -17,7 +17,7 @@ Sekä requirements.txt-tiedostossa määritellyt python-kirjastot:
 
 `pip install -r requirements.txt`
 
-Testien ajamista varten tulee käynnistää testausta varten perustettu botti. CI-workflowssa botin ympäristömuuttujat on määritelty github salaisuuksina E2E Testing ympäristössä. Nykyiset testit on tehty testaamaan test-hybridilusmu-nimistä bottia. Ohjeet uuden botin käyttöönottoon ja käynnistämiseen löydät [täältä](https://github.com/hytuslain/hytuslain/blob/master/docs/kayttoonottoohjeet.md).
+Testien ajamista varten tulee käynnistää testausta varten perustettu botti. CI-workflowssa botin ympäristömuuttujat on määritelty GitHub salaisuuksina E2E Testing ympäristössä. Nykyiset testit on tehty testaamaan test-hybridilusmu-nimistä bottia. Ohjeet uuden botin käyttöönottoon ja käynnistämiseen löydät [täältä](https://github.com/hytuslain/hytuslain/blob/master/docs/kayttoonottoohjeet.md).
 
 Testaamista varten työtilassa tulee olla määriteltynä myös vähintään kaksi testikäyttäjää, toinen vieras-roolilla ja toinen käyttäjä-roolilla. Myös testikäyttäjien sähköpostiosoitteet ja salasanat on määritelty E2E Testing ympäristössä CI-workflowta varten.
 
