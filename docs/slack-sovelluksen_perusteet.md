@@ -1,0 +1,16 @@
+# Slack-sovelluksen perusteet
+
+Hybridilusmu on Javascriptillä kirjoitettu Slack-sovellus. Slack API:n [dokumentaatiosta](https://api.slack.com/) löytyy paljon hyödyllistä tietoa sovelluksen kehittämiseen. Hybridilusmu-sovellukseen kuuluu hybridilusmu-niminen botti-käyttäjä, jonka oikeuksia pääsee muokkaamaan hallintapaneelin sivulta "OAuth & Permissions".
+
+Slackin kanssa kommunikointiin sovellus käyttää [Bolt-frameworkkia](https://slack.dev/bolt-js/tutorial/getting-started). Boltin avulla saadaan käyttöön app-olio, jonka avulla luodaan yhteys Slackiin ja avaimien avulla määritelty Slack-botti käynnistetään. Sovelluksen konfiguroinnista ja avaimista voi lukea lisää [käyttöönotto-ohjeista](https://github.com/hytuslain/hytuslain/blob/master/docs/kayttoonottoohjeet.md). Avaimet ovat sovelluskohtaisia ja määrittävät, mikä Slack-sovellus käynnistyy.
+
+Sovellus kuuntelee erilaisia Slack-työtilan tapahtumia [Events API](https://api.slack.com/apis/connections/events-api):n avulla. Sovelluksen [hallintapaneelista](https://api.slack.com/apps/) pystytään tilaamaan erilaisia tapahtumia, joita sovellus kuuntelee kuuntelija-funktioilla. Aina kun sovelluksen tilaama tapahtuma triggeröityy, Slack lähettää sovellukselle tapahtuman oleelliset tiedot niin sanotussa payloadissa ja sovellus pystyy reagoimaan tapahtumaan. Sovellus voi esimerkiksi kuunnella keskusteluja Slack-kanavilla, joihin se on lisätty ja se voidaan laittaa reagoimaan tietynlaisiin viesteihin. Hybridilusmun tapahtumakuuntelijat löytyvät eventListeners.js-tiedostosta.
+
+Jotta Slack tietää, mihin se lähettää pyydetyt payloadit, sovelluksen täytyy antaa Slackille julkinen HTTP-osoite. Tämä voidaan kuitenkin välttää käyttämällä [Socket Modea](https://api.slack.com/apis/connections/socket), joka hyödyntää Web-Socketteja Slackin kanssa kommunikointiin. Aiemmin linkatusta Boltin dokumentaatiosta löytyy tietoa myös Socket Moden käytöstä. Socket Mode on laitettu päälle Hybridilusmun hallintapaneelista. 
+
+Slackin App Home on pääasiallinen tapa käyttää Hybridilusmua. App Home koostuu kolmesta tabista: Home, Messages ja About. Näistä erityisesti Home-tab on oleellinen. Home-tabin näkymän muodostama koodii löytyy home.js-tiedostosta. GUI on rakennettu käyttämällä Slackin [Block Kit](https://api.slack.com/block-kit):iä. Blockit ovat yksinkertaisia graafisia elementtejä, joiden avulla tietoa voidaan näyttää käyttäjälle visuaalisessa muodossa. Oletusasetukset näytetään käyttäjälle omassa [modaalissa](https://api.slack.com/surfaces/modals).
+
+[Slash-komennot](https://api.slack.com/interactivity/slash-commands) ovat toinen oleellinen tapa, jolla Hybridilusmu kommunkoi käyttäjien kanssa. Slash-komennot toimivat erillään Events API:sta ja niille on omat kuuntelijansa slashCommands.js-tiedostossa. Sovelluksen käyttämät Slash-komennot on määritelty hallintapaneelissa sivulla "Slash Commands". 
+ 
+Sovelluksen käytössä on myös yksi globaali [middleware](https://slack.dev/bolt-js/concepts#global-middleware), joka löytyy tiedostosta middleware.js ja jonka läpi Slackiltä tulevat paylodit kulkevat ennen kuin ne saavuttavat esimerkiksi tapahtumakuuntelijat. Boltin dokumentaatiosta löytyy lisätietoa middlewaresta.
+Hybridilusmun middlewarella tarkistetaan ennen pyyntöihin reagointia, onko käyttäjä vieraskäyttäjä.
