@@ -218,8 +218,8 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
             const userId = command.user_id;
 
             // check if bot is a member
-            const conversation = await app.client.conversations.info({ channel: channelId });
-            if (!conversation.channel.is_member) {
+            const isMember = await helper.isBotChannelMember(app, channelId);
+            if (!isMember) {
                 helper.postEphemeralMessage(
                     app,
                     channelId,

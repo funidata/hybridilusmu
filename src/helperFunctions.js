@@ -8,6 +8,26 @@ async function getMemberChannelIds(app) {
 }
 
 /**
+ * Returns whether we're a channel member or not
+ * @param {*} app - Slack app instance
+ * @param {*} channelId - Slack channel id
+ * @returns {boolean} Whether we're a member of the channel or not
+ */
+const isBotChannelMember = async (app, channelId) => {
+    try {
+        return (await app.client.conversations.info({ channel: channelId })).channel.is_member === true;
+    } catch (err) {
+        if (err.data && err.data.error === 'channel_not_found') {
+            // private channels we're not a member of don't turn up data,
+            // so just be silent in such cases
+            return false;
+        }
+        console.log('failed to get channel membership status', err);
+    }
+    return false;
+};
+
+/**
 * Posts an ephemeral message to the given user at the given channel.
 */
 async function postEphemeralMessage(app, channelId, userId, message) {
@@ -67,6 +87,7 @@ const readUsergroupsFromCleanSlate = async ({ app, usergroups }) => {
 
 module.exports = {
     getMemberChannelIds,
+    isBotChannelMember,
     postEphemeralMessage,
     postMessage,
     readUsergroupsFromCleanSlate,

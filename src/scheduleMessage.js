@@ -42,16 +42,16 @@ async function scheduleMessage({
     } else { // create job
         const job = schedule.scheduleJob(rule, async () => {
             console.log('delivering scheduled posts');
-            // Parallelize channel fetching
-            const channelPromise = helper.getMemberChannelIds(app);
+            // Parallelize membership info fetching
+            const memberPromise = helper.isBotChannelMember(app, channelId);
             const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
             // Freshen up user cache to provide data for string generation
             const userPromises = registrations.map((uid) => userCache.getCachedUser(uid));
             await Promise.all(userPromises);
             // Read our channels from its promise
-            const channels = await channelPromise;
+            const isMember = await memberPromise;
             // remove job from channel the bot is no longer a member of
-            if (!channels.includes(channelId)) {
+            if (!isMember) {
                 unScheduleMessage({ channelId });
                 return;
             }
