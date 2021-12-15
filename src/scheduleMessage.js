@@ -55,7 +55,7 @@ async function scheduleMessage({
                 unScheduleMessage({ channelId });
                 return;
             }
-            const usergroupIds = await usergroups.getUsergroupsForChannel(channelId);
+            const usergroupIds = usergroups.getUsergroupsForChannel(channelId);
             if (usergroupIds.length === 0) {
                 const message = library.registrationList(
                     DateTime.now(),
