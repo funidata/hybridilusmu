@@ -253,6 +253,11 @@ const demandDateAndRemindAboutUGName = () => 'Anna parametrina päivä. Jos anno
  */
 const demandTime = () => 'Anna parametrina kellonaika.';
 
+/**
+ * Reply when /tilaa command is given from bad channel
+ */
+const subscribeFailedNotInChannel = (channelName) => `Automaattiviestien tilaaminen epäonnistui koska bottia ei ole lisätty kanavalle "${channelName}"`;
+
 module.exports = {
     automatedMessageRescheduled,
     defaultRegistrationAdded,
@@ -272,4 +277,5 @@ module.exports = {
     registrationList,
     registrationListWithUsergroup,
     usergroupNotFound,
+    subscribeFailedNotInChannel
 };

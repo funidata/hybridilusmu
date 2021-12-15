@@ -10,3 +10,5 @@ test/e2e/results/
 !test/e2e/results/.keep
 **/__pycache__
 test/e2e/testcases/site-packages/
+
+.DS_Store

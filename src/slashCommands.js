@@ -216,6 +216,18 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
             const input = command.text;
             const channelId = command.channel_id;
             const userId = command.user_id;
+
+            // check if bot is a member
+            const conversation = await app.client.conversations.info({ channel: channelId });
+            if (!conversation.channel.is_member) {
+                helper.postEphemeralMessage(
+                    app,
+                    channelId,
+                    userId,
+                    library.subscribeFailedNotInChannel(command.channel_name));
+                return;
+            }
+
             if (help(input, channelId, userId, library.explainTilaa)) return;
             let response = library.demandTime();
             const parameters = argify(input);

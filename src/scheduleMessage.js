@@ -33,10 +33,11 @@ async function scheduleMessage({
     rule.hour = time ? time.hour : 6; // use given or default time
     rule.minute = time ? time.minute : 0;
     // rule.second = [0, 15, 30, 45]; // for testing
+    // rule.second = time ? time.hour : 1; // also for testing
 
     const foundJob = jobs.get(channelId);
     if (foundJob) { // update job
-        service.addJob(channelId, time ? time.toISOTime() : null);
+        await service.addJob(channelId, time ? time.toSQLTime() : null);
         foundJob.reschedule(rule);
     } else { // create job
         const job = schedule.scheduleJob(rule, async () => {
