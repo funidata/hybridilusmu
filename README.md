@@ -2,7 +2,7 @@
 ![docker ci](https://github.com/hytuslain/hytuslain/actions/workflows/docker-image.yml/badge.svg)
 ![node.js ci](https://github.com/hytuslain/hytuslain/actions/workflows/node.js.yml/badge.svg)
 
-# Hybridityöskentelyn tukisovellus Slack-integraatiolla
+# Hybridilusmu - _Hybridityöskentelyn tukisovellus Slack-integraatiolla_
 
 Toteutettu Helsingin yliopiston ohjelmistotuotantoprojektikurssin työnä syksyllä 2021.
 

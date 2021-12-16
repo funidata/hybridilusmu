@@ -16,7 +16,7 @@ Siirryt Botin hallintapaneelin sivulle "Basic Information":
 
 ## Ohjelman konfigurointi
 
-Ohjelma yhdistyy Slackin rajapintaan kolmella salausavaimella ympäristömuuttujien kautta. Avaimet löytää Slack apin [hallintapaneelista](https://api.slack.com/apps/):
+Ohjelma yhdistyy Slackin rajapintaan kolmella salausavaimella ympäristömuuttujien kautta. Ympäristömuuttujat lisätään projektin juureen .env-tiedostoon. Avaimet löytää Slack apin [hallintapaneelista](https://api.slack.com/apps/). Avataksesi hallintapaneelin, valitse linkatulta sivulta sovellus, jota haluat tarkastella. Ohjelman konfigurointiin tarvitaan seuraavat avaimet:
 
 `SLACK_SIGNING_SECRET`: Avain löytyy sivulta "Basic Information", laatikosta "App Credentials" nimellä "Signing Secret".
 
@@ -28,8 +28,8 @@ Ohjelma yhdistää postgreSQL-tietokantaan ympäristömuuttujilla `DB_HOST`, `DB
 
 ### Muut ympäristömuuttujat:
 
-`COMMAND_PREFIX`: Vapaaehtoinen etuliite ohjelman kauttaviivakomennoille. Jos tälle asettaa vaikkapa arvon `h`, niin esimerkiksi komento `/listaa` muuttuu muotoon `/hlistaa`. Tämä vaatii myös etuliitteen lisäämisen manuaalisesti manifestin komentoihin.
+`COMMAND_PREFIX`: Vapaaehtoinen etuliite ohjelman kauttaviivakomennoille. Jos tälle asettaa vaikkapa arvon `h`, niin esimerkiksi komento `/listaa` muuttuu muotoon `/hlistaa`. Tämä vaatii myös etuliitteen lisäämisen manuaalisesti botin komentoihin, eli manifestiin ja [hallintapaneelin](https://api.slack.com/apps/) sivulta "Slash Commands" löytyviin komentoihin. Kauttaviivakomentojen etuliitettä tarvitaan erityisesti kehitysvaiheessa, koska samassa workspacessa olevien bottien kauttaviivakomentojen tulee olla uniikkeja. 
 
 ## docker-compose
 
-Repositoriossa on [docker-compose](https://github.com/hytuslain/hytuslain/blob/master/docker-compose.yml) -tiedosto jonka avulla saa käynnistettyä botin yhdessä valmiin postgreSQL Docker-kontin kanssa.
+Kloonaa projektin github repositorio komennolla `git clone https://github.com/hytuslain/hytuslain.git` ja siirry sovelluksen kansioon. Repositoriossa on [docker-compose](https://github.com/hytuslain/hytuslain/blob/master/docker-compose.yml) -tiedosto jonka avulla saa käynnistettyä botin yhdessä valmiin postgreSQL Docker-kontin kanssa komennolla `docker-compose up --build`.
