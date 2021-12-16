@@ -5,5 +5,6 @@ COPY package.json ./
 RUN npm install
 USER node
 COPY --chown=node:node . .
+RUN npm run generate-timezones
 USER node
 CMD [ "npm", "start" ]

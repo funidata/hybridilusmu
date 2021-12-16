@@ -12,6 +12,7 @@
     "test": "nyc --reporter=html mocha",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "setup-e2e": "pip3 install --upgrade --target ./test/e2e/testcases/site-packages/ --requirement ./test/e2e/requirements.txt",
+    "generate-timezones": "awk '!/^#/ { print $3 }' < /usr/share/zoneinfo/zone1970.tab | sort > ./src/timezones.txt",
     "eslint": "npx eslint ."
   },
   "repository": {
