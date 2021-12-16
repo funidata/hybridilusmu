@@ -54,6 +54,19 @@ const getRegistrationsFor = async (date) => {
     return Array.from(result);
 };
 
+const removeJob = async (channelId) => db.removeJob(channelId);
+
+const addAllJobs = async (jobs) => db.addAllJobs(jobs);
+
+/**
+ * Adds or updates the timing of the daily message for the given channel.
+ * @param {string} channelId - Slack channel ID.
+ * @param {string} time - Optional. Time string in the ISO date format.
+ */
+const addJob = async (channelId, time) => db.addJob(channelId, time);
+
+const getAllJobs = async () => db.getAllJobs();
+
 /**
  * Returns a list of Slack user IDs of people who are at the office for every weekday
  * between firstDate and lastDate (inclusive).
@@ -157,4 +170,8 @@ module.exports = {
     getRegistrationsFor,
     getRegistrationsBetween,
     getRegistrationsForUserBetween,
+    removeJob,
+    addAllJobs,
+    addJob,
+    getAllJobs,
 };

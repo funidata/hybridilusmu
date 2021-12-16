@@ -4,6 +4,7 @@ const dfunc = require('./dateFunctions');
 const helper = require('./helperFunctions');
 const service = require('./databaseService');
 const library = require('./responses');
+const schedule = require('./scheduleMessage');
 
 /**
  * An optional prefix for our slash-commands. When set to e.g. 'h',
@@ -32,7 +33,7 @@ const argify = (text) => {
         .filter((str) => str.trim().length > 0);
 };
 
-exports.enableSlashCommands = ({ app, usergroups }) => {
+exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
     /**
     * Checks if user gave 'help' as a parameter to a command.
     * If yes, posts instructions on how to use that command.
@@ -202,7 +203,59 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
             }
             helper.postEphemeralMessage(app, channelId, userId, response);
         } catch (error) {
-            console.log('Tapahtui virhe :(');
+            console.log(error);
+        }
+    });
+
+    /**
+    * Listens to a slash-command and changes the time at which the automated message is posted to the current channel.
+    */
+    app.command(`/${COMMAND_PREFIX}tilaa`, async ({ command, ack }) => {
+        try {
+            await ack();
+            const input = command.text;
+            const channelId = command.channel_id;
+            const userId = command.user_id;
+
+            // check if bot is a member
+            const isMember = await helper.isBotChannelMember(app, channelId);
+            if (!isMember) {
+                helper.postEphemeralMessage(
+                    app,
+                    channelId,
+                    userId,
+                    library.subscribeFailedNotInChannel(command.channel_name),
+                );
+                return;
+            }
+
+            if (help(input, channelId, userId, library.explainTilaa)) return;
+            let response = library.demandTime();
+            const parameters = argify(input);
+            if (!enoughParameters(
+                1,
+                parameters.length,
+                channelId,
+                userId,
+                library.demandTime,
+            )) { return; }
+            const timeString = parameters[0];
+            const time = dfunc.parseTime(timeString);
+            if (time.isValid) {
+                schedule.scheduleMessage({
+                    channelId,
+                    time,
+                    app,
+                    usergroups,
+                    userCache,
+                });
+                response = library.automatedMessageRescheduled(time.setLocale('fi').toLocaleString(DateTime.TIME_24_SIMPLE));
+                helper.postMessage(app, channelId, response);
+            } else {
+                response = library.demandTime();
+                helper.postEphemeralMessage(app, channelId, userId, response);
+            }
+        } catch (error) {
             console.log(error);
         }
     });

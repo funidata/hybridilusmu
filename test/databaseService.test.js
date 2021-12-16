@@ -240,3 +240,72 @@ describe('Database service tests', function () { // eslint-disable-line
         }
     });
 });
+
+describe('Job', function () { // eslint-disable-line
+    this.beforeEach(async () => {
+        await database.sequelize.sync({ force: true });
+    });
+
+    it('can be added with a time value', async () => {
+        let jobs = await db.getAllJobs();
+        assert.equal(jobs.length, 0);
+        await service.addJob('CHANNELID', '13:00');
+        jobs = await db.getAllJobs();
+        assert.equal(jobs.length, 1);
+    });
+
+    it('can be added without a time value', async () => {
+        let jobs = await db.getAllJobs();
+        assert.equal(jobs.length, 0);
+        await service.addJob('CHANNELID');
+        jobs = await db.getAllJobs();
+        assert.equal(jobs.length, 1);
+    });
+
+    it('can be added in multiples at a time with time values', async () => {
+        let jobs = await db.getAllJobs();
+        assert.equal(jobs.length, 0);
+        const data = [
+            {
+                channel_id: 'CHANNELID1',
+                time: '01:00',
+            },
+            {
+                channel_id: 'CHANNELID2',
+                time: '02:00',
+            },
+        ];
+        await service.addAllJobs(data);
+        jobs = await db.getAllJobs();
+        assert.equal(jobs.length, 2);
+    });
+
+    it('can be added in multiples at a time with or without time values', async () => {
+        let jobs = await db.getAllJobs();
+        assert.equal(jobs.length, 0);
+        const data1 = [
+            {
+                channel_id: 'CHANNELID1',
+            },
+            {
+                channel_id: 'CHANNELID2',
+                time: '02:00',
+            },
+        ];
+        await service.addAllJobs(data1);
+        jobs = await db.getAllJobs();
+        assert.equal(jobs.length, 2);
+    });
+
+    it('can be removed', async () => {
+        let jobs = await db.getAllJobs();
+        assert.equal(jobs.length, 0);
+        await service.addJob('CHANNELID');
+        jobs = await db.getAllJobs();
+        assert.equal(jobs.length, 1);
+
+        await service.removeJob('CHANNELID');
+        jobs = await db.getAllJobs();
+        assert.equal(jobs.length, 0);
+    });
+});

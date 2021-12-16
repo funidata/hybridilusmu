@@ -22,6 +22,10 @@ features:
     - command: /poista
       description: Poistaa ilmoittautumisen
       usage_hint: "[def] <päivä>"
+    - command: /tilaa
+      description: Ajastaa kanavan viestin
+      usage_hint: "<kellonaika>"
+      should_escape: false
 oauth_config:
   scopes:
     bot:
@@ -41,6 +45,8 @@ oauth_config:
 settings:
   event_subscriptions:
     bot_events:
+      - member_joined_channel
+      - member_left_channel
       - message.channels
       - message.groups
       - message.im

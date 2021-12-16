@@ -168,6 +168,12 @@ const normalRegistrationRemoved = (date) => `Ilmoittautuminen poistettu ${lta(da
 const defaultRegistrationRemoved = (date) => `Oletusilmoittautuminen poistettu ${lta(date).toLowerCase()}.`;
 
 /**
+ * Response to /tilaa command.
+ * @param {string}
+ */
+const automatedMessageRescheduled = (time) => `Ajastettu viesti tilattu kanavalle kello ${time}`;
+
+/**
  * Explains allowed formats for day parameter in slash commands.
  */
 const explainPäivä = () => '    • Maanantai\n'
@@ -198,6 +204,14 @@ Antamalla parametrin *def* ennen muita parametreja, voit tehdä oletusilmoittaut
 const explainPoista = () => `*/poista*: Anna komennolle parametrina päivä jossain seuraavista muodoista:
 ${explainPäivä()}
 Antamalla parametrin *def* ennen muita parametreja, voit poistaa oletusilmoittautumisen.`;
+
+/**
+ * Reply to /tilaa command with help parameter.
+ */
+const explainTilaa = () => `*/tilaa*: Anna komennolle parametrina kellonaika jossain seuraavista muodoista:
+    • 13:37
+    • 4.20
+    • 07`;
 
 /**
  * Reply when user has given a mention string but no usergroup matches.
@@ -234,20 +248,34 @@ const demandDate = () => 'Anna parametrina päivä.';
  */
 const demandDateAndRemindAboutUGName = () => 'Anna parametrina päivä. Jos annoit tiimin nimen, tarkista että kirjoitit sen oikein.';
 
+/**
+ * Reply to /tilaa command, if something goes wrong.
+ */
+const demandTime = () => 'Anna parametrina kellonaika.';
+
+/**
+ * Reply when /tilaa command is given from bad channel
+ */
+const subscribeFailedNotInChannel = (channelName) => `Automaattiviestien tilaaminen epäonnistui koska bottia ei ole lisätty kanavalle "${channelName}"`;
+
 module.exports = {
+    automatedMessageRescheduled,
     defaultRegistrationAdded,
     defaultRegistrationRemoved,
     demandDate,
     demandDateAndStatus,
     demandDateAndRemindAboutUGName,
+    demandTime,
     denyDefaultRegistrationForWeekend,
     denyNormalRegistrationForWeekend,
     explainIlmoita,
     explainListaa,
     explainPoista,
+    explainTilaa,
     normalRegistrationAdded,
     normalRegistrationRemoved,
     registrationList,
     registrationListWithUsergroup,
     usergroupNotFound,
+    subscribeFailedNotInChannel,
 };
