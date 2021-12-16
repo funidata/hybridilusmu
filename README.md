@@ -8,11 +8,11 @@ Toteutettu Helsingin yliopiston ohjelmistotuotantoprojektikurssin työnä syksyl
 
 ## Dokumentaatio
 
-[Botin käyttöönotto-ohje](docs/kayttoonottoohjeet.md)
-[Loppukäyttäjän käyttöohje](docs/kayttoohje.md)
+- [Botin käyttöönotto-ohje](docs/kayttoonottoohjeet.md)
+- [Loppukäyttäjän käyttöohje](docs/kayttoohje.md)
 
 ## Kehittäjälle
 
-[CI/CD -pipeline](docs/cicd_pipeline.md)
-[Slack-sovelluksen perusteet](docs/slack-sovelluksen_perusteet.md)
-[Testaaminen](docs/testaaminen.md)
+- [CI/CD -pipeline](docs/cicd_pipeline.md)
+- [Slack-sovelluksen perusteet](docs/slack-sovelluksen_perusteet.md)
+- [Testaaminen](docs/testaaminen.md)
