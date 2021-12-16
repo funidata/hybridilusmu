@@ -29,6 +29,16 @@ exports.enableMiddleware = ({ app, userCache }) => {
         ack,
         event,
     }) {
+        let goodToSkip = false;
+        // Whitelist the subteam_* family of events
+        if (event && event.type.startsWith('subteam_')) {
+            goodToSkip = true;
+        }
+        if (goodToSkip) {
+            console.log('skipping guest check due to whitelisted action');
+            await next();
+            return;
+        }
         // The user ID is found in many different places depending on the type of action taken
         let userId; // Undefined evaluates as false
         if (!userId) try { userId = payload.user; } catch (error) {} // tab
