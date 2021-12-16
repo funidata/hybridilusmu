@@ -11,6 +11,7 @@ Yksikkötestit on kirjoitettu Mocha-testikehyksellä. Testit voi ajaa komennolla
 End-to-end testit on kirjoitettu Robot Frameworkia ja Selenium-kirjastoa käyttäen. Testien ajaminen lokaalisti vaatii pythonin ja pip:n asentamista. Myös seuraavat kirjastot tulee asentaa:
 
 `pip install robotframework`
+
 `pip install robotframework-selenium2library`
 
 Sekä requirements.txt-tiedostossa määritellyt python-kirjastot: 
@@ -25,4 +26,6 @@ Kun testibotti on käynnissä, testit voi ajaa /test/e2e-hakemistossa komennolla
 
 `robot --outputdir results -v USER_PASSWORD:tähän_salasana -v GUEST_PASSWORD:tähän_salasana -v COMMAND_PREFIX:testi testcases`
 
-Ylläoleva komento ajaa testcase-hakemistossa olevat test suitet ja luo niistä raportin results-hakemistoon.
+Ylläoleva komento ajaa testcase-hakemistossa olevat test suitet ja luo niistä raportin results-hakemistoon. 
+
+Github Actions workflowssa end-to-end-testit ajetaan [Docker-kontissa](https://github.com/ppodgorsek/docker-robot-framework).
