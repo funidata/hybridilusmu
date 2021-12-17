@@ -24,6 +24,11 @@ korkeammalla.
 Ohjelma lähettää joka arkipäivä viestin kaikille niille kanaville, joille se
 on lisätty.
 
+Mikäli kanava on listattu jonkin Slack-työtilan user groupin oletuskanavissa,
+tehdään automaattiviestille tiimirajaus kyseisen user groupin perusteella.
+Mikäli kanava on listattu useamman user groupin kohdalla, lähetetään jokaista
+täsmäävää user groupia vastaava tiimirajattu listaus.
+
 Kuka tahansa kanavan käyttäjä voi vaihtaa automaattiviestin toimitusaikaa:
 tällöin ohjelma lähettää kanavalle kaikille kanavan käyttäjille näkyvän
 ilmoituksen toimitusajankohdan muuttamisesta.
@@ -74,3 +79,71 @@ käsiteltyä ilmoittautumiskäyttöliittymää. Tyhjän napin painaminen asettaa
 napin arvon oletusasetukseksi asianmukaiselle viikonpäivälle. Korostettu nappi
 merkkaa valittua asetusta. Jos korostettua nappia painaa, niin päivän
 oletusasetus poistetaan.
+
+## Tekstikäyttöliittymä (ns. slash-komennot)
+
+Ohjelmaa voi käyttää myös slash-komennoin. Vastaukset slash-komentoihin tulevat
+pääasiassa vain käyttäjälle itselleen näkyvinä viesteinä, sille kanavalle jolla
+komentoa on käyttänyt. Mikäli ohjelmalla ei ole pääsyä kanavalle, jolta
+komentoa on kutsuttu, niin ohjelma vastaa yksityisviestillä.
+
+Jokaiselle komennolle on mahdollista antaa "help" -parametri, mikä laittaa
+ohjelman vastaamaan käyttäjälle kyseisen komennon käyttöohjeella.
+
+Alla on lyhyt kuvaus kunkin komennon käytöstä. Tarkempaa tietoa komennoista
+kannattaa kysellä itse ohjelmalta edellämainitun "help" -parametrin avulla.
+
+### `/listaa [<päivä>] [<tiimi>]`
+
+Listaa toimiston läsnäolijat annetulle päivälle. Mikäli päivää ei ole annettu,
+listaa tämän päivän läsnäolijat.
+
+Mikäli komennolle antaa myös tiimin @-maininnan, listaus rajoitetaan kyseisen
+tiimin jäseniin.
+
+Parametrien järjestyksellä ei ole väliä.
+
+Esimerkkejä:
+- `/listaa`
+- `/listaa huomenna`
+- `/listaa @kahvi perjantai`
+- `/listaa 11.11. @pannu`
+
+### `/ilmoita [def] <päivä> <status>`
+
+Lisää ilmoittautumisen (tai oletusilmoittautumisen) määritellylle päivälle.
+
+Jos parametri `def` on annettu komennon ensimmäisenä parametrina, tehdään
+oletusilmoittautuminen.
+
+Esimerkkejä:
+- `/ilmoita maanantai toimisto`
+- `/ilmoita def perjantai etä`
+- `/ilmoita 1.5. etä`
+
+### `/poista [def] <päivä>`
+
+Poistaa ilmoittautumisen (tai oletusilmoittautumisen) määritellyltä päivältä.
+
+Jos parametri `def` on annettu komennon ensimmäisenä parametrina, poistetaan
+oletusilmoittautuminen.
+
+Esimerkkejä:
+- `/poista maanantai`
+- `/poista def tänään`
+
+### `/tilaa <kellonaika>`
+
+Tilaa automaattiviestin toimitettavaksi tälle kanavalle tiettyyn kellonaikaan
+joka arkipäivä.
+
+_Ohjelman tulee olla jo lisätty kanavalle, jolta tätä komentoa kutsutaan._
+
+Poikkeuksena valtaosaan muista komennoista, onnistuneeseen tilaukseen vastaus
+tulee kaikille näkyvänä viestinä. Tämä käytäntö on tehty läpinäkyvyyden ja
+käyttäjäystävällisyyden vuoksi.
+
+Esimerkkejä:
+- `/tilaa 7.15`
+- `/tilaa 06:45`
+- `/tilaa 11`
