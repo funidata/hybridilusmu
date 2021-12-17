@@ -7,7 +7,7 @@ Botti ei ole saatavilla slackin lisäosavalikoimasta, vaan se tulee ottaa käytt
 - [Luo uusi Slack app](https://api.slack.com/apps?new_app=1&ref=bolt_start_hub)
 - Valitse "From an app manifest"
 - Valitse workspace johon haluat botin lisätä
-- Kopioi ja liitä [manifestin sisältö](<https://github.com/hytuslain/hytuslain/blob/master/docs/manifest.yml>) sitä kysyttäessä. Formaatti on YAML.
+- Kopioi ja liitä [manifestin sisältö](manifest.yml) sitä kysyttäessä. Formaatti on YAML.
 - Klikkaa lopuksi Create
 
 Siirryt Botin hallintapaneelin sivulle "Basic Information":
@@ -32,4 +32,4 @@ Ohjelma yhdistää postgreSQL-tietokantaan ympäristömuuttujilla `DB_HOST`, `DB
 
 ## docker-compose
 
-Kloonaa projektin github repositorio komennolla `git clone https://github.com/hytuslain/hytuslain.git` ja siirry sovelluksen kansioon. Repositoriossa on [docker-compose](https://github.com/hytuslain/hytuslain/blob/master/docker-compose.yml) -tiedosto jonka avulla saa käynnistettyä botin yhdessä valmiin postgreSQL Docker-kontin kanssa komennolla `docker-compose up --build`.
+Kloonaa projektin github repositorio komennolla `git clone https://github.com/hytuslain/hytuslain.git` ja siirry sovelluksen kansioon. Repositoriossa on [docker-compose](https://github.com/hytuslain/hytuslain/blob/master/docker-compose.yml) -tiedosto jonka avulla saa käynnistettyä botin yhdessä valmiin postgreSQL Docker-kontin kanssa komennolla `docker-compose --env-file .env up --build`.
