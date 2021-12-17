@@ -217,6 +217,9 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
             const channelId = command.channel_id;
             const userId = command.user_id;
 
+            // print help before channel membership check
+            if (help(input, channelId, userId, library.explainTilaa)) return;
+
             // check if bot is a member
             const isMember = await helper.isBotChannelMember(app, channelId);
             if (!isMember) {
@@ -228,8 +231,6 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
                 );
                 return;
             }
-
-            if (help(input, channelId, userId, library.explainTilaa)) return;
             let response = library.demandTime();
             const parameters = argify(input);
             if (!enoughParameters(
