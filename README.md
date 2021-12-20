@@ -4,6 +4,8 @@
 
 # Hybridilusmu - _Hybridityöskentelyn tukisovellus Slack-integraatiolla_
 
+![Hybridilusmun logo](/imgs/hybridilusmulogo1darkbgsmall.jpg)
+
 Hybridilusmu on hybridityöskentelyn tueksi tarkoitettu Slack-sovellus, jonka avulla työtilan käyttäjät pystyvät ilmoittamaan päiväkohtaisesti työskentelevätkö he toimistolla vai kotona.
 
 Toteutettu Helsingin yliopiston ohjelmistotuotantoprojektikurssin työnä syksyllä 2021.
