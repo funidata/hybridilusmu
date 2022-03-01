@@ -9,9 +9,9 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - hytuslain-db:/var/lib/postgresql/data
+      - hybridilusmu-db:/var/lib/postgresql/data
 
-  hytuslain:
+  hybridilusmu:
     build:
       context: .
     restart: always
@@ -32,4 +32,4 @@ services:
       - '3000:3000'
 
 volumes:
-  hytuslain-db:
+  hybridilusmu-db:

@@ -32,4 +32,4 @@ Ohjelma yhdistää postgreSQL-tietokantaan ympäristömuuttujilla `DB_HOST`, `DB
 
 ## docker-compose
 
-Kloonaa projektin github repositorio komennolla `git clone https://github.com/hytuslain/hytuslain.git` ja siirry sovelluksen kansioon. Repositoriossa on [docker-compose](https://github.com/hytuslain/hytuslain/blob/master/docker-compose.yml) -tiedosto jonka avulla saa käynnistettyä botin yhdessä valmiin postgreSQL Docker-kontin kanssa komennolla `docker-compose --env-file .env up --build`.
+Kloonaa projektin github repositorio komennolla `git clone https://github.com/funidata/hybridilusmu.git` ja siirry sovelluksen kansioon. Repositoriossa on [docker-compose](https://github.com/funidata/hybridilusmu/blob/master/docker-compose.yml) -tiedosto jonka avulla saa käynnistettyä botin yhdessä valmiin postgreSQL Docker-kontin kanssa komennolla `docker-compose --env-file .env up --build`.

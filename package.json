@@ -1,5 +1,5 @@
 {
-  "name": "hytuslain",
+  "name": "hybridilusmu",
   "version": "1.0.0",
   "description": "Toteutettu Helsingin yliopiston ohjelmistotuotantoprojektikurssin työnä syksyllä 2021.",
   "main": "./src/index.js",
@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hytuslain/hytuslain.git"
+    "url": "git+https://github.com/funidata/hybridilusmu.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/hytuslain/hytuslain/issues"
+    "url": "https://github.com/funidata/hybridilusmu/issues"
   },
-  "homepage": "https://github.com/hytuslain/hytuslain#readme",
+  "homepage": "https://github.com/funidata/hybridilusmu#readme",
   "dependencies": {
     "@slack/bolt": "^3.6.0",
     "dotenv": "^10.0.0",
