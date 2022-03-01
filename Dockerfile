@@ -1,9 +1,17 @@
-FROM node:16.13.0
-RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
-WORKDIR /home/node/hytuslain
-COPY package.json ./
-RUN npm install
+FROM node:16.13.0-alpine as build
+WORKDIR /build
+
+COPY package*.json ./
+COPY src src/
+
+RUN npm install \
+    && chmod -R +xr .
+
+FROM node:16.13.0-alpine
+WORKDIR /usr/app
+
+COPY --from=build /build ./
+
 USER node
-COPY --chown=node:node . .
-USER node
+
 CMD [ "npm", "start" ]
