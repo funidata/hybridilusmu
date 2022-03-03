@@ -28,8 +28,6 @@ services:
       COMMAND_PREFIX:
     depends_on:
       - postgres
-    ports:
-      - '3000:3000'
 
 volumes:
   hybridilusmu-db:
