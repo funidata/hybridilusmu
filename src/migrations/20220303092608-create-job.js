@@ -25,6 +25,11 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
+    await queryInterface.addIndex('Jobs', {
+      fields: ['channel_id'],
+      unique: true
+    }
+  );
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Jobs');

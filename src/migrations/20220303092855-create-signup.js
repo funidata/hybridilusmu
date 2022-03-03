@@ -38,6 +38,10 @@ module.exports = {
         onDelete: 'SET NULL',
       }
     );
+    await queryInterface.addIndex('Signups', {
+        fields: ['officeDate']
+      }
+    );
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Signups');
