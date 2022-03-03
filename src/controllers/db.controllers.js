@@ -1,6 +1,5 @@
 const { Op } = require('sequelize');
-const { sequelize } = require('../database');
-const db = require('../database');
+const { sequelize, db } = require('../models/index');
 
 const { Person } = db;
 const { Signup } = db;
