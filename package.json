@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node ./src/index.js",
-    "migrate": "node ./dev/migrate.js",
+    "migrate": "npx sequelize-cli db:migrate",
     "test": "nyc --reporter=html mocha",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "setup-e2e": "pip3 install --upgrade --target ./test/e2e/testcases/site-packages/ --requirement ./test/e2e/requirements.txt",

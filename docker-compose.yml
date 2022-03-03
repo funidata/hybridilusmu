@@ -28,6 +28,10 @@ services:
       COMMAND_PREFIX:
     depends_on:
       - postgres
+    volumes:
+      - ./dev:/usr/app/dev:ro
+      - ./src/config/:/usr/app/src/config:ro
+      - ./src/migrations:/usr/app/src/migrations:ro
 
 volumes:
   hybridilusmu-db:
