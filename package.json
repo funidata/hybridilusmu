@@ -7,6 +7,7 @@
     "extends": "./dev/.eslintrc.js"
   },
   "scripts": {
+    "init": "npx sequelize-cli db:create && npm run migrate",
     "start": "node ./src/index.js",
     "migrate": "npx sequelize-cli db:migrate",
     "test": "NODE_ENV=unittest nyc --reporter=html mocha",
