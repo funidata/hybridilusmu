@@ -8,7 +8,7 @@
   },
   "scripts": {
     "init": "npx sequelize-cli db:create && npm run migrate",
-    "start": "node ./src/index.js",
+    "start": "npm run migrate && node ./src/index.js",
     "migrate": "npx sequelize-cli db:migrate",
     "test": "NODE_ENV=unittest nyc --reporter=html mocha",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
