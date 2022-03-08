@@ -43,4 +43,6 @@ Repositoriossa on [docker-compose](https://github.com/funidata/hybridilusmu/blob
 
 ## Kehitys
 
+Käytetty node versio: 16.13
+
 Kehitystä varten tarvitsee paikallisen postgres instanssin tietokannaksi. Helpoin tapa on käyttää `docker-compose`ssa olevaa postgres palvelua. Tämän saa käyttöön ajamalla `docker-compose up -d postgres` projektin juuressa. Asenna tämän jälkeen node moduulit: `npm install` ja initialisoi tietokanta: `npm run init`. Tietokannan luomisen lisäksi initialisointi-skripti ajaa migraatiot, jotka ajetaan myös aina sovelluksen käynnistymisen yhteydessä. Sovellus on valmis käynnistettäväksi `npm start` komennolla.
