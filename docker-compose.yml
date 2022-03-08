@@ -14,17 +14,15 @@ services:
   hybridilusmu:
     build:
       context: .
-    restart: always
     environment:
       NODE_ENV: docker
-      SLACK_APP_TOKEN:
-      SLACK_BOT_TOKEN:
-      SLACK_SIGNING_SECRET:
-      COMMAND_PREFIX:
+      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN}
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
+      SLACK_SIGNING_SECRET: ${SLACK_SIGNING_SECRET}
+      COMMAND_PREFIX: ${COMMAND_PREFIX}
     depends_on:
       - postgres
     volumes:
-      - ./dev:/usr/app/dev:ro
       - ./src/config/:/usr/app/src/config:ro
       - ./src/migrations:/usr/app/src/migrations:ro
 
