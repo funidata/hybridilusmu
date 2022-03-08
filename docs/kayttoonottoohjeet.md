@@ -16,7 +16,7 @@ Siirryt Botin hallintapaneelin sivulle "Basic Information":
 
 ## Ohjelman konfigurointi
 
-Ohjelma yhdistyy Slackin rajapintaan kolmella salausavaimella ympäristömuuttujien kautta. Ympäristömuuttujat lisätään projektin juureen .env-tiedostoon. Avaimet löytää Slack apin [hallintapaneelista](https://api.slack.com/apps/). Avataksesi hallintapaneelin, valitse linkatulta sivulta sovellus, jota haluat tarkastella. Ohjelman konfigurointiin tarvitaan seuraavat avaimet:
+Ohjelma yhdistyy Slackin rajapintaan kolmella salausavaimella ympäristömuuttujien kautta. Ympäristömuuttujat voi lisätä halutessaa projektin juureen .env-tiedostoon. Avaimet löytää Slack apin [hallintapaneelista](https://api.slack.com/apps/). Avataksesi hallintapaneelin, valitse linkatulta sivulta sovellus, jota haluat tarkastella. Alla listattu ohjelman konfigurointimuuttujat:
 
 `SLACK_SIGNING_SECRET`: Avain löytyy sivulta "Basic Information", laatikosta "App Credentials" nimellä "Signing Secret".
 
@@ -24,12 +24,23 @@ Ohjelma yhdistyy Slackin rajapintaan kolmella salausavaimella ympäristömuuttuj
 
 `SLACK_BOT_TOKEN`: Valitse vasemmasta sivupalkista "OAuth & Permissions". Avain löytyy ensimmäisestä laatikosta nimellä "Bot User OAuth Token".
 
-Ohjelma yhdistää postgreSQL-tietokantaan ympäristömuuttujilla `DB_HOST`, `DB_PORT`, `DB_USER` ja `DB_PASSWORD`.
-
-### Muut ympäristömuuttujat:
-
 `COMMAND_PREFIX`: Vapaaehtoinen etuliite ohjelman kauttaviivakomennoille. Jos tälle asettaa vaikkapa arvon `h`, niin esimerkiksi komento `/listaa` muuttuu muotoon `/hlistaa`. Tämä vaatii myös etuliitteen lisäämisen manuaalisesti botin komentoihin, eli manifestiin ja [hallintapaneelin](https://api.slack.com/apps/) sivulta "Slash Commands" löytyviin komentoihin. Kauttaviivakomentojen etuliitettä tarvitaan erityisesti kehitysvaiheessa, koska samassa workspacessa olevien bottien kauttaviivakomentojen tulee olla uniikkeja. 
 
-## docker-compose
+`.env` tiedoston tynkä:
 
-Kloonaa projektin github repositorio komennolla `git clone https://github.com/funidata/hybridilusmu.git` ja siirry sovelluksen kansioon. Repositoriossa on [docker-compose](https://github.com/funidata/hybridilusmu/blob/master/docker-compose.yml) -tiedosto jonka avulla saa käynnistettyä botin yhdessä valmiin postgreSQL Docker-kontin kanssa komennolla `docker-compose --env-file .env up --build`.
+```
+COMMAND_PREFIX=
+SLACK_SIGNING_SECRET=
+SLACK_APP_TOKEN=
+SLACK_BOT_TOKEN=
+```
+
+PostgreSQL-tietokantayhteys ja konfiguraatio on määritelty tiedostossa `src/config/config.json`, josta löytyy valmiit konfiguraatiot paikallista kehitysympäristöä varten. Konfiguraatio-objekti valitaa `NODE_ENV`-muuttujan perusteella, joka on vakiona `development`.
+
+## Docker-compose
+
+Repositoriossa on [docker-compose](https://github.com/funidata/hybridilusmu/blob/master/docker-compose.yml) -tiedosto jonka avulla saa käynnistettyä botin yhdessä valmiin postgreSQL Docker-kontin kanssa komennolla `docker-compose up --build`.
+
+## Kehitys
+
+Kehitystä varten tarvitsee paikallisen postgres instanssin tietokannaksi. Helpoin tapa on käyttää `docker-compose`ssa olevaa postgres palvelua. Tämän saa käyttöön ajamalla `docker-compose up -d postgres` projektin juuressa. Asenna tämän jälkeen node moduulit: `npm install` ja initialisoi tietokanta: `npm run init`. Tietokannan luomisen lisäksi initialisointi-skripti ajaa migraatiot, jotka ajetaan myös aina sovelluksen käynnistymisen yhteydessä. Sovellus on valmis käynnistettäväksi `npm start` komennolla.
