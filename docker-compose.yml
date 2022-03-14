@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   postgres:
-    image: postgres
+    image: postgres:14.2-alpine
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -9,27 +9,19 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - hytuslain-db:/var/lib/postgresql/data
+      - hybridilusmu-db:/var/lib/postgresql/data
 
-  hytuslain:
+  hybridilusmu:
     build:
       context: .
-    restart: always
     environment:
-      DB_SCHEMA: ${DB_SCHEMA:-postgres}
-      DB_USER: ${DB_USER:-postgres}
-      DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      # host should only be set here in compose
-      DB_HOST: postgres
-      DB_PORT: 5432
-      SLACK_APP_TOKEN:
-      SLACK_BOT_TOKEN:
-      SLACK_SIGNING_SECRET:
-      COMMAND_PREFIX:
+      NODE_ENV: docker
+      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN}
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
+      SLACK_SIGNING_SECRET: ${SLACK_SIGNING_SECRET}
+      COMMAND_PREFIX: ${COMMAND_PREFIX}
     depends_on:
       - postgres
-    ports:
-      - '3000:3000'
 
 volumes:
-  hytuslain-db:
+  hybridilusmu-db:

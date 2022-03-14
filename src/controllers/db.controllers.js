@@ -1,12 +1,7 @@
 const { Op } = require('sequelize');
-const { sequelize } = require('../database');
-const db = require('../database');
+const { sequelize } = require('../models/index');
 
-const { Person } = db;
-const { Signup } = db;
-const { Defaultsignup } = db;
-const { Job } = db;
-
+const { Person, Signup, Defaultsignup, Job } = require('../models');
 /**
  * Returns a row from the People table that matches the Slack user ID.
  * The row contains the following:

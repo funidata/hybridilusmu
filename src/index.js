@@ -4,11 +4,6 @@ require('./tools/quotenv').checkEnv([
     'SLACK_BOT_TOKEN',
     'SLACK_APP_TOKEN',
     'SLACK_SIGNING_SECRET',
-    'DB_SCHEMA',
-    'DB_USER',
-    'DB_PASSWORD',
-    'DB_HOST',
-    'DB_PORT',
 ]);
 const { App } = require('@slack/bolt');
 const scheduler = require('./scheduleMessage');
@@ -43,7 +38,7 @@ enableSlashCommands(state);
  * Starts the bot.
  */
 (async () => {
-    await app.start(process.env.PORT || 3000);
+    await app.start();
     scheduler.startScheduling(state);
     scheduler.scheduleUsergroupReadings(state);
     console.log('⚡️ Bolt app is running!');

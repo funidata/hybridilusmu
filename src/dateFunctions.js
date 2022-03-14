@@ -159,7 +159,7 @@ const parseDate = (input, today) => {
     const regex = /^([0-9]+\.[0-9]+(\.)?)$/;
     if (!regex.test(input)) return DateTime.fromObject({ day: 0 });
     const pieces = input.split('.');
-    let date = DateTime.fromObject({ month: pieces[1], day: pieces[0] });
+    let date = DateTime.fromObject({ year: today.year, month: pieces[1], day: pieces[0] });
     if (date < today.minus({ days: HALF_YEAR })) date = date.plus({ years: 1 });
     if (date > today.plus({ days: HALF_YEAR })) date = date.minus({ years: 1 });
     return date;

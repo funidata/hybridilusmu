@@ -1,5 +1,5 @@
 const assert = require('assert');
-const db = require('../src/database');
+const db = require('../src/models/index');
 const controller = require('../src/controllers/db.controllers');
 
 describe('Persons test', function () { // eslint-disable-line

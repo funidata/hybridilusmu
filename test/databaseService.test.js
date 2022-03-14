@@ -1,6 +1,6 @@
 const { DateTime } = require('luxon');
 const assert = require('assert');
-const database = require('../src/database');
+const database = require('../src/models/index');
 const db = require('../src/controllers/db.controllers');
 const service = require('../src/databaseService');
 const dfunc = require('../src/dateFunctions');
