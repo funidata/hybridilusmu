@@ -1,0 +1,10 @@
+{
+  "name": "hybridilusmu-dev-env",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "docker compose up --build",
+    "stop": "docker compose down",
+    "init": "cd app && npm ci"
+  },
+  "license": "MIT"
+}
