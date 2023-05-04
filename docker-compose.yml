@@ -7,13 +7,13 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - hybridilusmu-db:/var/lib/postgresql/data
 
   hybridilusmu:
     build:
-      context: .
+      context: app
     environment:
       NODE_ENV: docker
       SLACK_APP_TOKEN: ${SLACK_APP_TOKEN}
