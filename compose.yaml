@@ -1,0 +1,22 @@
+volumes:
+  lusmu-db:
+
+services:
+  lusmu:
+    container_name: lusmu-dev
+    build: app/
+    environment:
+      NODE_ENV: development
+    env_file:
+      - .env.development
+    depends_on:
+      - db
+
+  db:
+    container_name: lusmu-db
+    image: postgres:14.7
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - lusmu-db:/var/lib/postgresql/data
