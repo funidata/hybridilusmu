@@ -1,14 +1,1 @@
-.env
-.env*
-node_modules/
-.nyc_output
-coverage
-*.lcov
-.vscode
-venv/
-test/e2e/results/
-!test/e2e/results/.keep
-**/__pycache__
-test/e2e/testcases/site-packages/
-
-.DS_Store
+node_modules
