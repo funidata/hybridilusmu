@@ -49,6 +49,14 @@ npm start
 npm stop
 ```
 
+#### View Logs
+
+```bash
+npm run logs
+```
+
+(Using `npm start`, the containers start detached.)
+
 ### Environment Maintenance
 
 #### Reset Database
