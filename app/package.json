@@ -1,7 +1,10 @@
 {
   "name": "hybridilusmu",
   "version": "1.0.0",
-  "main": "./src/index.js",
+  "engines" : { 
+    "npm" : ">=9.5.1",
+    "node" : ">=18.16.0"
+  },
   "eslintConfig": {
     "extends": "./dev/.eslintrc.js"
   },
