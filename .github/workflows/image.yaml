@@ -1,0 +1,25 @@
+name: Build and upload image
+
+on: 
+  workflow_call:
+
+jobs:
+  build:
+    name: Build and upload image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build and export
+        uses: docker/build-push-action@v4
+        with:
+          context: app
+          tags: hybridilusmu-ci
+          outputs: type=docker,dest=/tmp/hybridilusmu-ci.tar
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: hybridilusmu-ci
+          path: /tmp/hybridilusmu-ci.tar

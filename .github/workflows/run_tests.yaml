@@ -4,6 +4,33 @@ on:
   push:
 
 jobs:
+  build:
+    name: Build image
+    uses: ./.github/workflows/image.yaml
+
+  test-unit-alt:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: hybridilusmu-ci
+          path: /tmp
+      - name: Load image
+        run: |
+          docker load --input /tmp/hybridilusmu-ci.tar
+          docker image ls -a
+      - run: touch .env.development
+      - name: Start containers
+        run: docker compose -f compose.yaml -f compose-ci.yaml up
+      - name: Run unit tests
+        run: npm test
+      - name: Stop containers
+        run: npm stop
+
   test-unit:
     name: Unit tests
     runs-on: ubuntu-latest
