@@ -10,7 +10,9 @@
     "stop": "docker compose down",
     "logs": "docker compose logs -f",
     "init": "cd app && npm ci",
-    "test": "docker exec -t lusmu-dev npm test"
+    "test": "docker exec -t lusmu-dev npm test",
+    "test:integration": "docker exec -ti lusmu-dev npm run test:integration",
+    "test:all": "npm test && npm test:integration"
   },
   "license": "MIT"
 }
