@@ -1,36 +1,36 @@
-name: Docker Image CI
+# name: Docker Image CI
 
-on:
-  workflow_run:
-    workflows: [ "Node.js CI" ]
-    branches: [ master ]
-    types:
-      - completed
+# on:
+#   workflow_run:
+#     workflows: [ "Node.js CI" ]
+#     branches: [ master ]
+#     types:
+#       - completed
 
-jobs:
+# jobs:
 
-  build:
-    environment: Docker deployment
+#   build:
+#     environment: Docker deployment
 
-    runs-on: ubuntu-latest
+#     runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: docker login
-      if: ${{ github.event.workflow_run.conclusion == 'success' }}
-      env:
-        DOCKER_USER: ${{secrets.DOCKER_USER}}
-        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-      run: |
-        docker login -u "${DOCKER_USER}" -p "${DOCKER_PASSWORD}"
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: docker login
+#       if: ${{ github.event.workflow_run.conclusion == 'success' }}
+#       env:
+#         DOCKER_USER: ${{secrets.DOCKER_USER}}
+#         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+#       run: |
+#         docker login -u "${DOCKER_USER}" -p "${DOCKER_PASSWORD}"
 
-    - name: Build the Docker image
-      if: ${{ github.event.workflow_run.conclusion == 'success' }}
-      run: docker build . --file Dockerfile --tag hytuslain/hytuslain:"${GITHUB_SHA}"
+#     - name: Build the Docker image
+#       if: ${{ github.event.workflow_run.conclusion == 'success' }}
+#       run: docker build . --file Dockerfile --tag hytuslain/hytuslain:"${GITHUB_SHA}"
 
-    - name: Docker Push
-      if: |
-        github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.event == 'push' &&
-        github.ref == 'refs/heads/master'
-      run: docker tag hytuslain/hytuslain:"${GITHUB_SHA}" hytuslain/hytuslain:latest && docker push --all-tags hytuslain/hytuslain
+#     - name: Docker Push
+#       if: |
+#         github.event.workflow_run.conclusion == 'success' &&
+#         github.event.workflow_run.event == 'push' &&
+#         github.ref == 'refs/heads/master'
+#       run: docker tag hytuslain/hytuslain:"${GITHUB_SHA}" hytuslain/hytuslain:latest && docker push --all-tags hytuslain/hytuslain
