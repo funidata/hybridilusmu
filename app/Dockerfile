@@ -1,4 +1,5 @@
-FROM node:18.16
+# Using alpine because GitHub artifact upload is very slow for big images...
+FROM node:18.16-alpine
 
 # Install dependencies.
 WORKDIR /usr/src/app
