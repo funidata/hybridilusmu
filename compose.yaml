@@ -10,7 +10,8 @@ services:
     env_file:
       - .env.development
     volumes:
-      - ./app/src:/usr/app/src
+      - ./app/src:/usr/src/app/src
+    command: npm run watch
     depends_on:
       - db
 
