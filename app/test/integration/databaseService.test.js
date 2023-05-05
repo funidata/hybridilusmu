@@ -1,9 +1,9 @@
 const { DateTime } = require('luxon');
 const assert = require('assert');
-const database = require('../src/models/index');
-const db = require('../src/controllers/db.controllers');
-const service = require('../src/databaseService');
-const dfunc = require('../src/dateFunctions');
+const database = require('../../src/models/index');
+const db = require('../../src/controllers/db.controllers');
+const service = require('../../src/databaseService');
+const dfunc = require('../../src/dateFunctions');
 
 describe('ChangeRegistration Tests', function () { // eslint-disable-line
     this.beforeAll(async () => {
