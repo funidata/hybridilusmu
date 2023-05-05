@@ -1,13 +1,10 @@
-FROM node:16.13.0-alpine
-WORKDIR /usr/app
+FROM node:18.12.1
 
-COPY package*.json ./
-
-RUN npm install \
-    && chmod -R +xr .
+# Install dependencies.
+WORKDIR /usr/src/app
+COPY package.json package-lock.json ./
+RUN npm ci
 
 COPY . .
 
-USER node
-
-CMD [ "npm", "run", "watch" ]
+CMD npm start
