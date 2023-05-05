@@ -27,7 +27,7 @@ jobs:
           docker image ls -a
       - run: touch .env.development
       - name: Start containers
-        run: docker compose -f compose.yaml -f compose-ci.yaml up
+        run: docker compose -f compose.yaml -f compose-ci.yaml up -d
       - name: Run unit tests
         run: npm test
       - name: Stop containers
