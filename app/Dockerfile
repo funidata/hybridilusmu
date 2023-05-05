@@ -10,4 +10,4 @@ COPY . .
 
 USER node
 
-CMD [ "npm", "start" ]
+CMD [ "npm", "run", "watch" ]
