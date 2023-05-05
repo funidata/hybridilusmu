@@ -5,7 +5,8 @@
     "start": "docker compose up -d --build",
     "stop": "docker compose down",
     "logs": "docker compose logs -f",
-    "init": "cd app && npm ci"
+    "init": "cd app && npm ci",
+    "test": "docker exec -t lusmu-dev npm test"
   },
   "license": "MIT"
 }
