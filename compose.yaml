@@ -9,6 +9,8 @@ services:
       NODE_ENV: development
     env_file:
       - .env.development
+    volumes:
+      - ./app/src:/usr/app/src
     depends_on:
       - db
 
