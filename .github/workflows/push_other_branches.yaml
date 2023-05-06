@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build image
-    uses: ./.github/workflows/image.yaml
+    uses: ./.github/workflows/build_image.yaml
 
   tests:
     name: Run tests

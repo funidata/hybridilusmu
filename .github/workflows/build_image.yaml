@@ -16,10 +16,10 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: app
-          tags: hybridilusmu-ci
-          outputs: type=docker,dest=/tmp/hybridilusmu-ci.tar
+          tags: hybridilusmu
+          outputs: type=docker,dest=/tmp/hybridilusmu.tar
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: hybridilusmu-ci
-          path: /tmp/hybridilusmu-ci.tar
+          name: hybridilusmu
+          path: /tmp/hybridilusmu.tar
