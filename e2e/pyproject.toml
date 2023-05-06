@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "hybridilusmu-e2e"
+version = "0.0.1"
+description = ""
+authors = ["joonashak <hakkijoo@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "hybridilusmu_e2e"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pynput = "^1.7.6"
+robotframework = "^6.0.2"
+robotframework-selenium2library = "^3.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
