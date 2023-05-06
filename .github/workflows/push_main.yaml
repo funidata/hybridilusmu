@@ -1,0 +1,17 @@
+name: Push (main)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build image
+    uses: ./.github/workflows/build_image.yaml
+
+  tests:
+    name: Run tests
+    uses: ./.github/workflows/run_tests.yaml
+    needs:
+      - build
