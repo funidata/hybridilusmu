@@ -12,6 +12,7 @@
     "init": "cd app && npm ci",
     "test": "docker exec -t lusmu-dev npm test",
     "test:integration": "docker exec -t lusmu-dev npm run test:integration",
+    "test:e2e": "docker compose -f compose-e2e.yaml up --build",
     "test:all": "npm test && npm test:integration"
   },
   "license": "MIT"
