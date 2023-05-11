@@ -1,7 +1,6 @@
 const home = require('./home');
-const scheduleMessage = require('./scheduleMessage');
 
-exports.enableEventListeners = ({ app, usergroups, userCache }) => {
+exports.enableEventListeners = ({ app, usergroups }) => {
     /**
     * Updates the App-Home page for the specified user when they click on the Home tab.
     */
@@ -50,25 +49,5 @@ exports.enableEventListeners = ({ app, usergroups, userCache }) => {
         const ret = usergroups.processMembersChangedEvent(event);
         const shorthand = usergroups.generatePlaintextString(id);
         console.log(`ug ${shorthand} <${id}>: ${type}, returning ${ret}`);
-    });
-
-    /**
-     * Event listener for channel member join events
-     */
-    app.event('member_joined_channel', async ({ event }) => {
-        try {
-            // When the bot joins a channel, a daily message is scheduled for that channel with the default time.
-            if (app.client.auth.test.bot_id === event.bot) {
-                const channelId = event.channel;
-                scheduleMessage.scheduleMessage({
-                    channelId,
-                    app,
-                    usergroups,
-                    userCache,
-                });
-            }
-        } catch (error) {
-            console.error(error);
-        }
     });
 };
