@@ -6,7 +6,7 @@ const service = require('../../src/databaseService');
 const dfunc = require('../../src/dateFunctions');
 
 describe('ChangeRegistration Tests', function () { // eslint-disable-line
-    this.beforeAll(async () => {
+    before(async () => {
         await database.sequelize.sync({ force: true });
     });
 
@@ -69,7 +69,7 @@ describe('ChangeRegistration Tests', function () { // eslint-disable-line
 });
 
 describe('GetRegistrationsFor Tests', function () { // eslint-disable-line
-    this.beforeAll(async () => {
+    before(async () => {
         await database.sequelize.sync({ force: true });
     });
 
