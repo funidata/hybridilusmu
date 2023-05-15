@@ -5,7 +5,7 @@ const db = require('../../src/controllers/db.controllers');
 const service = require('../../src/databaseService');
 const dfunc = require('../../src/dateFunctions');
 
-describe.only('ChangeRegistration Tests', function () { // eslint-disable-line
+describe('ChangeRegistration Tests', function () { // eslint-disable-line
     this.beforeAll(async () => {
         await database.sequelize.sync({ force: true });
     });
@@ -68,7 +68,7 @@ describe.only('ChangeRegistration Tests', function () { // eslint-disable-line
     });
 });
 
-describe('GetRegistrationsFor Tests', function () { // eslint-disable-line
+describe.skip('GetRegistrationsFor Tests', function () { // eslint-disable-line
     this.beforeAll(async () => {
         await database.sequelize.sync({ force: true });
     });
@@ -137,7 +137,7 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
 
-describe('Database service tests', function () { // eslint-disable-line
+describe.skip('Database service tests', function () { // eslint-disable-line
     const signupTrueDic = {};
     const signupFalseDic = {};
     const defaultTrueDic = {};
@@ -241,7 +241,7 @@ describe('Database service tests', function () { // eslint-disable-line
     });
 });
 
-describe('Job', function () { // eslint-disable-line
+describe.skip('Job', function () { // eslint-disable-line
     this.beforeEach(async () => {
         await database.sequelize.sync({ force: true });
     });
