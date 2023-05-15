@@ -68,7 +68,7 @@ describe('ChangeRegistration Tests', function () { // eslint-disable-line
     });
 });
 
-describe.skip('GetRegistrationsFor Tests', function () { // eslint-disable-line
+describe('GetRegistrationsFor Tests', function () { // eslint-disable-line
     this.beforeAll(async () => {
         await database.sequelize.sync({ force: true });
     });
