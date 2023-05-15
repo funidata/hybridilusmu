@@ -1,7 +1,6 @@
 volumes:
   lusmu-db:
 
-
 services:
   lusmu:
     container_name: lusmu-dev
