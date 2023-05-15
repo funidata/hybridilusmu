@@ -6,7 +6,7 @@ const service = require('../../src/databaseService');
 const dfunc = require('../../src/dateFunctions');
 
 describe('ChangeRegistration Tests', function () { // eslint-disable-line
-    before(async () => {
+    this.beforeAll(async () => {
         await database.sequelize.sync({ force: true });
     });
 
@@ -69,7 +69,7 @@ describe('ChangeRegistration Tests', function () { // eslint-disable-line
 });
 
 describe('GetRegistrationsFor Tests', function () { // eslint-disable-line
-    before(async () => {
+    this.beforeAll(async () => {
         await database.sequelize.sync({ force: true });
     });
 
@@ -143,7 +143,7 @@ describe('Database service tests', function () { // eslint-disable-line
     const defaultTrueDic = {};
     const defaultFalseDic = {};
 
-    before(async () => {
+    this.beforeAll(async () => {
         await database.sequelize.sync({ force: true });
     });
 
@@ -241,8 +241,8 @@ describe('Database service tests', function () { // eslint-disable-line
     });
 });
 
-describe.only('Job', function () { // eslint-disable-line
-    beforeEach(async () => {
+describe('Job', function () { // eslint-disable-line
+    this.beforeEach(async () => {
         await database.sequelize.sync({ force: true });
     });
 

@@ -3,7 +3,7 @@ const db = require('../../src/models/index');
 const controller = require('../../src/controllers/db.controllers');
 
 describe('Default signups test', function () { // eslint-disable-line
-    before(async () => {
+    this.beforeAll(async () => {
         await db.sequelize.sync({ force: true });
     });
 
