@@ -242,7 +242,7 @@ describe.skip('Database service tests', function () { // eslint-disable-line
 });
 
 describe('Job', function () { // eslint-disable-line
-    this.beforeEach(async () => {
+    beforeEach(async () => {
         await database.sequelize.sync({ force: true });
     });
 
