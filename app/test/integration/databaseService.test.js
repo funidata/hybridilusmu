@@ -137,7 +137,7 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
 
-describe.skip('Database service tests', function () { // eslint-disable-line
+describe.only('Database service tests', function () { // eslint-disable-line
     const signupTrueDic = {};
     const signupFalseDic = {};
     const defaultTrueDic = {};
