@@ -137,7 +137,7 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
 
-describe.only('Database service tests', function () { // eslint-disable-line
+describe('Database service tests', function () { // eslint-disable-line
     const signupTrueDic = {};
     const signupFalseDic = {};
     const defaultTrueDic = {};
@@ -241,7 +241,7 @@ describe.only('Database service tests', function () { // eslint-disable-line
     });
 });
 
-describe('Job', function () { // eslint-disable-line
+describe.only('Job', function () { // eslint-disable-line
     beforeEach(async () => {
         await database.sequelize.sync({ force: true });
     });
