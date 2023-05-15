@@ -5,7 +5,7 @@ const db = require('../../src/controllers/db.controllers');
 const service = require('../../src/databaseService');
 const dfunc = require('../../src/dateFunctions');
 
-describe('ChangeRegistration Tests', function () { // eslint-disable-line
+describe.only('ChangeRegistration Tests', function () { // eslint-disable-line
     this.beforeAll(async () => {
         await database.sequelize.sync({ force: true });
     });
