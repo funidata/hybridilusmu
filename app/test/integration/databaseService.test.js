@@ -137,13 +137,13 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
 
-describe.skip('Database service tests', function () { // eslint-disable-line
+describe('Database service tests', function () { // eslint-disable-line
     const signupTrueDic = {};
     const signupFalseDic = {};
     const defaultTrueDic = {};
     const defaultFalseDic = {};
 
-    this.beforeAll(async () => {
+    before(async () => {
         await database.sequelize.sync({ force: true });
     });
 
