@@ -64,7 +64,7 @@ async function scheduleMessage({
                 const message = library.registrationList(
                     DateTime.now(),
                     registrations,
-                    userCache.generatePlaintextString,
+                    userCache.generateFullNameAndTag,
                 );
                 helper.postMessage(app, channelId, message);
             } else {
@@ -76,7 +76,7 @@ async function scheduleMessage({
                         DateTime.now(),
                         filteredRegistrations,
                         usergroups.generatePlaintextString(usergroupId),
-                        userCache.generatePlaintextString,
+                        userCache.generateFullNameAndTag,
                     );
                     helper.postMessage(app, channelId, message);
                 });

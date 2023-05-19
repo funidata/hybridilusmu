@@ -78,9 +78,14 @@ module.exports = {
             return `${u.user.profile.real_name || u.user.profile.display_name}`;
         };
 
+        const generateFullNameAndTag = (userId) => {
+            return `${generatePlaintextString(userId)} (<@${userId}>)`
+        }
+
         return {
             getCachedUser,
             generatePlaintextString,
+            generateFullNameAndTag
         };
     },
 };
