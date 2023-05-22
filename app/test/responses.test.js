@@ -5,7 +5,9 @@ const registrations = [
   'AAAAAAAA001',
   'AAAAAAAA002',
   'AAAAAAAA003',
-  'AAAAAAAA004'
+  'AAAAAAAA004',
+  'AAAAAAAA005',
+  'AAAAAAAA006',
 ]
 
 const testUsers = [
@@ -41,13 +43,29 @@ const testUsers = [
     },
     date: Date.now()
   },
+  {
+    user: {
+      id: 'AAAAAAAA005',
+      real_name: 'Olgierd von Everec',
+      display_name: 'Olgierd'
+    },
+    date: Date.now()
+  },
+  {
+    user: {
+      id: 'AAAAAAAA006',
+      real_name: '',
+      display_name: 'Ciri'
+    },
+    date: Date.now()
+  },
+  
 ]
 
 const mockUserCache = {}
 
 const initUserCache = () => {
   testUsers.forEach((user) => {
-    console.log(user.user)
     mockUserCache[user.user.id] = {
       user: user.user,
       date: Date.now(),
@@ -55,6 +73,7 @@ const initUserCache = () => {
   })
 }
 
+// This is identical to the function found in ../userCache.js
 const generatePlaintextString = (userId) => {
   if (!userId) {
       return '';
@@ -64,12 +83,8 @@ const generatePlaintextString = (userId) => {
       // fall back to a mention string if user is not found
       return `<@${userId}>`;
   }
-  return `${u.user.real_name || u.user.display_name}`;
+  return `${u.user.real_name || u.user.display_name} (<@${userId}>)`;
 };
-
-const generateFullNameAndTag = (userId) => {
-  return `${generatePlaintextString(userId)} (<@${userId}>)`
-}
 
 describe('responses: string generation', () => {
   before(() => {
@@ -81,9 +96,11 @@ describe('responses: string generation', () => {
       'Ada Lovelace (<@AAAAAAAA003>)',
       'Alan Turing (<@AAAAAAAA004>)',
       'Barbara Liskov (<@AAAAAAAA001>)',
+      'Ciri (<@AAAAAAAA006>)',
       'John McCarthy (<@AAAAAAAA002>)',
+      'Olgierd von Everec (<@AAAAAAAA005>)'
     ]
-    const result = responses.formatRegistrationList(registrations, generateFullNameAndTag)
+    const result = responses.formatRegistrationList(registrations, generatePlaintextString)
     assert.deepEqual(result, wantedResult);
   })
 })
