@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 const dfunc = require('./dateFunctions');
+const { formatUserIdList } = require('./helperFunctions')
 
 const weekdays = [
     'Maanantai',
@@ -95,20 +96,6 @@ const correctVerbForm = (date, peopleCnt) => {
 const generateUserMention = (uid) => `<@${uid}>`;
 
 /**
- * Formats the registration list by fetching the user's full names
- * and sorting them alphabetically
- *
- * @param {List} registrations - List of user ID strings
- * @param {function} userFormatter - User ID formatter, fetches the username from ID
- * @returns {List} List of registrations (string) in format: [ 'Ada Lovelace (@Ada)', ... ]
- */
-const formatRegistrationList = (registrations, userFormatter) => {
-    return registrations.map((user) => (
-        userFormatter(user)
-    )).sort()
-}
-
-/**
  * Response to /listaa command.
  * @param {Luxon Date} date - Luxon Date object.
  * @param {List} registrations - List of user ID strings, usernames to be added to the response.
@@ -118,7 +105,7 @@ const registrationList = (date, registrations, userFormatter = generateUserMenti
     if (registrations.length === 0) return nobodyAtOffice(date);
     const verb = correctVerbForm(date, registrations.length);
     let response = `${atDate(date)} toimistolla ${verb}:\n`;
-    registrations = formatRegistrationList(registrations, userFormatter)
+    registrations = formatUserIdList(registrations, userFormatter)
     for (const user of registrations) {
         response += `${user}\n`;
     }
@@ -144,7 +131,7 @@ const registrationListWithUsergroup = (
     if (registrations.length === 0) return nobodyAtOfficeFromTeam(date, usergroupMention);
     const verb = correctVerbForm(date, registrations.length);
     let response = `${atDate(date)} tiimistä ${usergroupMention} ${verb} toimistolla:\n`;
-    registrations = formatRegistrationList(registrations, userFormatter)
+    registrations = formatUserIdList(registrations, userFormatter)
     for (const user of registrations) {
         response += `${user}\n`
     }
@@ -296,5 +283,4 @@ module.exports = {
     registrationListWithUsergroup,
     usergroupNotFound,
     subscribeFailedNotInChannel,
-    formatRegistrationList
 };
