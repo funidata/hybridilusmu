@@ -95,7 +95,7 @@ const correctVerbForm = (date, peopleCnt) => {
 const generateUserMention = (uid) => `<@${uid}>`;
 
 /**
- * Formats the registrations by fetching the user's full name
+ * Formats the registration list by fetching the user's full names
  * and sorting them alphabetically
  *
  * @param {List} registrations - List of user ID strings

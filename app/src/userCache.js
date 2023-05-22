@@ -61,7 +61,7 @@ module.exports = {
          * You should call and wait on `getCachedUser(userId)` before calling this function.
          *
          * @param {string} userId - Slack user id
-         * @returns {string} User's real name or username. If user hasn't been cached,
+         * @returns {string} User's real name or username and a mention tag. If user hasn't been cached,
          *                   falls back to generating a mention string (`<@${userId}>`).
          *
          * @see getCachedUser
@@ -75,17 +75,12 @@ module.exports = {
                 // fall back to a mention string if user is not found
                 return `<@${userId}>`;
             }
-            return `${u.user.profile.real_name || u.user.profile.display_name}`;
+            return `${u.user.profile.real_name || u.user.profile.display_name} (<@${userId}>)`;
         };
-
-        const generateFullNameAndTag = (userId) => {
-            return `${generatePlaintextString(userId)} (<@${userId}>)`
-        }
 
         return {
             getCachedUser,
             generatePlaintextString,
-            generateFullNameAndTag
         };
     },
 };
