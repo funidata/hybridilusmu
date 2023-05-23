@@ -14,7 +14,6 @@
     "watch": "npm run migrate && nodemon src/index.js",
     "migrate": "npx sequelize-cli db:migrate",
     "test": "mocha",
-    "test:dev": "mocha 'test/responses.test.js'",
     "test:integration": "mocha 'test/integration/*.js' --exit",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "setup-e2e": "pip3 install --upgrade --target ./test/e2e/testcases/site-packages/ --requirement ./test/e2e/requirements.txt",
