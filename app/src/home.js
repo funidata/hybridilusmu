@@ -6,6 +6,7 @@ const { header } = require('./blocks/header');
 const { actions } = require('./blocks/actions');
 const { divider } = require('./blocks/divider');
 const { button } = require('./blocks/elements/button');
+const { formatUserIdList } = require('./helperFunctions')
 
 const SHOW_DAYS_UNTIL = 10;
 const DAYS_IN_WEEK = 5;
@@ -95,12 +96,13 @@ const getRegistrationsBlock = async (userId) => {
     for (let i = 0; i < dates.length; i += 1) {
         const date = dates[i];
         registrationsBlock.push(header(dfunc.toPrettyFormat(date)));
-        let userIdList = registrations[date].size === 0
+        let userList = registrations[date].size === 0
             ? 'Kukaan ei ole ilmoittautunut toimistolle!'
             : 'Toimistolla aikoo olla:\n';
-        registrations[date].forEach((user) => {
-            userIdList += `<@${user}>\n`;
-        });
+        const registrationList = formatUserIdList([...registrations[date]]);
+        for (user of registrationList) {
+            userList += `${user}\n`;
+        };
         const weekday = dfunc.getWeekday(DateTime.fromISO(date));
         const buttonValue = {
             date,
@@ -118,7 +120,7 @@ const getRegistrationsBlock = async (userId) => {
             emoji = 'normal';
         }
         registrationsBlock.push(
-            mrkdwn(userIdList),
+            mrkdwn(userList),
             plainText('Oma ilmoittautumiseni:'),
             actions([
                 button('Toimistolla', 'office_click', JSON.stringify(buttonValue), officeColor, emoji),
