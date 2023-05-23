@@ -88,24 +88,16 @@ const correctVerbForm = (date, peopleCnt) => {
 };
 
 /**
- * Generates a user mention string.
- *
- * @param {string} uid - Slack user id
- * @returns {string} Slack mention string for the given user
- */
-const generateUserMention = (uid) => `<@${uid}>`;
-
-/**
  * Response to /listaa command.
  * @param {Luxon Date} date - Luxon Date object.
  * @param {List} registrations - List of user ID strings, usernames to be added to the response.
- * @param {function} userFormatter - User id formatter, like `(uid) => doThings(userCache, uid)`.
+ * @return {string} A message ready to post
  */
-const registrationList = (date, registrations, userFormatter = generateUserMention) => {
+const registrationList = (date, registrations) => {
     if (registrations.length === 0) return nobodyAtOffice(date);
     const verb = correctVerbForm(date, registrations.length);
     let response = `${atDate(date)} toimistolla ${verb}:\n`;
-    registrations = formatUserIdList(registrations, userFormatter)
+    registrations = formatUserIdList(registrations)
     for (const user of registrations) {
         response += `${user}\n`;
     }
@@ -119,19 +111,17 @@ const registrationList = (date, registrations, userFormatter = generateUserMenti
  * @param {Luxon Date} date - Luxon Date object.
  * @param {List} registrations - List of strings, usernames to be added to the response.
  * @param {string} usergroupMention - Usergroup mention string to be added to the response.
- * @param {function} userFormatter - User id formatter, like `(uid) => doThings(userCache, uid)`.
  * @return {string} A message ready to post
  */
 const registrationListWithUsergroup = (
     date,
     registrations,
     usergroupMention,
-    userFormatter = generateUserMention,
 ) => {
     if (registrations.length === 0) return nobodyAtOfficeFromTeam(date, usergroupMention);
     const verb = correctVerbForm(date, registrations.length);
     let response = `${atDate(date)} tiimistä ${usergroupMention} ${verb} toimistolla:\n`;
-    registrations = formatUserIdList(registrations, userFormatter)
+    registrations = formatUserIdList(registrations)
     for (const user of registrations) {
         response += `${user}\n`
     }
