@@ -101,8 +101,6 @@ const registrationList = (date, registrations) => {
     for (const user of registrations) {
         response += `${user}\n`;
     }
-    console.log(response)
-
     return response;
 };
 
