@@ -1,3 +1,5 @@
+const { generatePlaintextString } = require('./userCache')
+
 /**
 * Returns a list of all the channels the bot is a member of.
 */
@@ -90,10 +92,11 @@ const readUsergroupsFromCleanSlate = async ({ app, usergroups }) => {
  * and sorting them alphabetically
  *
  * @param {List} userIdList - List of user ID strings
- * @param {function} userFormatter - User ID formatter, fetches the user's name from the ID
+ * @param {function} [userFormatter=generatePlaintextString] - Optional user ID formatter,
+ * fetches the user's name from the ID
  * @returns {List} List of users (string) in format: [ 'Ada Lovelace (<@ID>)', ... ]
  */
-const formatUserIdList = (userIdList, userFormatter) => {
+const formatUserIdList = (userIdList, userFormatter=generatePlaintextString) => {
     return userIdList.map((user) => (
         userFormatter(user)
     )).sort()

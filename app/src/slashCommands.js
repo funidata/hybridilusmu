@@ -109,9 +109,7 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
                     }
                 } else {
                     const registrations = await service.getRegistrationsFor(date.toISODate());
-                    response = library.registrationList(date,
-                        registrations,
-                        userCache.generatePlaintextString);
+                    response = library.registrationList(date, registrations);
                 }
             }
             helper.postEphemeralMessage(app, channelId, userId, response);
