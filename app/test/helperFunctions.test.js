@@ -1,5 +1,5 @@
 const assert = require('assert');
-const responses = require('../src/responses')
+const { formatUserIdList } = require('../src/helperFunctions')
 
 const registrations = [
   'AAAAAAAA001',
@@ -86,7 +86,7 @@ const generatePlaintextString = (userId) => {
   return `${u.user.real_name || u.user.display_name} (<@${userId}>)`;
 };
 
-describe('responses: string generation', () => {
+describe('formatting: user list generation', () => {
   before(() => {
     initUserCache()
   })
@@ -100,7 +100,7 @@ describe('responses: string generation', () => {
       'John McCarthy (<@AAAAAAAA002>)',
       'Olgierd von Everec (<@AAAAAAAA005>)'
     ]
-    const result = responses.formatRegistrationList(registrations, generatePlaintextString)
+    const result = formatUserIdList(registrations, generatePlaintextString)
     assert.deepEqual(result, wantedResult);
   })
 })
