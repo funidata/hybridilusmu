@@ -33,6 +33,8 @@ jobs:
     name: Integration tests
     runs-on: ubuntu-latest
     steps:
+      - name: Collect Workflow Telemetry
+        uses: runforesight/workflow-telemetry-action@v1
       - name: Checkout
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
