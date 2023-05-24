@@ -1,9 +1,9 @@
 {
   "name": "hybridilusmu-dev-env",
   "version": "0.0.1",
-  "engines" : { 
-    "npm" : ">=9.5.1",
-    "node" : ">=18.16.0"
+  "engines": {
+    "npm": ">=9.5.1",
+    "node": ">=18.16.0"
   },
   "scripts": {
     "start": "docker compose up -d --build",

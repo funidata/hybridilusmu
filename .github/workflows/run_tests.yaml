@@ -48,7 +48,7 @@ jobs:
           docker image ls -a
       - run: touch .env.development
       - name: Start containers
-        run: docker compose -f compose.yaml -f compose-ci.yaml up -d
+        run: docker compose -f compose.yaml -f compose-ci.yaml up -d --timeout 600
       - name: Run integration tests
         run: npm run test:integration
       - name: Stop containers
