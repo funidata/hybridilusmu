@@ -1,14 +1,12 @@
 const assert = require('assert');
 const db = require('../../src/models/index');
 const controller = require('../../src/controllers/db.controllers');
+const { disconnect, open } = require('../../src/models/index')
 
 describe('Signups Tests', function () { // eslint-disable-line
     this.beforeAll(async () => {
         await db.sequelize.sync({ force: true });
     });
-    after(async () => {
-        await db.sequelize.close()
-    })
 
     it('Create an office registration for a user.', async () => {
         const person = await db.Person.create({
