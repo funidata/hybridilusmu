@@ -27,7 +27,7 @@
     "node-schedule": "^2.0.0",
     "pg": "^8.7.1",
     "sequelize": "^6.6.5",
-    "sequelize-cli": "^6.4.1"
+    "sequelize-cli": "^6.6.0"
   },
   "devDependencies": {
     "codecov": "^3.8.3",
