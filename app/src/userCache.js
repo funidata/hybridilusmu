@@ -18,6 +18,29 @@ const usercache = {};
 /** Maximum age of stored objects in cache */
 const OBJECT_AGE = 60000;
 
+/**
+ * Generates a plain text string for the Slack user in question.
+ *
+ * You should call and wait on `getCachedUser(userId)` before calling this function.
+ *
+ * @param {string} userId - Slack user id
+ * @returns {string} User's real name or username and a mention tag. If user hasn't been cached,
+ *                   falls back to generating a mention string (`<@${userId}>`).
+ *
+ * @see getCachedUser
+ */
+const generatePlaintextString = (userId) => {
+    if (!userId) {
+        return '';
+    }
+    const u = usercache[userId];
+    if (!u) {
+        // fall back to a mention string if user is not found
+        return `<@${userId}>`;
+    }
+    return `${u.user.profile.real_name || u.user.profile.display_name} (<@${userId}>)`;
+};
+
 module.exports = {
     enableUserCache: ({ app }) => {
         /**
@@ -55,32 +78,10 @@ module.exports = {
             return null;
         };
 
-        /**
-         * Generates a plain text string for the Slack user in question.
-         *
-         * You should call and wait on `getCachedUser(userId)` before calling this function.
-         *
-         * @param {string} userId - Slack user id
-         * @returns {string} User's real name or username. If user hasn't been cached,
-         *                   falls back to generating a mention string (`<@${userId}>`).
-         *
-         * @see getCachedUser
-         */
-        const generatePlaintextString = (userId) => {
-            if (!userId) {
-                return '';
-            }
-            const u = usercache[userId];
-            if (!u) {
-                // fall back to a mention string if user is not found
-                return `<@${userId}>`;
-            }
-            return `${u.user.profile.real_name || u.user.profile.display_name}`;
-        };
-
         return {
             getCachedUser,
-            generatePlaintextString,
+            generatePlaintextString
         };
     },
+    generatePlaintextString
 };
