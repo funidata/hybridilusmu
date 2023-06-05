@@ -4,6 +4,7 @@ const schedule = require('node-schedule');
 const service = require('./databaseService');
 const helper = require('./helperFunctions');
 const library = require('./responses');
+const { generatePlaintextString } = require('./userCache')
 
 const jobs = new Map();
 
@@ -61,22 +62,40 @@ async function scheduleMessage({
             }
             const usergroupIds = usergroups.getUsergroupsForChannel(channelId);
             if (usergroupIds.length === 0) {
-                const message = library.registrationList(
+                const messageWithoutMentions = library.registrationList(
                     DateTime.now(),
-                    registrations
+                    registrations,
+                    generatePlaintextString
                 );
-                helper.postMessage(app, channelId, message);
+                // First post the registrations without the mention tags,
+                // so we don't send obnoxious notifications to everyone.
+                const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts;
+                // Now edit the message that was just sent by adding mention tags
+                // This way we're not sending unnecessary notifications.
+                const withMentionsMessage = library.registrationList(
+                    DateTime.now(),
+                    registrations,
+                )
+                helper.editMessage(app, channelId, messageId, withMentionsMessage)
+
             } else {
                 usergroupIds.forEach(async (usergroupId) => {
                     const filteredRegistrations = registrations.filter(
                         (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
                     );
-                    const message = library.registrationListWithUsergroup(
+                    const messageWithoutMentions = library.registrationListWithUsergroup(
                         DateTime.now(),
                         filteredRegistrations,
-                        usergroups.generatePlaintextString(usergroupId)
-                    );
-                    helper.postMessage(app, channelId, message);
+                        usergroups.generatePlaintextString(usergroupId),
+                        generatePlaintextString
+                    )
+                    const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts
+                    const messageWithMentions = library.registrationListWithUsergroup(
+                        DateTime.now(),
+                        filteredRegistrations,
+                        usergroups.generatePlaintextString(usergroupId),
+                    )
+                    helper.editMessage(app, channelId, messageId, messageWithMentions)
                 });
             }
         });

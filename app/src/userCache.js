@@ -38,8 +38,12 @@ const generatePlaintextString = (userId) => {
         // fall back to a mention string if user is not found
         return `<@${userId}>`;
     }
-    return `${u.user.profile.real_name || u.user.profile.display_name} (<@${userId}>)`;
+    return `${u.user.profile.real_name || u.user.profile.display_name}`;
 };
+
+const generateNameAndMention = (userId) => {
+    return `${generatePlaintextString(userId)} (<@${userId}>)`
+}
 
 module.exports = {
     enableUserCache: ({ app }) => {
@@ -83,5 +87,6 @@ module.exports = {
             generatePlaintextString
         };
     },
-    generatePlaintextString
+    generatePlaintextString,
+    generateNameAndMention
 };

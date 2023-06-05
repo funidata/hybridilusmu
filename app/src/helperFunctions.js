@@ -1,5 +1,3 @@
-const { generatePlaintextString } = require('./userCache')
-
 /**
 * Returns a list of all the channels the bot is a member of.
 */
@@ -60,6 +58,22 @@ async function postMessage(app, channelId, message) {
 }
 
 /**
+ * Edits a given message on a given channel
+ * @param {*} app - Slack app instance
+ * @param {string} channelId - Slack channel id
+ * @param {string} timestamp - Slack message id
+ * @param {string} message - Your message
+ * @returns {Object} - Slack message object
+ */
+async function editMessage(app, channelId, timestamp, message) {
+    return app.client.chat.update({
+        channel: channelId,
+        ts: timestamp,
+        text: message
+    })
+}
+
+/**
  * Reads usergroups from Slack to our local cache
  */
 const readUsergroupsFromCleanSlate = async ({ app, usergroups }) => {
@@ -92,11 +106,11 @@ const readUsergroupsFromCleanSlate = async ({ app, usergroups }) => {
  * and sorting them alphabetically
  *
  * @param {List} userIdList - List of user ID strings
- * @param {function} [userFormatter=generatePlaintextString] - Optional user ID formatter,
+ * @param {function} userFormatter - user ID formatter,
  * fetches the user's name from the ID
  * @returns {List} List of users (string) in format: [ 'Ada Lovelace (<@ID>)', ... ]
  */
-const formatUserIdList = (userIdList, userFormatter=generatePlaintextString) => {
+const formatUserIdList = (userIdList, userFormatter) => {
     return userIdList.map((user) => (
         userFormatter(user)
     )).sort()
@@ -107,6 +121,7 @@ module.exports = {
     isBotChannelMember,
     postEphemeralMessage,
     postMessage,
+    editMessage,
     readUsergroupsFromCleanSlate,
     formatUserIdList
 };
