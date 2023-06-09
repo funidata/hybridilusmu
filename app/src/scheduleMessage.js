@@ -17,6 +17,46 @@ async function unScheduleMessage({ channelId }) {
     }
 }
 
+async function postRegistrationsWithoutNotifications(app, registrations, channelId) {
+    const messageWithoutMentions = library.registrationList(
+        DateTime.now(),
+        registrations,
+        generatePlaintextString
+    );
+    // First post the registrations without the mention tags,
+    // so we don't send obnoxious notifications to everyone.
+    const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts;
+    const messageWithMentions = library.registrationList(
+        DateTime.now(),
+        registrations,
+    )
+    // Now edit the message that was just sent by adding mention tags
+    // This way we're not sending unnecessary notifications.
+    helper.editMessage(app, channelId, messageId, messageWithMentions)
+}
+
+async function postRegistrationsWithUsergroupWithoutNotifications(
+    app,
+    registrations,
+    channelId,
+    usergroups,
+    usergroupId) {
+    const messageWithoutMentions = library.registrationListWithUsergroup(
+        DateTime.now(),
+        registrations,
+        usergroups.generatePlaintextString(usergroupId),
+        generatePlaintextString
+    )
+
+    const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts
+    const messageWithMentions = library.registrationListWithUsergroup(
+        DateTime.now(),
+        registrations,
+        usergroups.generatePlaintextString(usergroupId),
+    )
+    helper.editMessage(app, channelId, messageId, messageWithMentions)
+}
+
 /**
  * Schedules a job to send a daily message to the given channel at the given or default time.
  * Creates or updates both entires in both the Map and the database.
@@ -62,40 +102,19 @@ async function scheduleMessage({
             }
             const usergroupIds = usergroups.getUsergroupsForChannel(channelId);
             if (usergroupIds.length === 0) {
-                const messageWithoutMentions = library.registrationList(
-                    DateTime.now(),
-                    registrations,
-                    generatePlaintextString
-                );
-                // First post the registrations without the mention tags,
-                // so we don't send obnoxious notifications to everyone.
-                const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts;
-                // Now edit the message that was just sent by adding mention tags
-                // This way we're not sending unnecessary notifications.
-                const withMentionsMessage = library.registrationList(
-                    DateTime.now(),
-                    registrations,
-                )
-                helper.editMessage(app, channelId, messageId, withMentionsMessage)
+                postRegistrationsWithoutNotifications(app, registrations, channelId)
 
             } else {
                 usergroupIds.forEach(async (usergroupId) => {
                     const filteredRegistrations = registrations.filter(
                         (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
                     );
-                    const messageWithoutMentions = library.registrationListWithUsergroup(
-                        DateTime.now(),
+                    postRegistrationsWithUsergroupWithoutNotifications(
+                        app,
                         filteredRegistrations,
-                        usergroups.generatePlaintextString(usergroupId),
-                        generatePlaintextString
-                    )
-                    const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts
-                    const messageWithMentions = library.registrationListWithUsergroup(
-                        DateTime.now(),
-                        filteredRegistrations,
-                        usergroups.generatePlaintextString(usergroupId),
-                    )
-                    helper.editMessage(app, channelId, messageId, messageWithMentions)
+                        channelId,
+                        usergroups,
+                        usergroupId)
                 });
             }
         });
@@ -114,15 +133,14 @@ async function startScheduling({ app, usergroups, userCache }) {
     }));
     await service.addAllJobs(channels); // add all those channels that are not in the db yet
     console.log('Scheduling every Job found in the database');
-    await service.getAllJobs().then((dbJobs) => {
-        dbJobs.forEach((job) => {
-            const channelId = job.channelId; // eslint-disable-line prefer-destructuring
-            const time = job.time ? DateTime.fromSQL(job.time) : null;
-            scheduleMessage({
-                channelId, time, app, usergroups, userCache,
-            });
-        });
-    });
+    const allJobs = await service.getAllJobs()
+    await Promise.all(allJobs.map((job) => {
+        const channelId = job.channelId
+        const time = DateTime.fromSQL(job.time)
+        return scheduleMessage({
+            channelId, time, app, usergroups, userCache
+        })
+    }))
 }
 
 /**
