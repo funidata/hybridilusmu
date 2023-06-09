@@ -4,7 +4,7 @@ const dfunc = require('./dateFunctions');
 const helper = require('./helperFunctions');
 const service = require('./databaseService');
 const library = require('./responses');
-const schedule = require('./scheduleMessage');
+const schedule = require('./scheduler/scheduler');
 
 /**
  * An optional prefix for our slash-commands. When set to e.g. 'h',

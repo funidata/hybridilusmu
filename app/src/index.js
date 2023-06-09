@@ -6,7 +6,7 @@ require('./tools/quotenv').checkEnv([
     'SLACK_SIGNING_SECRET',
 ]);
 const { App } = require('@slack/bolt');
-const scheduler = require('./scheduleMessage');
+const scheduler = require('./scheduler/scheduler');
 const usergroups = require('./usergroups');
 const { enableActionFunctions } = require('./actionFunctions');
 const { enableEventListeners } = require('./eventListeners');
