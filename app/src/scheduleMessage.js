@@ -57,6 +57,44 @@ async function postRegistrationsWithUsergroupWithoutNotifications(
     helper.editMessage(app, channelId, messageId, messageWithMentions)
 }
 
+const sendScheduledMessage = async (app, channelId, usergroups, userCache) => {
+    console.log('delivering scheduled posts')
+    const isMember = await helper.isBotChannelMember(app, channelId)
+    // remove job from channel the bot is no longer a member of
+    if (!isMember) {
+        unScheduleMessage({ channelId })
+        return
+    }
+    const registrations = await service.getRegistrationsFor(DateTime.now().toISODate())
+    // Freshen up user cache to provide data for string generation
+    const userPromises = registrations.map((uid) => userCache.getCachedUser(uid))
+    // Wait for said freshening up to finish before continuing with message generation.
+    // Otherwise we can get empty strings for all our users, unless they've already used the application
+    // during this particular execution of the application. (Trust me, it's happened to me.)
+    await Promise.all(userPromises)
+
+    const usergroupIds = usergroups.getUsergroupsForChannel(channelId)
+    // No Slack user groups are added to this channel.
+    // Send normal message containing everyone that is registered.
+    if (usergroupIds.length === 0) {
+        postRegistrationsWithoutNotifications(app, registrations, channelId)
+    } else {
+        // Send a separate list of registered users from each
+        // Slack user group in this channel
+        usergroupIds.forEach(async (usergroupId) => {
+            const filteredRegistrations = registrations.filter(
+                (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
+            );
+            postRegistrationsWithUsergroupWithoutNotifications(
+                app,
+                filteredRegistrations,
+                channelId,
+                usergroups,
+                usergroupId)
+        });
+    }
+}
+
 /**
  * Schedules a job to send a daily message to the given channel at the given or default time.
  * Creates or updates both entires in both the Map and the database.
@@ -81,43 +119,9 @@ async function scheduleMessage({
         await service.addJob(channelId, time ? time.toSQLTime() : null);
         foundJob.reschedule(rule);
     } else { // create job
-        const job = schedule.scheduleJob(rule, async () => {
-            console.log('delivering scheduled posts');
-            // Parallelize membership info fetching
-            const memberPromise = helper.isBotChannelMember(app, channelId);
-            // We have to await on registrations, because they're needed for user fetching
-            const registrations = await service.getRegistrationsFor(DateTime.now().toISODate());
-            // Freshen up user cache to provide data for string generation
-            const userPromises = registrations.map((uid) => userCache.getCachedUser(uid));
-            // Wait for said freshening up to finish before continuing with message generation.
-            // Otherwise we can get empty strings for all our users, unless they've already used the application
-            // during this particular execution of the application. (Trust me, it's happened to me.)
-            await Promise.all(userPromises);
-            // Read our membership info from its promise
-            const isMember = await memberPromise;
-            // remove job from channel the bot is no longer a member of
-            if (!isMember) {
-                unScheduleMessage({ channelId });
-                return;
-            }
-            const usergroupIds = usergroups.getUsergroupsForChannel(channelId);
-            if (usergroupIds.length === 0) {
-                postRegistrationsWithoutNotifications(app, registrations, channelId)
-
-            } else {
-                usergroupIds.forEach(async (usergroupId) => {
-                    const filteredRegistrations = registrations.filter(
-                        (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
-                    );
-                    postRegistrationsWithUsergroupWithoutNotifications(
-                        app,
-                        filteredRegistrations,
-                        channelId,
-                        usergroups,
-                        usergroupId)
-                });
-            }
-        });
+        const sendMessage = () => sendScheduledMessage(app, channelId, usergroups, userCache)
+        // 1st arg: when to execute, 2nd arg: what to execute
+        const job = schedule.scheduleJob(rule, sendMessage)
         // add the job to the map so that we can reschedule it later
         jobs.set(channelId, job);
     }
@@ -136,7 +140,7 @@ async function startScheduling({ app, usergroups, userCache }) {
     const allJobs = await service.getAllJobs()
     await Promise.all(allJobs.map((job) => {
         const channelId = job.channelId
-        const time = DateTime.fromSQL(job.time)
+        const time = job.time ? DateTime.fromSQL(job.time) : null
         return scheduleMessage({
             channelId, time, app, usergroups, userCache
         })
