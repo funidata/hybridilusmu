@@ -6,41 +6,29 @@ const service = require('../databaseService');
 const { generatePlaintextString } = require('../userCache')
 
 /**
- * Sends the list of registered users to the given channel, without sending mention notifications.
+ * Sends the list of registered users to the given channel.
  * @param {*} app - Slack app instance.
  * @param {List} registrations - List of user id string.
  * @param {string} channelId - Slack channel id.
  */
-const postRegistrationsWithoutNotifications = async (app, registrations, channelId) => {
+const postRegistrations = async (app, registrations, channelId) => {
   const messageWithoutMentions = library.registrationList(
       DateTime.now(),
       registrations,
       generatePlaintextString
   );
-  // First post the registrations without the mention tags,
-  // so we don't send obnoxious notifications to everyone.
-  const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts;
-  const messageWithMentions = library.registrationList(
-      DateTime.now(),
-      registrations,
-  )
-  // Now edit the message that was just sent by adding mention tags
-  // This way we're not sending unnecessary notifications.
-  //helper.postMessage(app, channelId, messageWithMentions)
-  //return setTimeout(() => helper.editMessage(app, channelId, messageId, messageWithMentions), 61000)
-  helper.editMessage(app, channelId, messageId, messageWithMentions)
+  await helper.postMessage(app, channelId, messageWithoutMentions)
 }
 
 /**
- * Sends the list of registered users within a usergroup to the given channel,
- * without sending mention notifications.
+ * Sends the list of registered users within a usergroup to the given channel.
  * @param {*} app - Slack app instance.
  * @param {List} registrations - List of user id string.
  * @param {string} channelId - Slack channel id.
  * @param {*} usergroups - Usergroup functions.
  * @param {string} usergroupId - Id of the slack usergroup we want to include in the message.
  */
-const postRegistrationsWithUsergroupWithoutNotifications = async (
+const postRegistrationsWithUsergroup = async (
   app,
   registrations,
   channelId,
@@ -53,16 +41,19 @@ const postRegistrationsWithUsergroupWithoutNotifications = async (
       usergroups.generatePlaintextString(usergroupId),
       generatePlaintextString
   )
-
-  const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts
-  const messageWithMentions = library.registrationListWithUsergroup(
-      DateTime.now(),
-      registrations,
-      usergroups.generatePlaintextString(usergroupId),
-  )
-  helper.editMessage(app, channelId, messageId, messageWithMentions)
+  await helper.postMessage(app, channelId, messageWithoutMentions)
 }
 
+/**
+ * Function which posts messages of the current days registered users
+ * on the given channel. Checks if any Slack user groups are added on the channel
+ * and posts separate messages for each.
+ * @param {*} app - Slack app instance.
+ * @param {string} channelId - ID of the channel where messages will be posted
+ * @param {*} usergroups - usergroups cache instance
+ * @param {*} userCache - userCache instance
+ * @returns 
+ */
 const sendScheduledMessage = async (app, channelId, usergroups, userCache) => {
   console.log('delivering scheduled posts')
   const registrations = await service.getRegistrationsFor(DateTime.now().toISODate())
@@ -77,7 +68,7 @@ const sendScheduledMessage = async (app, channelId, usergroups, userCache) => {
   // No Slack user groups are added to this channel.
   // Send normal message containing everyone that is registered.
   if (usergroupIds.length === 0) {
-      return postRegistrationsWithoutNotifications(app, registrations, channelId)
+      return postRegistrations(app, registrations, channelId)
   } else {
       // Send a separate list of registered users from each
       // Slack user group in this channel
@@ -85,7 +76,7 @@ const sendScheduledMessage = async (app, channelId, usergroups, userCache) => {
           const filteredRegistrations = registrations.filter(
               (userId) => usergroups.isUserInUsergroup(userId, usergroupId),
           );
-          return postRegistrationsWithUsergroupWithoutNotifications(
+          return postRegistrationsWithUsergroup(
             app,
             filteredRegistrations,
             channelId,
