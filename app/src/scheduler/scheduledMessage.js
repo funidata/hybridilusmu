@@ -5,6 +5,12 @@ const helper = require('../helperFunctions');
 const service = require('../databaseService');
 const { generatePlaintextString } = require('../userCache')
 
+/**
+ * Sends the list of registered users to the given channel, without sending mention notifications.
+ * @param {*} app - Slack app instance.
+ * @param {List} registrations - List of user id string.
+ * @param {string} channelId - Slack channel id.
+ */
 const postRegistrationsWithoutNotifications = async (app, registrations, channelId) => {
   const messageWithoutMentions = library.registrationList(
       DateTime.now(),
@@ -20,9 +26,20 @@ const postRegistrationsWithoutNotifications = async (app, registrations, channel
   )
   // Now edit the message that was just sent by adding mention tags
   // This way we're not sending unnecessary notifications.
-  return helper.editMessage(app, channelId, messageId, messageWithMentions)
+  //helper.postMessage(app, channelId, messageWithMentions)
+  //return setTimeout(() => helper.editMessage(app, channelId, messageId, messageWithMentions), 61000)
+  helper.editMessage(app, channelId, messageId, messageWithMentions)
 }
 
+/**
+ * Sends the list of registered users within a usergroup to the given channel,
+ * without sending mention notifications.
+ * @param {*} app - Slack app instance.
+ * @param {List} registrations - List of user id string.
+ * @param {string} channelId - Slack channel id.
+ * @param {*} usergroups - Usergroup functions.
+ * @param {string} usergroupId - Id of the slack usergroup we want to include in the message.
+ */
 const postRegistrationsWithUsergroupWithoutNotifications = async (
   app,
   registrations,
@@ -48,12 +65,6 @@ const postRegistrationsWithUsergroupWithoutNotifications = async (
 
 const sendScheduledMessage = async (app, channelId, usergroups, userCache) => {
   console.log('delivering scheduled posts')
-  const isMember = await helper.isBotChannelMember(app, channelId)
-  // remove job from channel the bot is no longer a member of
-  if (!isMember) {
-      unScheduleMessage({ channelId })
-      return
-  }
   const registrations = await service.getRegistrationsFor(DateTime.now().toISODate())
   // Freshen up user cache to provide data for string generation
   const userPromises = registrations.map((uid) => userCache.getCachedUser(uid))

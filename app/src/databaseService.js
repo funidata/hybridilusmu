@@ -59,6 +59,24 @@ const removeJob = async (channelId) => db.removeJob(channelId);
 const addAllJobs = async (jobs) => db.addAllJobs(jobs);
 
 /**
+ * Updates the jobs in the database by removing channels that the bot
+ * is no longer a member of and conversely adds all the channels that the bot
+ * is a member of.
+ * @param {*} channels - List of channel IDs that the bot is a member of.
+ */
+const updateJobs = async (channels) => {
+    const currentJobs = await getAllJobs()
+    // First remove jobs that are no longer found in the list of channels
+    for (const job of currentJobs) {
+        if (!channels.find(c => c.channel_id === job.channelId)) {
+            removeJob(job.channelId)
+        }
+    }
+    // Add any new channels that are not yet in the database.
+    addAllJobs(channels)
+}
+
+/**
  * Adds or updates the timing of the daily message for the given channel.
  * @param {string} channelId - Slack channel ID.
  * @param {string} time - Optional. Time string in the ISO date format.
@@ -174,4 +192,5 @@ module.exports = {
     addAllJobs,
     addJob,
     getAllJobs,
+    updateJobs
 };

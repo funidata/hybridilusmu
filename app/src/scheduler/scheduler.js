@@ -5,9 +5,15 @@ const service = require('../databaseService');
 const helper = require('../helperFunctions');
 const { sendScheduledMessage } = require('../scheduler/scheduledMessage')
 
+// Node-Schedule Job Objects
 const jobs = new Map();
 
-async function unScheduleMessage({ channelId }) {
+/**
+ * Removes the given channel from the database's Job table
+ * and cancels the job from the node-schedule jobs map.
+ * @param {string} channelId - ID of the channel we want to unschedule
+ */
+async function unScheduleMessage(channelId) {
     const foundJob = jobs.get(channelId);
     if (foundJob) {
         service.removeJob(channelId);
@@ -56,7 +62,7 @@ async function startScheduling({ app, usergroups, userCache }) {
     channels = channels.map((channel) => ({
         channel_id: channel,
     }));
-    await service.addAllJobs(channels); // add all those channels that are not in the db yet
+    await service.updateJobs(channels); // update the database to include channels the bot is a member of
     console.log('Scheduling every Job found in the database');
     const allJobs = await service.getAllJobs()
     await Promise.all(allJobs.map((job) => {
