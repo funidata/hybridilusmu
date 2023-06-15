@@ -181,6 +181,10 @@ const getRegistrationsForUserBetween = async (userId, firstDate, lastDate) => {
     return result;
 };
 
+const getScheduledMessageId = async (date, channelId, usergroupId = null) => {
+    // SELECT messageId FROM scheduledMessages WHERE date, channelId usergroupId?
+}
+
 module.exports = {
     changeRegistration,
     changeDefaultRegistration,

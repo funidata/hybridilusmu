@@ -1,5 +1,6 @@
 const home = require('./home');
 const service = require('./databaseService');
+const { updateScheduledMessages } = require('./lateRegistration');
 
 exports.enableActionFunctions = ({ app }) => {
     /**
@@ -24,6 +25,7 @@ exports.enableActionFunctions = ({ app }) => {
     app.action('office_click', async ({ body, ack, client }) => {
         const data = JSON.parse(body.actions[0].value);
         await service.changeRegistration(body.user.id, data.date, !data.atOffice);
+        await updateScheduledMessages(app, data.date)
         home.update(client, body.user.id);
         await ack();
     });
@@ -35,6 +37,7 @@ exports.enableActionFunctions = ({ app }) => {
     app.action('remote_click', async ({ body, ack, client }) => {
         const data = JSON.parse(body.actions[0].value);
         await service.changeRegistration(body.user.id, data.date, !data.isRemote, false);
+        await updateScheduledMessages(app, data.date)
         home.update(client, body.user.id);
         await ack();
     });
