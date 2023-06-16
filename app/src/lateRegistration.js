@@ -39,7 +39,9 @@ const updateScheduledMessages = async (app, date) => {
       // Haetaan tietokannasta scheduledMessages taulusta messageId
       // SELECT messageId WHERE date, channelId
       const messageId = await service.getScheduledMessageId(date, channelId)
-      return editRegistrations(app, registrations, channelId, messageId)
+      if (messageId) {
+        editRegistrations(app, registrations, channelId, messageId)
+      }
     } else {
       console.log(`found usergroups in channel: ${channelId}`)
       // Kanavalla voi olla monta aikataulutettua viestiä
@@ -47,12 +49,14 @@ const updateScheduledMessages = async (app, date) => {
       // SELECT messageId WHERE date, channel, usegroupId
       usergroupIds.forEach(async (usergroupId) => {
         const messageId = service.getScheduledMessageId(date, channelId, usergroupId)
-        const filteredRegistrations = registrations.filter(
-          (userId) => usergroups.isUserInUsergroup(userId, usergroupId)
-        )
-        return editRegistrationsWithUsergroup(
-          app, filteredRegistrations, channelId, messageId, usergroupId
-        )
+        if (messageId) {
+          const filteredRegistrations = registrations.filter(
+            (userId) => usergroups.isUserInUsergroup(userId, usergroupId)
+          )
+          editRegistrationsWithUsergroup(
+            app, filteredRegistrations, channelId, messageId, usergroupId
+          )
+        }
       })
     }
   }
