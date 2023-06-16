@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Job extends Model {
+  class ScheduledMessage extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,18 +11,20 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.hasMany(models.ScheduledMessage, {
-        foreignKey: 'jobId'
+      this.belongsTo(models.Job, {
+        foreignKey: 'jobId',
+        as: 'job'
       })
     }
   }
-  Job.init({
-    channel_id: DataTypes.STRING,
-    time: DataTypes.TIME
+  ScheduledMessage.init({
+    messageId: DataTypes.STRING,
+    date: DataTypes.DATEONLY,
+    channelId: DataTypes.STRING,
+    usergroupId: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'Job',
-    indexes: [{ fields: ['channel_id'], unique: true }],
+    modelName: 'ScheduledMessage',
   });
-  return Job;
+  return ScheduledMessage;
 };
