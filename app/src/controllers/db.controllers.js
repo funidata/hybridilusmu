@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const { sequelize } = require('../models/index');
 
-const { Person, Signup, Defaultsignup, Job } = require('../models');
+const { Person, Signup, Defaultsignup, Job, ScheduledMessage } = require('../models');
 /**
  * Returns a row from the People table that matches the Slack user ID.
  * The row contains the following:
@@ -505,3 +505,17 @@ exports.getAllJobs = async () => {
         return undefined;
     }
 };
+
+exports.addScheduledMessage = async (messageId, date, channelId, usegroupId) => {
+    try {
+        return await ScheduledMessage.upsert({
+            messageId: messageId,
+            date: date,
+            channelId: channelId,
+            usegroupId: usegroupId
+        })
+    } catch (err) {
+        console.log('Error while creating a scheduled message', err)
+        return undefined
+    }
+}

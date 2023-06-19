@@ -11,13 +11,14 @@ const { generatePlaintextString } = require('../userCache')
  * @param {List} registrations - List of user id string.
  * @param {string} channelId - Slack channel id.
  */
-const postRegistrations = async (app, registrations, channelId) => {
+const postRegistrations = async (app, registrations, channelId, date) => {
   const messageWithoutMentions = library.registrationList(
       DateTime.now(),
       registrations,
       generatePlaintextString
   );
-  await helper.postMessage(app, channelId, messageWithoutMentions)
+  const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts
+  service.addScheduledMessage(messageId, date, channelId)
 }
 
 /**
@@ -56,7 +57,8 @@ const postRegistrationsWithUsergroup = async (
  */
 const sendScheduledMessage = async (app, channelId, usergroups, userCache) => {
   console.log('delivering scheduled posts')
-  const registrations = await service.getRegistrationsFor(DateTime.now().toISODate())
+  const date = DateTime.now().toISODate()
+  const registrations = await service.getRegistrationsFor(date)
   // Freshen up user cache to provide data for string generation
   const userPromises = registrations.map((uid) => userCache.getCachedUser(uid))
   // Wait for said freshening up to finish before continuing with message generation.
@@ -68,7 +70,7 @@ const sendScheduledMessage = async (app, channelId, usergroups, userCache) => {
   // No Slack user groups are added to this channel.
   // Send normal message containing everyone that is registered.
   if (usergroupIds.length === 0) {
-      return postRegistrations(app, registrations, channelId)
+      return postRegistrations(app, registrations, channelId, date)
   } else {
       // Send a separate list of registered users from each
       // Slack user group in this channel

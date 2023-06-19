@@ -181,11 +181,15 @@ const getRegistrationsForUserBetween = async (userId, firstDate, lastDate) => {
     return result;
 };
 
-const getScheduledMessageId = async (date, channelId, usergroupId = null) => {
+const getScheduledMessageId = async (date, channelId, usergroupId = null) => (
     // scheduledMessages- taulu kannassa, missä kentät: { id, (slack)messageId, date, channelId, usergroupId (optional) }
     // SELECT messageId FROM scheduledMessages WHERE date, channelId usergroupId?
-    return null
-}
+    db.getScheduledMessageId(date, channelId, usergroupId)
+)
+
+const addScheduledMessage = async (messageId, date, channelId, usergroupId = null) => (
+    db.addScheduledMessage(messageId, date, channelId, usergroupId)
+)
 
 module.exports = {
     changeRegistration,
@@ -199,5 +203,6 @@ module.exports = {
     addJob,
     getAllJobs,
     updateJobs,
-    getScheduledMessageId
+    getScheduledMessageId,
+    addScheduledMessage
 };

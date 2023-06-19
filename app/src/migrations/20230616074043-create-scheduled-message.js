@@ -19,7 +19,7 @@ module.exports = {
         references: {
           model: 'Jobs',
           key: 'channel_id',
-          as: 'jobId'
+          as: 'channelId'
         }
       },
       usergroupId: {
