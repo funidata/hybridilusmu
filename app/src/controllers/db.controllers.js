@@ -506,6 +506,14 @@ exports.getAllJobs = async () => {
     }
 };
 
+/**
+ * Adds a scheduledMessage
+ * @param {string} messageId Slack message id AKA message timestamp
+ * @param {string} date Date in the ISO date format
+ * @param {string} channelId Slack channel id
+ * @param {string} usegroupId Slack usergroup id
+ * @returns true if succesful, undefined otherwise
+ */
 exports.addScheduledMessage = async (messageId, date, channelId, usegroupId) => {
     try {
         return await ScheduledMessage.upsert({
@@ -516,6 +524,31 @@ exports.addScheduledMessage = async (messageId, date, channelId, usegroupId) => 
         })
     } catch (err) {
         console.log('Error while creating a scheduled message', err)
+        return undefined
+    }
+}
+
+/**
+ * Fetches a Slack message id for the given date, channel and usergroup
+ * @param {string} date Date in the ISO date format.
+ * @param {string} channelId Slack channel id
+ * @param {string} usergroupId Slack usergroup id
+ * @returns Sequelize virtual object containing the messageId
+ * or undefined if message not found
+ */
+exports.getScheduledMessageId = async (date, channelId, usergroupId) => {
+    try {
+        return await ScheduledMessage.findOne({
+            raw: true,
+            attributes: ['messageId'],
+            where: {
+                date: date,
+                channelId: channelId,
+                usergroupId: usergroupId
+            }
+        })
+    } catch (err) {
+        console.log('Error while finding a scheduled message ', err)
         return undefined
     }
 }
