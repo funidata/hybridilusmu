@@ -14,7 +14,7 @@ const testUsers = [
   {
     user: {
       id: 'AAAAAAAA001',
-      real_name: 'Barbara Liskov',
+      real_name: 'barbara Liskov',
       display_name: 'Barbara'
     },
     date: Date.now()
@@ -95,7 +95,7 @@ describe('formatting: user list generation', () => {
     const wantedResult = [
       'Ada Lovelace (<@AAAAAAAA003>)',
       'Alan Turing (<@AAAAAAAA004>)',
-      'Barbara Liskov (<@AAAAAAAA001>)',
+      'barbara Liskov (<@AAAAAAAA001>)',
       'Ciri (<@AAAAAAAA006>)',
       'John McCarthy (<@AAAAAAAA002>)',
       'Olgierd von Everec (<@AAAAAAAA005>)'

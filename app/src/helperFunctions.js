@@ -119,7 +119,7 @@ const readUsergroupsFromCleanSlate = async ({ app, usergroups }) => {
 const formatUserIdList = (userIdList, userFormatter) => {
     return userIdList.map((user) => (
         userFormatter(user)
-    )).sort()
+    )).sort(Intl.Collator().compare)
 }
 
 module.exports = {
