@@ -66,11 +66,17 @@ async function postMessage(app, channelId, message) {
  * @returns {Object} - Slack message object
  */
 async function editMessage(app, channelId, timestamp, message) {
-    return app.client.chat.update({
-        channel: channelId,
-        ts: timestamp,
-        text: message
-    })
+    try {
+        const result = await app.client.chat.update({
+            channel: channelId,
+            ts: timestamp,
+            text: message
+        })
+        console.log(`edited message ${timestamp} in channel ${channelId} successfully`)
+        return result
+    } catch (err) {
+        console.log('error while editing message ', err)
+    }
 }
 
 /**
