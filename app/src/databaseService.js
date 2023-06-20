@@ -197,7 +197,7 @@ const getScheduledMessageId = async (date, channelId, usergroupId = null) => {
 }
 
 /**
- * Adds a scheduledMessage
+ * Saves the scheduled messages id to the database.
  * @param {string} messageId Slack message id AKA message timestamp
  * @param {string} date Date in the ISO date format
  * @param {string} channelId Slack channel id

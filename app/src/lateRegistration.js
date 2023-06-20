@@ -65,8 +65,8 @@ const updateScheduledMessages = async (app, date) => {
         editRegistrations(app, registrations, channelId, messageId)
       }
     } else {
-      usergroupIds.forEach(async (usergroupId) => {
-        const messageId = service.getScheduledMessageId(date, channelId, usergroupId)
+      for (const usergroupId of usergroupIds) {
+        const messageId = await service.getScheduledMessageId(date, channelId, usergroupId)
         if (messageId) {
           const filteredRegistrations = registrations.filter(
             (userId) => usergroups.isUserInUsergroup(userId, usergroupId)
@@ -75,7 +75,7 @@ const updateScheduledMessages = async (app, date) => {
             app, filteredRegistrations, channelId, messageId, usergroupId
           )
         }
-      })
+      }
     }
   }
 }

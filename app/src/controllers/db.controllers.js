@@ -511,16 +511,16 @@ exports.getAllJobs = async () => {
  * @param {string} messageId Slack message id AKA message timestamp
  * @param {string} date Date in the ISO date format
  * @param {string} channelId Slack channel id
- * @param {string} usegroupId Slack usergroup id
+ * @param {string} usergroupId Slack usergroup id
  * @returns true if succesful, undefined otherwise
  */
-exports.addScheduledMessage = async (messageId, date, channelId, usegroupId) => {
+exports.addScheduledMessage = async (messageId, date, channelId, usergroupId) => {
     try {
         return await ScheduledMessage.upsert({
             messageId: messageId,
             date: date,
             channelId: channelId,
-            usegroupId: usegroupId
+            usergroupId: usergroupId
         })
     } catch (err) {
         console.log('Error while creating a scheduled message', err)
@@ -529,7 +529,7 @@ exports.addScheduledMessage = async (messageId, date, channelId, usegroupId) => 
 }
 
 /**
- * Fetches a Slack message id for the given date, channel and usergroup
+ * Fetches the _latest_ Slack message id for the given date, channel and usergroup
  * @param {string} date Date in the ISO date format.
  * @param {string} channelId Slack channel id
  * @param {string} usergroupId Slack usergroup id
@@ -545,7 +545,8 @@ exports.getScheduledMessageId = async (date, channelId, usergroupId) => {
                 date: date,
                 channelId: channelId,
                 usergroupId: usergroupId
-            }
+            },
+            order: [ [ 'createdAt', 'DESC' ] ]
         })
     } catch (err) {
         console.log('Error while finding a scheduled message ', err)

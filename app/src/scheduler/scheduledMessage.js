@@ -10,6 +10,7 @@ const { generatePlaintextString } = require('../userCache')
  * @param {*} app - Slack app instance.
  * @param {List} registrations - List of user id string.
  * @param {string} channelId - Slack channel id.
+ * @param {string} date - Date string in the ISO date format.
  */
 const postRegistrations = async (app, registrations, channelId, date) => {
   const messageWithoutMentions = library.registrationList(
@@ -18,7 +19,9 @@ const postRegistrations = async (app, registrations, channelId, date) => {
       generatePlaintextString
   );
   const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts
-  service.addScheduledMessage(messageId, date, channelId)
+  if (messageId) {
+    service.addScheduledMessage(messageId, date, channelId)
+  }
 }
 
 /**
@@ -28,13 +31,15 @@ const postRegistrations = async (app, registrations, channelId, date) => {
  * @param {string} channelId - Slack channel id.
  * @param {*} usergroups - Usergroup functions.
  * @param {string} usergroupId - Id of the slack usergroup we want to include in the message.
+ * @param {string} date - Date string in the ISO date format.
  */
 const postRegistrationsWithUsergroup = async (
   app,
   registrations,
   channelId,
   usergroups,
-  usergroupId
+  usergroupId,
+  date
   ) => {
   const messageWithoutMentions = library.registrationListWithUsergroup(
       DateTime.now(),
@@ -42,7 +47,10 @@ const postRegistrationsWithUsergroup = async (
       usergroups.generatePlaintextString(usergroupId),
       generatePlaintextString
   )
-  await helper.postMessage(app, channelId, messageWithoutMentions)
+  const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts
+  if (messageId) {
+    service.addScheduledMessage(messageId, date, channelId, usergroupId)
+  }
 }
 
 /**
@@ -83,7 +91,8 @@ const sendScheduledMessage = async (app, channelId, usergroups, userCache) => {
             filteredRegistrations,
             channelId,
             usergroups,
-            usergroupId
+            usergroupId,
+            date
           )
       });
   }
