@@ -109,7 +109,7 @@ const readUsergroupsFromCleanSlate = async ({ app, usergroups }) => {
 
 /**
  * Formats a list of user IDs by fetching the user's full names
- * and sorting them alphabetically
+ * and sorting them alphabetically (case-insensitive)
  *
  * @param {List} userIdList - List of user ID strings
  * @param {function} userFormatter - user ID formatter,
