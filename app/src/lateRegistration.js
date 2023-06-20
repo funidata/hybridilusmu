@@ -60,22 +60,47 @@ const updateScheduledMessages = async (app, date) => {
     const channelId = job.channelId
     const usergroupIds = usergroups.getUsergroupsForChannel(channelId)
     if (usergroupIds.length === 0) {
-      const messageId = await service.getScheduledMessageId(date, channelId)
-      if (messageId) {
-        editRegistrations(app, registrations, channelId, messageId)
-      }
+      updateChannelsWithoutUsergroups(app, date, registrations, channelId)
     } else {
-      for (const usergroupId of usergroupIds) {
-        const messageId = await service.getScheduledMessageId(date, channelId, usergroupId)
-        if (messageId) {
-          const filteredRegistrations = registrations.filter(
-            (userId) => usergroups.isUserInUsergroup(userId, usergroupId)
-          )
-          editRegistrationsWithUsergroup(
-            app, filteredRegistrations, channelId, messageId, usergroupId
-          )
-        }
-      }
+      updateChannelsWithUsergroups(app, date, registrations, channelId, usergroupIds)
+    }
+  }
+}
+/**
+ * Checks if the scheduled message has been sent for the given date
+ * on this channel and updates it with updated registrations.
+ * @param {*} app Slack app instance.
+ * @param {string} date Date string in the ISO date format.
+ * @param {string} channelId Slack channel id
+ * @param {List} registrations An array of Slack user ids
+ */
+const updateChannelsWithoutUsergroups = async (app, date, registrations, channelId) => {
+  const messageId = await service.getScheduledMessageId(date, channelId)
+  if (messageId) {
+    editRegistrations(app, registrations, channelId, messageId)
+  }
+}
+
+/**
+ * Checks if the scheduled messages have been sent on this channel for
+ * the given date then updates and filters the individual messages
+ * for each usergroup present in this channel.
+ * @param {*} app Slack app instance.
+ * @param {string} date Date string in the ISO date format.
+ * @param {string} channelId Slack channel id
+ * @param {string} usergroupIds Slack usergroup id
+ * @param {List} registrations An array of Slack user ids
+ */
+const updateChannelsWithUsergroups = async (app, date, registrations, channelId, usergroupIds) => {
+  for (const usergroupId of usergroupIds) {
+    const messageId = await service.getScheduledMessageId(date, channelId, usergroupId)
+    if (messageId) {
+      const filteredRegistrations = registrations.filter(
+        (userId) => usergroups.isUserInUsergroup(userId, usergroupId)
+      )
+      editRegistrationsWithUsergroup(
+        app, filteredRegistrations, channelId, messageId, usergroupId
+      )
     }
   }
 }
