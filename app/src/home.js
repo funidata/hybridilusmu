@@ -7,6 +7,7 @@ const { actions } = require('./blocks/actions');
 const { divider } = require('./blocks/divider');
 const { button } = require('./blocks/elements/button');
 const { formatUserIdList } = require('./helperFunctions')
+const { generateNameAndMention } = require('./userCache')
 
 const SHOW_DAYS_UNTIL = 10;
 const DAYS_IN_WEEK = 5;
@@ -99,7 +100,7 @@ const getRegistrationsBlock = async (userId) => {
         let userList = registrations[date].size === 0
             ? 'Kukaan ei ole ilmoittautunut toimistolle!'
             : 'Toimistolla aikoo olla:\n';
-        const registrationList = formatUserIdList([...registrations[date]]);
+        const registrationList = formatUserIdList([...registrations[date]], generateNameAndMention);
         for (user of registrationList) {
             userList += `${user}\n`;
         };

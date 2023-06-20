@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 const dfunc = require('./dateFunctions');
 const { formatUserIdList } = require('./helperFunctions')
+const { generateNameAndMention } = require('./userCache')
 
 const weekdays = [
     'Maanantai',
@@ -93,11 +94,11 @@ const correctVerbForm = (date, peopleCnt) => {
  * @param {List} registrations - List of user ID strings, usernames to be added to the response.
  * @return {string} A message ready to post
  */
-const registrationList = (date, registrations) => {
+const registrationList = (date, registrations, userFormatter=generateNameAndMention) => {
     if (registrations.length === 0) return nobodyAtOffice(date);
     const verb = correctVerbForm(date, registrations.length);
     let response = `${atDate(date)} toimistolla ${verb}:\n`;
-    registrations = formatUserIdList(registrations)
+    registrations = formatUserIdList(registrations, userFormatter)
     for (const user of registrations) {
         response += `${user}\n`;
     }
@@ -115,11 +116,12 @@ const registrationListWithUsergroup = (
     date,
     registrations,
     usergroupMention,
+    userFormatter=generateNameAndMention
 ) => {
     if (registrations.length === 0) return nobodyAtOfficeFromTeam(date, usergroupMention);
     const verb = correctVerbForm(date, registrations.length);
     let response = `${atDate(date)} tiimistä ${usergroupMention} ${verb} toimistolla:\n`;
-    registrations = formatUserIdList(registrations)
+    registrations = formatUserIdList(registrations, userFormatter)
     for (const user of registrations) {
         response += `${user}\n`
     }

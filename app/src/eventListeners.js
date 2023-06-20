@@ -1,4 +1,5 @@
 const home = require('./home');
+const { unScheduleMessage } = require('./scheduler/scheduler')
 
 exports.enableEventListeners = ({ app, usergroups }) => {
     /**
@@ -50,4 +51,12 @@ exports.enableEventListeners = ({ app, usergroups }) => {
         const shorthand = usergroups.generatePlaintextString(id);
         console.log(`ug ${shorthand} <${id}>: ${type}, returning ${ret}`);
     });
+
+    /**
+     * Event listener for when the bot is removed from a channel
+     */
+    app.event('channel_left', async ({ event }) => {
+        const { channel } = event;
+        unScheduleMessage(channel)
+    })
 };
