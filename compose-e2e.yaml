@@ -3,5 +3,4 @@ services:
     container_name: lusmu-e2e
     build: e2e/
     volumes:
-      - ./e2e/results:/usr/src/app/results
-      - ./e2e/testcases:/usr/src/app/testcases
+      - ./e2e/cypress:/e2e/cypress
