@@ -1,0 +1,11 @@
+{
+  "name": "hybridilusmu-e2e",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "cypress open",
+    "test": "cypress run"
+  },
+  "dependencies": {
+    "cypress": "^12.14.0"
+  }
+}
