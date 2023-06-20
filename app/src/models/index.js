@@ -24,6 +24,40 @@ const sequelize = new Sequelize(
   },
 );
 
+// db.close = () => {
+//   db.sequelize.close()
+// }
+
+// db.open = () => {
+//   db.sequelize = new Sequelize(
+//     DATABASE_NAME,
+//     DATABASE_USERNAME,
+//     DATABASE_PASSWORD,
+//     {
+//       host: DATABASE_HOST,
+//       dialect: 'postgres',
+//       logging: false,
+//     },
+//   );
+// }
+
+const disconnect = () => {
+  db.sequelize.close()
+}
+
+const open = () => {
+  db.sequelize = new Sequelize(
+    DATABASE_NAME,
+    DATABASE_USERNAME,
+    DATABASE_PASSWORD,
+    {
+      host: DATABASE_HOST,
+      dialect: 'postgres',
+      logging: false,
+    },
+  );
+}
+
 // FIXME: This needs to go.
 fs
   .readdirSync(__dirname)
@@ -44,4 +78,4 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-module.exports = db;
+module.exports = db, { disconnect, open };

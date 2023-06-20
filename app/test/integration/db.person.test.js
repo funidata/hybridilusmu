@@ -6,6 +6,7 @@ describe('Persons test', function () { // eslint-disable-line
     this.beforeAll(async () => {
         await db.sequelize.sync({ force: true });
     });
+    
 
     it('Create a person.', async () => {
         const person = await db.Person.create({
