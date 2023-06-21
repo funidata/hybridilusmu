@@ -1,7 +1,3 @@
 services:
   lusmu:
     image: hybridilusmu-ci
-
-  e2e:
-    environment:
-      - CYPRESS_BASE_URL=$CYPRESS_BASE_URL

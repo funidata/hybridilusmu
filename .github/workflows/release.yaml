@@ -50,4 +50,4 @@ jobs:
           docker tag hybridilusmu ghcr.io/funidata/hybridilusmu:${{ steps.semver.outputs.version }}
           docker tag hybridilusmu ghcr.io/funidata/hybridilusmu:latest
       - name: Push image to GHCR
-        run: docker push ghcr.io/funidata/hybridilusmu:next
+        run: docker push --all-tags ghcr.io/funidata/hybridilusmu
