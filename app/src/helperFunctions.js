@@ -66,11 +66,17 @@ async function postMessage(app, channelId, message) {
  * @returns {Object} - Slack message object
  */
 async function editMessage(app, channelId, timestamp, message) {
-    return app.client.chat.update({
-        channel: channelId,
-        ts: timestamp,
-        text: message
-    })
+    try {
+        const result = await app.client.chat.update({
+            channel: channelId,
+            ts: timestamp,
+            text: message
+        })
+        console.log(`edited message ${timestamp} in channel ${channelId} successfully`)
+        return result
+    } catch (err) {
+        console.log('error while editing message ', err)
+    }
 }
 
 /**
@@ -103,7 +109,7 @@ const readUsergroupsFromCleanSlate = async ({ app, usergroups }) => {
 
 /**
  * Formats a list of user IDs by fetching the user's full names
- * and sorting them alphabetically
+ * and sorting them alphabetically (case-insensitive)
  *
  * @param {List} userIdList - List of user ID strings
  * @param {function} userFormatter - user ID formatter,
@@ -113,7 +119,7 @@ const readUsergroupsFromCleanSlate = async ({ app, usergroups }) => {
 const formatUserIdList = (userIdList, userFormatter) => {
     return userIdList.map((user) => (
         userFormatter(user)
-    )).sort()
+    )).sort(Intl.Collator().compare)
 }
 
 module.exports = {

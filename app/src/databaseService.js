@@ -181,6 +181,33 @@ const getRegistrationsForUserBetween = async (userId, firstDate, lastDate) => {
     return result;
 };
 
+/**
+ * Fetches a Slack message id for the given date, channel and optional usergroup
+ * @param {string} date Date in the ISO date format.
+ * @param {string} channelId Slack channel id
+ * @param {string} [usergroupId] optional - Slack usergroup id
+ * @returns The message id
+ */
+const getScheduledMessageId = async (date, channelId, usergroupId = null) => {
+    const result = await db.getScheduledMessageId(date, channelId, usergroupId)
+    if (result) {
+        return result.messageId
+    }
+    return null
+}
+
+/**
+ * Saves the scheduled messages id to the database.
+ * @param {string} messageId Slack message id AKA message timestamp
+ * @param {string} date Date in the ISO date format
+ * @param {string} channelId Slack channel id
+ * @param {string} [usegroupId] optional - Slack usergroup id
+ * @returns true if succesful, undefined otherwise
+ */
+const addScheduledMessage = async (messageId, date, channelId, usergroupId = null) => (
+    db.addScheduledMessage(messageId, date, channelId, usergroupId)
+)
+
 module.exports = {
     changeRegistration,
     changeDefaultRegistration,
@@ -192,5 +219,7 @@ module.exports = {
     addAllJobs,
     addJob,
     getAllJobs,
-    updateJobs
+    updateJobs,
+    getScheduledMessageId,
+    addScheduledMessage
 };

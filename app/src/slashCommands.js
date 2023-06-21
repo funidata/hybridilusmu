@@ -5,6 +5,7 @@ const helper = require('./helperFunctions');
 const service = require('./databaseService');
 const library = require('./responses');
 const schedule = require('./scheduler/scheduler');
+const { updateScheduledMessages } = require('./lateRegistration')
 
 /**
  * An optional prefix for our slash-commands. When set to e.g. 'h',
@@ -157,6 +158,7 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
                     response = library.defaultRegistrationAdded(date, status);
                 } else {
                     await service.changeRegistration(userId, date.toISODate(), true, status === 'toimisto');
+                    await updateScheduledMessages(app, date.toISODate())
                     response = library.normalRegistrationAdded(date, status);
                 }
             } else if (dfunc.isWeekend(date)) {
@@ -198,6 +200,7 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
                     response = library.defaultRegistrationRemoved(date);
                 } else {
                     await service.changeRegistration(userId, date.toISODate(), false);
+                    await updateScheduledMessages(app, date.toISODate())
                     response = library.normalRegistrationRemoved(date);
                 }
             }

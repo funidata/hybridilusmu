@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const { sequelize } = require('../models/index');
 
-const { Person, Signup, Defaultsignup, Job } = require('../models');
+const { Person, Signup, Defaultsignup, Job, ScheduledMessage } = require('../models');
 /**
  * Returns a row from the People table that matches the Slack user ID.
  * The row contains the following:
@@ -505,3 +505,51 @@ exports.getAllJobs = async () => {
         return undefined;
     }
 };
+
+/**
+ * Adds a scheduledMessage
+ * @param {string} messageId Slack message id AKA message timestamp
+ * @param {string} date Date in the ISO date format
+ * @param {string} channelId Slack channel id
+ * @param {string} usergroupId Slack usergroup id
+ * @returns true if succesful, undefined otherwise
+ */
+exports.addScheduledMessage = async (messageId, date, channelId, usergroupId) => {
+    try {
+        return await ScheduledMessage.upsert({
+            messageId: messageId,
+            date: date,
+            channelId: channelId,
+            usergroupId: usergroupId
+        })
+    } catch (err) {
+        console.log('Error while creating a scheduled message', err)
+        return undefined
+    }
+}
+
+/**
+ * Fetches the _latest_ Slack message id for the given date, channel and usergroup
+ * @param {string} date Date in the ISO date format.
+ * @param {string} channelId Slack channel id
+ * @param {string} usergroupId Slack usergroup id
+ * @returns Sequelize virtual object containing the messageId
+ * or undefined if message not found
+ */
+exports.getScheduledMessageId = async (date, channelId, usergroupId) => {
+    try {
+        return await ScheduledMessage.findOne({
+            raw: true,
+            attributes: ['messageId'],
+            where: {
+                date: date,
+                channelId: channelId,
+                usergroupId: usergroupId
+            },
+            order: [ [ 'createdAt', 'DESC' ] ]
+        })
+    } catch (err) {
+        console.log('Error while finding a scheduled message ', err)
+        return undefined
+    }
+}
