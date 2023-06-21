@@ -10,6 +10,8 @@
 
 ## End-to-End Tests
 
+_**NOTE!** E2E tests are currently disabled pending further action. It is not clear if testing through Slack's web UI is meaningful in the sense that the tests will completely depend on Slack not introducing breaking changes in updates. Furthermore, we interaface only through Bolt which is tested by Slack. It seems that E2E tests would mostly test Slack's web UI, while unit and integration tests would test our own code specifically and would not be inherently flaky._
+
 E2E tests are implemented with Cypress. (Originally, Robot Framework was used but running the tests in CI was a hassle with no apparent advantage over Cypress.)
 
 ### Setup

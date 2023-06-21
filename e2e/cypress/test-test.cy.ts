@@ -1,12 +1,12 @@
 describe("Testing tests", () => {
   it("Asd", () => {
-    cy.visit("");
-    // Must use Cypress.env('baseUrl') as Cypress has a bug in resolving baseUrl from cypress.env.json files.
-    // No problem because we will need a custom visit/login function anyways.
-    const acualBaseUrl = Cypress.env("baseUrl");
-    console.log(acualBaseUrl);
-    //cy.visit(acualBaseUrl);
-    console.log("asd");
-    cy.contains("Sign in to");
+    const email = Cypress.env("USER_EMAIL");
+    const password = Cypress.env("USER_PASSWORD");
+    cy.visit("sign_in_with_password");
+    cy.get('[data-qa="login_email"]').type(email);
+    cy.get('[data-qa="login_password"]').type(password);
+    cy.get('[data-qa="signin_button"]').click();
+    //cy.get(".p-message_pane__foreword_description__container_header").contains("asd");
+    cy.contains("Welcome to the #lusmu channel");
   });
 });
