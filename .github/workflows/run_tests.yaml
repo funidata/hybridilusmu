@@ -33,9 +33,8 @@ jobs:
         run: |
           docker load --input /tmp/hybridilusmu.tar
           docker image ls -a
-      - run: touch .env.development
       - name: Start containers
-        run: docker compose -f compose.yaml -f compose-ci.yaml up -d
+        run: docker compose -f compose.yaml -f compose-ci.yaml up -d lusmu
       - name: Run unit tests
         run: npm test
       - name: Stop containers
@@ -59,15 +58,14 @@ jobs:
         run: |
           docker load --input /tmp/hybridilusmu.tar
           docker image ls -a
-      - run: touch .env.development
       - name: Build E2E container
-        run: docker compose -f compose-e2e.yaml build e2e
+        run: docker compose -f compose.yaml -f compose-ci.yaml build e2e
       - name: Start containers
-        run: docker compose -f compose.yaml -f compose-ci.yaml up -d
+        run: docker compose -f compose.yaml -f compose-ci.yaml up -d lusmu
       - name: Run E2E tests
         env:
           CYPRESS_BASE_URL: ${{ vars.CYPRESS_BASE_URL }}
-        run: npm run e2e:docker
+        run: npm run e2e:ci
       - name: Stop containers
         if: always()
         run: npm stop
@@ -90,9 +88,8 @@ jobs:
 #       run: |
 #         docker load --input /tmp/hybridilusmu.tar
 #         docker image ls -a
-#     - run: touch .env.development
 #     - name: Start containers
-#       run: docker compose -f compose.yaml -f compose-ci.yaml up -d
+#       run: docker compose -f compose.yaml -f compose-ci.yaml up -d lusmu
 #     - name: Run integration tests
 #       run: npm run test:integration
 #     - name: Stop containers

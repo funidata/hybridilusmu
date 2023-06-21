@@ -1,6 +1,0 @@
-services:
-  e2e:
-    container_name: lusmu-e2e
-    build: e2e/
-    volumes:
-      - ./e2e/cypress:/e2e/cypress
