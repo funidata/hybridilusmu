@@ -63,16 +63,10 @@ const postRegistrationsWithUsergroup = async (
  * @param {*} userCache - userCache instance
  * @returns 
  */
-const sendScheduledMessage = async (app, channelId, usergroups, userCache) => {
+const sendScheduledMessage = async (app, channelId, usergroups) => {
   console.log('delivering scheduled posts')
   const date = DateTime.now().toISODate()
   const registrations = await service.getRegistrationsFor(date)
-  // Freshen up user cache to provide data for string generation
-  const userPromises = registrations.map((uid) => userCache.getCachedUser(uid))
-  // Wait for said freshening up to finish before continuing with message generation.
-  // Otherwise we can get empty strings for all our users, unless they've already used the application
-  // during this particular execution of the application. (Trust me, it's happened to me.)
-  await Promise.all(userPromises)
 
   const usergroupIds = usergroups.getUsergroupsForChannel(channelId)
   // No Slack user groups are added to this channel.

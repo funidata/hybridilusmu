@@ -30,9 +30,7 @@ async function unScheduleMessage(channelId) {
  * @param app Optional. Needed only when creating a job.
  * @param usergroups Optional. Needed only when creating a job.
  */
-async function scheduleMessage({
-    channelId, time, app, usergroups, userCache,
-}) {
+async function scheduleMessage({ channelId, time, app, usergroups }) {
     const rule = new schedule.RecurrenceRule();
     rule.tz = 'Europe/Helsinki';
     rule.dayOfWeek = [1, 2, 3, 4, 5];
@@ -46,7 +44,7 @@ async function scheduleMessage({
         await service.addJob(channelId, time ? time.toSQLTime() : null);
         foundJob.reschedule(rule);
     } else { // create job
-        const sendMessage = () => sendScheduledMessage(app, channelId, usergroups, userCache)
+        const sendMessage = () => sendScheduledMessage(app, channelId, usergroups)
         // 1st arg: when to execute, 2nd arg: what to execute
         const job = schedule.scheduleJob(rule, sendMessage)
         // add the job to the map so that we can reschedule it later
@@ -57,7 +55,7 @@ async function scheduleMessage({
 /**
 * Schedules jobs to send a daily message to every channel the bot is a member of.
 */
-async function startScheduling({ app, usergroups, userCache }) {
+async function startScheduling({ app, usergroups }) {
     let channels = await helper.getMemberChannelIds(app);
     channels = channels.map((channel) => ({
         channel_id: channel,
@@ -68,9 +66,7 @@ async function startScheduling({ app, usergroups, userCache }) {
     await Promise.all(allJobs.map((job) => {
         const channelId = job.channelId
         const time = job.time ? DateTime.fromSQL(job.time) : null
-        return scheduleMessage({
-            channelId, time, app, usergroups, userCache
-        })
+        return scheduleMessage({ channelId, time, app, usergroups })
     }))
 }
 
