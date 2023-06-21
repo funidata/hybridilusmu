@@ -19,11 +19,11 @@ Fairly recent versions will do.
 
 Create `.env.development` file at project root and populate it with the variables below.
 
-Name|Description
---|--
-SLACK_APP_TOKEN|_App-Level Token_ with the `connections:write` scope. Used to authenticate the WebSocket connection (found under _Basic Information_ > _App-Level Tokens_).
-SLACK_BOT_TOKEN|_Bot User OAuth Token_ (found under _OAuth & Permissions_).
-SLACK_SIGNING_SECRET|_Signing Secret_ (found under _Basic Information_ > _App Credentials_).
+| Name                 | Description                                                                                                                                                 |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SLACK_APP_TOKEN      | _App-Level Token_ with the `connections:write` scope. Used to authenticate the WebSocket connection (found under _Basic Information_ > _App-Level Tokens_). |
+| SLACK_BOT_TOKEN      | _Bot User OAuth Token_ (found under _OAuth & Permissions_).                                                                                                 |
+| SLACK_SIGNING_SECRET | _Signing Secret_ (found under _Basic Information_ > _App Credentials_).                                                                                     |
 
 ### Installation (optional)
 
@@ -56,6 +56,12 @@ npm run logs
 ```
 
 (Using `npm start`, the containers start detached.)
+
+#### Run Linter
+
+```bash
+npm run lint
+```
 
 ### Environment Maintenance
 
