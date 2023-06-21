@@ -1,0 +1,15 @@
+services:
+  lusmu:
+    environment:
+      NODE_ENV: development
+      DATABASE_HOST: db
+      DATABASE_NAME: postgres
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+    env_file:
+      - .env.development
+    command: npm run watch
+
+  e2e:
+    env_file:
+      - .env.development

@@ -4,6 +4,18 @@ on:
   workflow_call:
 
 jobs:
+  lint:
+    name: Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup
+        run: npm run init
+      - name: Lint E2E tests
+        working-directory: e2e
+        run: npm run lint
+
   unit-tests:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -21,19 +33,17 @@ jobs:
         run: |
           docker load --input /tmp/hybridilusmu.tar
           docker image ls -a
-      - run: touch .env.development
       - name: Start containers
-        run: docker compose -f compose.yaml -f compose-ci.yaml up -d
+        run: docker compose -f compose.yaml -f compose-ci.yaml up -d lusmu
       - name: Run unit tests
         run: npm test
       - name: Stop containers
+        if: always()
         run: npm stop
 
-# FIXME: Enable these once integration tests exit cleanly.
-  # integration-tests:
-  #   name: Integration tests
+  # e2e-tests:
+  #   name: E2E tests
   #   runs-on: ubuntu-latest
-  #   needs: build
   #   steps:
   #     - name: Checkout
   #       uses: actions/checkout@v3
@@ -48,10 +58,47 @@ jobs:
   #       run: |
   #         docker load --input /tmp/hybridilusmu.tar
   #         docker image ls -a
-  #     - run: touch .env.development
+  #     - name: Build E2E container
+  #       run: docker compose -f compose.yaml -f compose-ci.yaml build e2e
   #     - name: Start containers
-  #       run: docker compose -f compose.yaml -f compose-ci.yaml up -d
-  #     - name: Run integration tests
-  #       run: npm run test:integration
+  #       run: docker compose -f compose.yaml -f compose-ci.yaml up -d lusmu
+  #     - name: Run E2E tests
+  #       env:
+  #         CYPRESS_BASE_URL: ${{ vars.CYPRESS_BASE_URL }}
+  #       run: npm run e2e:ci
+  #     - name: Save Results
+  #       uses: actions/upload-artifact@v2
+  #       if: failure()
+  #       with:
+  #         name: Cypress Results
+  #         path: |
+  #           e2e/cypress/videos
+  #           e2e/cypress/screenshots
   #     - name: Stop containers
+  #       if: always()
   #       run: npm stop
+# FIXME: Enable these once integration tests exit cleanly.
+# integration-tests:
+#   name: Integration tests
+#   runs-on: ubuntu-latest
+#   needs: build
+#   steps:
+#     - name: Checkout
+#       uses: actions/checkout@v3
+#     - name: Set up Docker Buildx
+#       uses: docker/setup-buildx-action@v2
+#     - name: Download artifact
+#       uses: actions/download-artifact@v3
+#       with:
+#         name: hybridilusmu
+#         path: /tmp
+#     - name: Load image
+#       run: |
+#         docker load --input /tmp/hybridilusmu.tar
+#         docker image ls -a
+#     - name: Start containers
+#       run: docker compose -f compose.yaml -f compose-ci.yaml up -d lusmu
+#     - name: Run integration tests
+#       run: npm run test:integration
+#     - name: Stop containers
+#       run: npm stop
