@@ -1,49 +1,48 @@
-'use strict';
+"use strict";
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Signups', {
+    await queryInterface.createTable("Signups", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       officeDate: {
         allowNull: false,
-        type: Sequelize.DATEONLY
+        type: Sequelize.DATEONLY,
       },
       atOffice: {
         allowNull: false,
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
     await queryInterface.addColumn(
-      'Signups', // name of Source model
-      'PersonId', // name of the key we're adding
+      "Signups", // name of Source model
+      "PersonId", // name of the key we're adding
       {
         type: Sequelize.INTEGER,
         references: {
-          model: 'People', // name of Target model
-          key: 'id', // key in Target model that we're referencing
+          model: "People", // name of Target model
+          key: "id", // key in Target model that we're referencing
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
-      }
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
     );
-    await queryInterface.addIndex('Signups', {
-        fields: ['officeDate']
-      }
-    );
+    await queryInterface.addIndex("Signups", {
+      fields: ["officeDate"],
+    });
   },
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Signups');
-  }
+  async down(queryInterface) {
+    await queryInterface.dropTable("Signups");
+  },
 };
