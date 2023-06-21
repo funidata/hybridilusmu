@@ -9,7 +9,3 @@ services:
     env_file:
       - .env.development
     command: npm run watch
-
-  e2e:
-    env_file:
-      - .env.development
