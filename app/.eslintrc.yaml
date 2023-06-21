@@ -1,0 +1,15 @@
+root: true
+env:
+  es2021: true
+  node: true
+  mocha: true
+extends:
+  - eslint:recommended
+  # Keep prettier last so it overrides other configs correctly!
+  - prettier
+overrides:
+  - files: "src/migrations/*"
+    rules:
+      "no-unused-vars":
+        - warn
+        - varsIgnorePattern: "sequelize"
