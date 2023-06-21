@@ -16,7 +16,10 @@
     "e2e:run": "set -o allexport && source .env.development && set +o allexport && cd e2e && npm test",
     "e2e:open": "set -o allexport && source .env.development && set +o allexport && cd e2e && npm start",
     "e2e:docker": "docker compose -f compose.yaml -f compose-dev.yaml run --build e2e cypress run",
-    "e2e:ci": "docker compose -f compose.yaml -f compose-ci.yaml run e2e cypress run"
+    "e2e:ci": "docker compose -f compose.yaml -f compose-ci.yaml run e2e cypress run",
+    "preversion": "if [ $(git rev-parse --abbrev-ref HEAD) != 'main' ]; then exit 1; fi ",
+    "version": "scripts/version_sub_projects.sh $npm_package_version",
+    "postversion": "git push && git push --tags"
   },
   "license": "MIT"
 }
