@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Job extends Model {
     /**
@@ -12,17 +10,20 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasMany(models.ScheduledMessage, {
-        foreignKey: 'channelId'
-      })
+        foreignKey: "channelId",
+      });
     }
   }
-  Job.init({
-    channel_id: DataTypes.STRING,
-    time: DataTypes.TIME
-  }, {
-    sequelize,
-    modelName: 'Job',
-    indexes: [{ fields: ['channel_id'], unique: true }],
-  });
+  Job.init(
+    {
+      channel_id: DataTypes.STRING,
+      time: DataTypes.TIME,
+    },
+    {
+      sequelize,
+      modelName: "Job",
+      indexes: [{ fields: ["channel_id"], unique: true }],
+    },
+  );
   return Job;
 };
