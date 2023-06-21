@@ -82,6 +82,20 @@ module.exports = {
             return null;
         };
 
+        const initUserCache = async () => {
+            const users = await app.client.users.list()
+            const date = Date.now()
+            for (const user of users.members) {
+                usercache[user.id] = {
+                    user: user,
+                    date: date
+                }   
+            }
+            console.log('initialized user cache with every channel member')
+        }
+
+        initUserCache()
+
         return {
             getCachedUser,
             generatePlaintextString
