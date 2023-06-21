@@ -4,7 +4,7 @@
   "scripts": {
     "start": "cypress open",
     "test": "cypress run",
-    "lint": "eslint \"cypress/**/*.ts\""
+    "lint": "eslint ."
   },
   "dependencies": {
     "cypress": "^12.14.0"
