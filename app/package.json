@@ -20,7 +20,7 @@
     "lint": "npx eslint ."
   },
   "dependencies": {
-    "@slack/bolt": "^3.6.0",
+    "@slack/bolt": "^3.13.1",
     "dotenv": "^10.0.0",
     "espree": "^9.0.0",
     "luxon": "^2.0.2",
