@@ -33,9 +33,7 @@ exports.enableMiddleware = ({ app, userCache }) => {
       return;
     }
     // The user ID is found in many different places depending on the type of action taken
-    // FIXME: Dirty fix to pass linting. Refactor.
-    const userId =
-      payload.user || payload.user_id || body.user.id || body.event.message.user || undefined;
+    const userId = payload.user || payload.user_id || body.user?.id || body.event?.message?.user;
     // Approve requests which don't include any of the above (couldn't find any)
     if (!userId) {
       console.log("alert: guest check skipped!");
