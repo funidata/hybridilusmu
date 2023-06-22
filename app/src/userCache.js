@@ -30,77 +30,77 @@ const OBJECT_AGE = 60000;
  * @see getCachedUser
  */
 const generatePlaintextString = (userId) => {
-    if (!userId) {
-        return '';
-    }
-    const u = usercache[userId];
-    if (!u) {
-        // fall back to a mention string if user is not found
-        return `<@${userId}>`;
-    }
-    return `${u.user.profile.real_name || u.user.profile.display_name}`;
+  if (!userId) {
+    return "";
+  }
+  const u = usercache[userId];
+  if (!u) {
+    // fall back to a mention string if user is not found
+    return `<@${userId}>`;
+  }
+  return `${u.user.profile.real_name || u.user.profile.display_name}`;
 };
 
 const generateNameAndMention = (userId) => {
-    return `${generatePlaintextString(userId)} (<@${userId}>)`
-}
+  return `${generatePlaintextString(userId)} (<@${userId}>)`;
+};
 
 module.exports = {
-    enableUserCache: ({ app }) => {
-        /**
-         * Try to cache our user data so that getUserRestriction() doesn't bump into rate limits
-         * @param {*} userId
-         * @returns {Object} The user object as originally returned by Slack
-         */
-        const getCachedUser = async (userId) => {
-            // don't bother with undefineds and nulls and falses and empty strings and such
-            // these caused some api errors too at some point in earlier development
-            if (!userId) {
-                return null;
-            }
-            if (usercache[userId] && usercache[userId].date + OBJECT_AGE > Date.now()) {
-                console.log(`cache hit for user ${userId}`);
-                return usercache[userId].user;
-            }
-            try {
-                const user = await app.client.users.info({ user: userId });
-                // something went wrong
-                if (!user.ok) {
-                    console.log(`users.info failed for uid ${userId}`);
-                    return null;
-                }
-                // success
-                console.log(`caching user ${userId}`);
-                usercache[userId] = {
-                    user: user.user,
-                    date: Date.now(),
-                };
-                return user.user;
-            } catch (err) {
-                console.log(`users.info failed for uid ${userId}: ${err}`);
-            }
-            return null;
-        };
-
-        const initUserCache = async () => {
-            const users = await app.client.users.list()
-            const date = Date.now()
-            for (const user of users.members) {
-                usercache[user.id] = {
-                    user: user,
-                    date: date
-                }   
-            }
-            console.log('initialized user cache with every channel member')
+  enableUserCache: ({ app }) => {
+    /**
+     * Try to cache our user data so that getUserRestriction() doesn't bump into rate limits
+     * @param {*} userId
+     * @returns {Object} The user object as originally returned by Slack
+     */
+    const getCachedUser = async (userId) => {
+      // don't bother with undefineds and nulls and falses and empty strings and such
+      // these caused some api errors too at some point in earlier development
+      if (!userId) {
+        return null;
+      }
+      if (usercache[userId] && usercache[userId].date + OBJECT_AGE > Date.now()) {
+        console.log(`cache hit for user ${userId}`);
+        return usercache[userId].user;
+      }
+      try {
+        const user = await app.client.users.info({ user: userId });
+        // something went wrong
+        if (!user.ok) {
+          console.log(`users.info failed for uid ${userId}`);
+          return null;
         }
-
-        initUserCache()
-
-        return {
-            getCachedUser,
-            generatePlaintextString
+        // success
+        console.log(`caching user ${userId}`);
+        usercache[userId] = {
+          user: user.user,
+          date: Date.now(),
         };
-    },
-    generatePlaintextString,
-    generateNameAndMention
+        return user.user;
+      } catch (err) {
+        console.log(`users.info failed for uid ${userId}: ${err}`);
+      }
+      return null;
+    };
+
+    const initUserCache = async () => {
+      const users = await app.client.users.list();
+      const date = Date.now();
+      for (const user of users.members) {
+        usercache[user.id] = {
+          user: user,
+          date: date,
+        };
+      }
+      console.log("initialized user cache with every channel member");
+    };
+
+    initUserCache();
+
+    return {
+      getCachedUser,
+      generatePlaintextString,
+    };
+  },
+  generatePlaintextString,
+  generateNameAndMention,
 };
