@@ -1,41 +1,27 @@
-const selectMenu = (id) => {
+const selectMenu = (offices, callback) => {
+  const options = offices.map((office) => ({
+    text: {
+      type: "plain_text",
+      text: office,
+    },
+    value: office,
+  }));
+
   const selectMenuElement = {
     type: "section",
-    block_id: id,
     text: {
       type: "mrkdwn",
       text: "Toimisto",
     },
     accessory: {
-      action_id: "text1234",
+      action_id: callback,
       type: "static_select",
       placeholder: {
         type: "plain_text",
-        text: "Select an item",
+        text: "Toimisto",
       },
-      options: [
-        {
-          text: {
-            type: "plain_text",
-            text: "*this is plain_text text*",
-          },
-          value: "value-0",
-        },
-        {
-          text: {
-            type: "plain_text",
-            text: "*this is plain_text text*",
-          },
-          value: "value-1",
-        },
-        {
-          text: {
-            type: "plain_text",
-            text: "*this is plain_text text*",
-          },
-          value: "value-2",
-        },
-      ],
+      options: options,
+      initial_option: options[0],
     },
   };
 

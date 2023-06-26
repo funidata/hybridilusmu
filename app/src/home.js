@@ -75,6 +75,8 @@ const getDefaultSettingsBlock = async (userId) => {
  * and a default settings button used to open the default settings modal.
  */
 const getUpdateBlock = async () => {
+  // FIXME:
+  const offices = ["Helsinki", "Tampere"];
   const updateBlock = [];
   updateBlock.push(
     header("ILMOITTAUTUMISET :spiral_calendar_pad:"),
@@ -82,7 +84,7 @@ const getUpdateBlock = async () => {
       button("Oletusasetukset", "settings_click", "updated"),
       button("Päivitä", "update_click", "updated"),
     ]),
-    selectMenu("office_select"),
+    selectMenu(offices, "office_select"),
     mrkdwn(
       `(_Tiedot päivitetty ${DateTime.now()
         .setZone("Europe/Helsinki")
@@ -144,7 +146,6 @@ const getRegistrationsBlock = async (userId) => {
     registrationsBlock.push(
       mrkdwn(userList),
       plainText("Oma ilmoittautumiseni:"),
-      selectMenu(i.toString()),
       actions([
         button("Toimistolla", "office_click", JSON.stringify(buttonValue), officeColor, emoji),
         button("Etänä", "remote_click", JSON.stringify(buttonValue), remoteColor, emoji),
