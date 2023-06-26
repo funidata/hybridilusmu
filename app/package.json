@@ -24,7 +24,7 @@
     "dotenv": "^10.0.0",
     "espree": "^9.0.0",
     "luxon": "^3.3.0",
-    "node-schedule": "^2.0.0",
+    "node-schedule": "^2.1.1",
     "pg": "^8.7.1",
     "sequelize": "^6.6.5",
     "sequelize-cli": "^6.6.1"
