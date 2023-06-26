@@ -4,8 +4,10 @@ const { updateScheduledMessages } = require("./lateRegistration");
 
 exports.enableActionFunctions = ({ app }) => {
   app.action("office_select", async ({ body, ack, client }) => {
+    const user = body.user.id;
     const office = body.actions[0].selected_option.value;
-    home.update(client, body.user.id, office);
+    await service.addDefaultOfficeForUser(user, office);
+    home.update(client, user, office);
     await ack();
   });
 

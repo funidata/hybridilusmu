@@ -76,9 +76,6 @@ const getDefaultSettingsBlock = async (userId) => {
  */
 const getUpdateBlock = async (selectedOffice) => {
   const offices = await service.getAllOffices();
-  if (!selectedOffice) {
-    selectedOffice = offices[0];
-  }
   const updateBlock = [];
   updateBlock.push(
     header(`${selectedOffice.toUpperCase()} :cityscape:`),

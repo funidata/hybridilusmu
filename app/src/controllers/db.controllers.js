@@ -578,8 +578,17 @@ exports.getScheduledMessageId = async (date, channelId, usergroupId) => {
   }
 };
 
+exports.addOffice = async () => {
+  return true;
+};
+
 exports.getAllOffices = async () => {
   return ["Helsinki", "Tampere"];
+};
+
+exports.addDefaultOfficeForUser = async (user, office) => {
+  console.log(`added default office ${office} for user ${user}`);
+  return true;
 };
 
 exports.getDefaultOfficeForUser = async (user) => {

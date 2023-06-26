@@ -207,7 +207,11 @@ const getScheduledMessageId = async (date, channelId, usergroupId = null) => {
 const addScheduledMessage = async (messageId, date, channelId, usergroupId = null) =>
   db.addScheduledMessage(messageId, date, channelId, usergroupId);
 
+const addOffice = async () => db.addOffice();
+
 const getAllOffices = async () => db.getAllOffices();
+
+const addDefaultOfficeForUser = async (user, office) => db.addDefaultOfficeForUser(user, office);
 
 const getDefaultOfficeForUser = async (user) => {
   const result = await db.getDefaultOfficeForUser(user);
@@ -233,6 +237,8 @@ module.exports = {
   updateJobs,
   getScheduledMessageId,
   addScheduledMessage,
+  addOffice,
   getDefaultOfficeForUser,
   getAllOffices,
+  addDefaultOfficeForUser,
 };

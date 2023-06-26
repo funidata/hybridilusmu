@@ -6,7 +6,7 @@ const selectMenu = (offices, initialOffice, callback) => {
     },
     value: office,
   }));
-  const initialOption = options.find(({ value }) => value === initialOffice) || options[0];
+  const initialOption = options.find(({ value }) => value === initialOffice);
 
   const selectMenuElement = {
     type: "section",
