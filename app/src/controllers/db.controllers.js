@@ -1,7 +1,7 @@
-const { Op } = require('sequelize');
-const { sequelize } = require('../models/index');
+const { Op } = require("sequelize");
+const { sequelize } = require("../models/index");
 
-const { Person, Signup, Defaultsignup, Job, ScheduledMessage } = require('../models');
+const { Person, Signup, Defaultsignup, Job, ScheduledMessage } = require("../models");
 /**
  * Returns a row from the People table that matches the Slack user ID.
  * The row contains the following:
@@ -13,13 +13,13 @@ const { Person, Signup, Defaultsignup, Job, ScheduledMessage } = require('../mod
  * @returns {Array}
  */
 const getUser = async (userId, transaction) => {
-    const userQuery = await Person.findOrCreate({
-        where: {
-            slackId: userId,
-        },
-        transaction,
-    });
-    return userQuery[0].dataValues;
+  const userQuery = await Person.findOrCreate({
+    where: {
+      slackId: userId,
+    },
+    transaction,
+  });
+  return userQuery[0].dataValues;
 };
 
 /**
@@ -32,13 +32,14 @@ const getUser = async (userId, transaction) => {
  * @param {*} transaction - Transcation object, with which this query can be made part of the given transaction.
  * @returns {Object}
  */
-const getRegistrationsForUserAndDate = async (personId, date, transaction) => Signup.findAndCountAll({
+const getRegistrationsForUserAndDate = async (personId, date, transaction) =>
+  Signup.findAndCountAll({
     where: {
-        officeDate: date,
-        PersonId: personId,
+      officeDate: date,
+      PersonId: personId,
     },
     transaction,
-});
+  });
 
 /**
  * Checks, if user has a default registration for the given weekday already.
@@ -50,13 +51,14 @@ const getRegistrationsForUserAndDate = async (personId, date, transaction) => Si
  * @param {*} transaction - Transcation object, with which this query can be made part of the given transaction.
  * @returns {Object}
  */
-const getDefaultRegistrationsForUserAndWeekday = async (personId, weekday, transaction) => Defaultsignup.findAndCountAll({
+const getDefaultRegistrationsForUserAndWeekday = async (personId, weekday, transaction) =>
+  Defaultsignup.findAndCountAll({
     where: {
-        weekday,
-        PersonId: personId,
+      weekday,
+      PersonId: personId,
     },
     transaction,
-});
+  });
 
 /**
  * Adds a normal registration for the given user.
@@ -65,34 +67,45 @@ const getDefaultRegistrationsForUserAndWeekday = async (personId, weekday, trans
  * @param {Boolean} atOffice - True, if we want to add an office registration. False otherwise.
  */
 exports.addRegistrationForUser = async (userId, date, atOffice) => {
-    try {
-        await sequelize.transaction(async (t) => {
-            const person = await getUser(userId, t);
-            const data = await getRegistrationsForUserAndDate(person.id, date, t);
-            if (data.count === 0) { // Let's add a new registration.
-                await Signup.create({
-                    officeDate: date,
-                    atOffice,
-                    PersonId: person.id,
-                }, {
-                    transaction: t,
-                });
-            } else if (data.count === 1) { // Let's modify an existing registration.
-                const row = data.rows[0].dataValues;
-                await Signup.update({
-                    atOffice,
-                }, {
-                    where: { id: row.id },
-                }, {
-                    transaction: t,
-                });
-            } else {
-                console.log('Error! The database seems to have more than one registration for the same user with the same date.');
-            }
-        });
-    } catch (error) {
-        console.log('Error while adding a registration:', error);
-    }
+  try {
+    await sequelize.transaction(async (t) => {
+      const person = await getUser(userId, t);
+      const data = await getRegistrationsForUserAndDate(person.id, date, t);
+      if (data.count === 0) {
+        // Let's add a new registration.
+        await Signup.create(
+          {
+            officeDate: date,
+            atOffice,
+            PersonId: person.id,
+          },
+          {
+            transaction: t,
+          },
+        );
+      } else if (data.count === 1) {
+        // Let's modify an existing registration.
+        const row = data.rows[0].dataValues;
+        await Signup.update(
+          {
+            atOffice,
+          },
+          {
+            where: { id: row.id },
+          },
+          {
+            transaction: t,
+          },
+        );
+      } else {
+        console.log(
+          "Error! The database seems to have more than one registration for the same user with the same date.",
+        );
+      }
+    });
+  } catch (error) {
+    console.log("Error while adding a registration:", error);
+  }
 };
 
 /**
@@ -102,35 +115,46 @@ exports.addRegistrationForUser = async (userId, date, atOffice) => {
  * @param {Boolean} atOffice - True, if we want to add an office registration. False otherwise.
  */
 exports.addDefaultRegistrationForUser = async (userId, weekday, atOffice) => {
-    try {
-        await sequelize.transaction(async (t) => {
-            const person = await getUser(userId, t);
-            const data = await getDefaultRegistrationsForUserAndWeekday(person.id, weekday, t);
-            if (data.count === 0) { // Let's add a new registration.
-                await Defaultsignup.create({
-                    weekday,
-                    atOffice,
-                    PersonId: person.id,
-                }, {
-                    transaction: t,
-                });
-            } else if (data.count === 1) { // Let's modify an existing registration.
-                const row = data.rows[0].dataValues;
-                await Defaultsignup.update({
-                    atOffice,
-                }, {
-                    where: { id: row.id },
-                }, {
-                    transaction: t,
-                });
-            } else {
-                console.log('Error!');
-                console.log('The database seems to have more than one default registration for the same user with the same day.');
-            }
-        });
-    } catch (error) {
-        console.log('Error while adding a default registration:', error);
-    }
+  try {
+    await sequelize.transaction(async (t) => {
+      const person = await getUser(userId, t);
+      const data = await getDefaultRegistrationsForUserAndWeekday(person.id, weekday, t);
+      if (data.count === 0) {
+        // Let's add a new registration.
+        await Defaultsignup.create(
+          {
+            weekday,
+            atOffice,
+            PersonId: person.id,
+          },
+          {
+            transaction: t,
+          },
+        );
+      } else if (data.count === 1) {
+        // Let's modify an existing registration.
+        const row = data.rows[0].dataValues;
+        await Defaultsignup.update(
+          {
+            atOffice,
+          },
+          {
+            where: { id: row.id },
+          },
+          {
+            transaction: t,
+          },
+        );
+      } else {
+        console.log("Error!");
+        console.log(
+          "The database seems to have more than one default registration for the same user with the same day.",
+        );
+      }
+    });
+  } catch (error) {
+    console.log("Error while adding a default registration:", error);
+  }
 };
 
 /**
@@ -139,19 +163,19 @@ exports.addDefaultRegistrationForUser = async (userId, weekday, atOffice) => {
  * @param {String} date - Date in the ISO date format.
  */
 exports.removeRegistration = async (userId, date) => {
-    try {
-        await sequelize.transaction(async (t) => {
-            const person = await getUser(userId, t);
-            await Signup.destroy({
-                where: {
-                    officeDate: date,
-                    PersonId: person.id,
-                },
-            });
-        });
-    } catch (error) {
-        console.log('Error while removing registration:', error);
-    }
+  try {
+    await sequelize.transaction(async (t) => {
+      const person = await getUser(userId, t);
+      await Signup.destroy({
+        where: {
+          officeDate: date,
+          PersonId: person.id,
+        },
+      });
+    });
+  } catch (error) {
+    console.log("Error while removing registration:", error);
+  }
 };
 
 /**
@@ -160,19 +184,19 @@ exports.removeRegistration = async (userId, date) => {
  * @param {String} date - Date in the ISO date format.
  */
 exports.removeDefaultRegistration = async (userId, weekday) => {
-    try {
-        await sequelize.transaction(async (t) => {
-            const person = await getUser(userId, t);
-            await Defaultsignup.destroy({
-                where: {
-                    weekday,
-                    PersonId: person.id,
-                },
-            });
-        });
-    } catch (error) {
-        console.log('Error while removing default registration:', error);
-    }
+  try {
+    await sequelize.transaction(async (t) => {
+      const person = await getUser(userId, t);
+      await Defaultsignup.destroy({
+        where: {
+          weekday,
+          PersonId: person.id,
+        },
+      });
+    });
+  } catch (error) {
+    console.log("Error while removing default registration:", error);
+  }
 };
 
 /**
@@ -181,25 +205,25 @@ exports.removeDefaultRegistration = async (userId, weekday) => {
  * and does not contain weekdays, which there is no entry.
  */
 exports.getDefaultSettingsForUser = async (userId) => {
-    try {
-        const defaultSettings = await Defaultsignup.findAll({
-            attributes: ['weekday', 'atOffice'],
-            include: {
-                model: Person,
-                as: 'person',
-                where: {
-                    slackId: userId,
-                },
-            },
-        });
-        return defaultSettings.map((s) => ({
-            weekday: s.dataValues.weekday,
-            status: s.dataValues.atOffice,
-        }));
-    } catch (error) {
-        console.log('Error while finding default registrations:', error);
-        return null;
-    }
+  try {
+    const defaultSettings = await Defaultsignup.findAll({
+      attributes: ["weekday", "atOffice"],
+      include: {
+        model: Person,
+        as: "person",
+        where: {
+          slackId: userId,
+        },
+      },
+    });
+    return defaultSettings.map((s) => ({
+      weekday: s.dataValues.weekday,
+      status: s.dataValues.atOffice,
+    }));
+  } catch (error) {
+    console.log("Error while finding default registrations:", error);
+    return null;
+  }
 };
 
 /**
@@ -210,29 +234,29 @@ exports.getDefaultSettingsForUser = async (userId) => {
  * @returns {Array}
  */
 exports.getAllRegistrationsForDateInterval = async (startDate, endDate) => {
-    try {
-        const registrations = await Signup.findAll({
-            attributes: ['officeDate', 'atOffice'],
-            where: {
-                officeDate: {
-                    [Op.gte]: startDate,
-                    [Op.lte]: endDate,
-                },
-            },
-            include: {
-                model: Person,
-                as: 'person',
-            },
-        });
-        return registrations.map((s) => ({
-            slackId: s.dataValues.person.dataValues.slackId,
-            date: s.dataValues.officeDate,
-            status: s.dataValues.atOffice,
-        }));
-    } catch (error) {
-        console.log('Error while finding registrations:', error);
-        return null;
-    }
+  try {
+    const registrations = await Signup.findAll({
+      attributes: ["officeDate", "atOffice"],
+      where: {
+        officeDate: {
+          [Op.gte]: startDate,
+          [Op.lte]: endDate,
+        },
+      },
+      include: {
+        model: Person,
+        as: "person",
+      },
+    });
+    return registrations.map((s) => ({
+      slackId: s.dataValues.person.dataValues.slackId,
+      date: s.dataValues.officeDate,
+      status: s.dataValues.atOffice,
+    }));
+  } catch (error) {
+    console.log("Error while finding registrations:", error);
+    return null;
+  }
 };
 
 /**
@@ -243,31 +267,31 @@ exports.getAllRegistrationsForDateInterval = async (startDate, endDate) => {
  * @returns {Array}
  */
 exports.getRegistrationsForUserForDateInterval = async (userId, startDate, endDate) => {
-    try {
-        const registrations = await Signup.findAll({
-            attributes: ['officeDate', 'atOffice'],
-            where: {
-                officeDate: {
-                    [Op.gte]: startDate,
-                    [Op.lte]: endDate,
-                },
-            },
-            include: {
-                model: Person,
-                as: 'person',
-                where: {
-                    slackId: userId,
-                },
-            },
-        });
-        return registrations.map((s) => ({
-            date: s.dataValues.officeDate,
-            status: s.dataValues.atOffice,
-        }));
-    } catch (error) {
-        console.log('Error while finding registrations:', error);
-        return null;
-    }
+  try {
+    const registrations = await Signup.findAll({
+      attributes: ["officeDate", "atOffice"],
+      where: {
+        officeDate: {
+          [Op.gte]: startDate,
+          [Op.lte]: endDate,
+        },
+      },
+      include: {
+        model: Person,
+        as: "person",
+        where: {
+          slackId: userId,
+        },
+      },
+    });
+    return registrations.map((s) => ({
+      date: s.dataValues.officeDate,
+      status: s.dataValues.atOffice,
+    }));
+  } catch (error) {
+    console.log("Error while finding registrations:", error);
+    return null;
+  }
 };
 
 /**
@@ -276,25 +300,25 @@ exports.getRegistrationsForUserForDateInterval = async (userId, startDate, endDa
  * @returns {Array}
  */
 exports.getAllDefaultOfficeSettings = async () => {
-    try {
-        const registrations = await Defaultsignup.findAll({
-            attributes: ['weekday'],
-            where: {
-                atOffice: true,
-            },
-            include: {
-                model: Person,
-                as: 'person',
-            },
-        });
-        return registrations.map((s) => ({
-            slackId: s.dataValues.person.dataValues.slackId,
-            weekday: s.dataValues.weekday,
-        }));
-    } catch (error) {
-        console.log('Error while finding registrations:', error);
-        return null;
-    }
+  try {
+    const registrations = await Defaultsignup.findAll({
+      attributes: ["weekday"],
+      where: {
+        atOffice: true,
+      },
+      include: {
+        model: Person,
+        as: "person",
+      },
+    });
+    return registrations.map((s) => ({
+      slackId: s.dataValues.person.dataValues.slackId,
+      weekday: s.dataValues.weekday,
+    }));
+  } catch (error) {
+    console.log("Error while finding registrations:", error);
+    return null;
+  }
 };
 
 /**
@@ -303,26 +327,26 @@ exports.getAllDefaultOfficeSettings = async () => {
  * @returns {Array}
  */
 exports.getAllRegistrationsForDate = async (date) => {
-    try {
-        const registrations = await Signup.findAll({
-            attributes: ['atOffice'],
-            where: {
-                officeDate: date,
-            },
-            include: {
-                model: Person,
-                as: 'person',
-                attributes: ['slackId'],
-            },
-        });
-        return registrations.map((s) => ({
-            slackId: s.dataValues.person.dataValues.slackId,
-            status: s.dataValues.atOffice,
-        }));
-    } catch (error) {
-        console.log('Error while finding registrations:', error);
-        return null;
-    }
+  try {
+    const registrations = await Signup.findAll({
+      attributes: ["atOffice"],
+      where: {
+        officeDate: date,
+      },
+      include: {
+        model: Person,
+        as: "person",
+        attributes: ["slackId"],
+      },
+    });
+    return registrations.map((s) => ({
+      slackId: s.dataValues.person.dataValues.slackId,
+      status: s.dataValues.atOffice,
+    }));
+  } catch (error) {
+    console.log("Error while finding registrations:", error);
+    return null;
+  }
 };
 
 /**
@@ -331,23 +355,23 @@ exports.getAllRegistrationsForDate = async (date) => {
  * @returns {Array}
  */
 exports.getAllDefaultOfficeRegistrationsForWeekday = async (weekday) => {
-    try {
-        const registrations = await Person.findAll({
-            attributes: ['slackId'],
-            include: {
-                model: Defaultsignup,
-                as: 'defaultsignup',
-                where: {
-                    weekday,
-                    atOffice: true,
-                },
-            },
-        });
-        return registrations.map((s) => s.dataValues.slackId);
-    } catch (error) {
-        console.log('Error while finding default registrations:', error);
-        return null;
-    }
+  try {
+    const registrations = await Person.findAll({
+      attributes: ["slackId"],
+      include: {
+        model: Defaultsignup,
+        as: "defaultsignup",
+        where: {
+          weekday,
+          atOffice: true,
+        },
+      },
+    });
+    return registrations.map((s) => s.dataValues.slackId);
+  } catch (error) {
+    console.log("Error while finding default registrations:", error);
+    return null;
+  }
 };
 
 /**
@@ -361,18 +385,18 @@ exports.getAllDefaultOfficeRegistrationsForWeekday = async (weekday) => {
  * @returns {Object}
  */
 exports.getUsersRegistrationForDate = async (userId, date) => {
-    try {
-        const result = await sequelize.transaction(async (t) => {
-            const user = await getUser(userId, t);
-            const data = await getRegistrationsForUserAndDate(user.id, date, t);
-            if (data.count === 1) return data.rows[0].dataValues;
-            return undefined;
-        });
-        return result;
-    } catch (error) {
-        console.log('Error while finding registrations:', error);
-        return undefined;
-    }
+  try {
+    const result = await sequelize.transaction(async (t) => {
+      const user = await getUser(userId, t);
+      const data = await getRegistrationsForUserAndDate(user.id, date, t);
+      if (data.count === 1) return data.rows[0].dataValues;
+      return undefined;
+    });
+    return result;
+  } catch (error) {
+    console.log("Error while finding registrations:", error);
+    return undefined;
+  }
 };
 
 /**
@@ -386,18 +410,18 @@ exports.getUsersRegistrationForDate = async (userId, date) => {
  * @returns {Object}
  */
 exports.getUsersDefaultRegistrationForWeekday = async (userId, weekday) => {
-    try {
-        const result = await sequelize.transaction(async (t) => {
-            const user = await getUser(userId, t);
-            const data = await getDefaultRegistrationsForUserAndWeekday(user.id, weekday, t);
-            if (data.count === 1) return data.rows[0].dataValues;
-            return undefined;
-        });
-        return result;
-    } catch (error) {
-        console.log('Error while finding registrations:', error);
-        return undefined;
-    }
+  try {
+    const result = await sequelize.transaction(async (t) => {
+      const user = await getUser(userId, t);
+      const data = await getDefaultRegistrationsForUserAndWeekday(user.id, weekday, t);
+      if (data.count === 1) return data.rows[0].dataValues;
+      return undefined;
+    });
+    return result;
+  } catch (error) {
+    console.log("Error while finding registrations:", error);
+    return undefined;
+  }
 };
 
 /**
@@ -412,98 +436,98 @@ exports.getUsersDefaultRegistrationForWeekday = async (userId, weekday) => {
  * @returns {Array}
  */
 exports.getAllRegistrationDatesForAUser = async (personId, atOffice = true) => {
-    try {
-        const registrations = await Signup.findAll({
-            attributes: ['officeDate'],
-            where: {
-                atOffice,
-                PersonId: personId,
-            },
-            include: { model: Person, as: 'person' },
-        });
-        return registrations.map((s) => s.dataValues.officeDate);
-    } catch (error) {
-        console.log('Error while finding registrations:', error);
-        return null;
-    }
+  try {
+    const registrations = await Signup.findAll({
+      attributes: ["officeDate"],
+      where: {
+        atOffice,
+        PersonId: personId,
+      },
+      include: { model: Person, as: "person" },
+    });
+    return registrations.map((s) => s.dataValues.officeDate);
+  } catch (error) {
+    console.log("Error while finding registrations:", error);
+    return null;
+  }
 };
 
 /**
  * Returns the primary key of the People table corresponding to the given Slack user ID.
  */
 exports.getPersonId = async (slackId) => {
-    try {
-        const person = await Person.findOne({
-            attributes: ['id'],
-            where: {
-                slackId,
-            },
-        });
-        return person.dataValues.id;
-    } catch (error) {
-        console.log('Error while finding people:', error);
-        return null;
-    }
+  try {
+    const person = await Person.findOne({
+      attributes: ["id"],
+      where: {
+        slackId,
+      },
+    });
+    return person.dataValues.id;
+  } catch (error) {
+    console.log("Error while finding people:", error);
+    return null;
+  }
 };
 
 exports.removeJob = async (channelId) => {
-    try {
-        await Job.destroy({
-            where: {
-                channel_id: channelId,
-            },
-        });
-    } catch (err) {
-        console.log('Error while removing job ', err);
-    }
+  try {
+    await Job.destroy({
+      where: {
+        channel_id: channelId,
+      },
+    });
+  } catch (err) {
+    console.log("Error while removing job ", err);
+  }
 };
 
 /**
  * Add only those given jobs which are not already in the database.
  */
 exports.addAllJobs = async (jobs) => {
-    try {
-        return Job.bulkCreate(jobs, {
-            updateOnDuplicate: ['channel_id'], // don't mind about existing Jobs
-        });
-    } catch (err) {
-        console.log('Error while adding all jobs ', err);
-        return undefined;
-    }
+  try {
+    return Job.bulkCreate(jobs, {
+      updateOnDuplicate: ["channel_id"], // don't mind about existing Jobs
+    });
+  } catch (err) {
+    console.log("Error while adding all jobs ", err);
+    return undefined;
+  }
 };
 
 exports.addJob = async (channelId, time) => {
-    try {
-        return await Job.upsert({
-            channel_id: channelId,
-            time,
-        });
-    } catch (err) {
-        console.log('Error while creating a job ', err);
-        return undefined;
-    }
+  try {
+    return await Job.upsert({
+      channel_id: channelId,
+      time,
+    });
+  } catch (err) {
+    console.log("Error while creating a job ", err);
+    return undefined;
+  }
 };
 
 exports.getJob = async (channelId) => {
-    try {
-        return await Job.findByPk(channelId);
-    } catch (err) {
-        console.log('Error while finding a job ', err);
-        return undefined;
-    }
+  try {
+    return await Job.findByPk(channelId);
+  } catch (err) {
+    console.log("Error while finding a job ", err);
+    return undefined;
+  }
 };
 
 exports.getAllJobs = async () => {
-    try {
-        const result = await Job.findAll();
-        return result.map((r) => ({
-            channelId: r.dataValues.channel_id,
-            time: r.dataValues.time,
-        }));
-    } catch (err) {
-        console.log('Error while finding jobs ', err);
-        return undefined;
-    }
+  try {
+    const result = await Job.findAll();
+    return result.map((r) => ({
+      channelId: r.dataValues.channel_id,
+      time: r.dataValues.time,
+    }));
+  } catch (err) {
+    console.log("Error while finding jobs ", err);
+    return undefined;
+  }
 };
 
 /**
@@ -515,18 +539,18 @@ exports.getAllJobs = async () => {
  * @returns true if succesful, undefined otherwise
  */
 exports.addScheduledMessage = async (messageId, date, channelId, usergroupId) => {
-    try {
-        return await ScheduledMessage.upsert({
-            messageId: messageId,
-            date: date,
-            channelId: channelId,
-            usergroupId: usergroupId
-        })
-    } catch (err) {
-        console.log('Error while creating a scheduled message', err)
-        return undefined
-    }
-}
+  try {
+    return await ScheduledMessage.upsert({
+      messageId: messageId,
+      date: date,
+      channelId: channelId,
+      usergroupId: usergroupId,
+    });
+  } catch (err) {
+    console.log("Error while creating a scheduled message", err);
+    return undefined;
+  }
+};
 
 /**
  * Fetches the _latest_ Slack message id for the given date, channel and usergroup
@@ -537,19 +561,27 @@ exports.addScheduledMessage = async (messageId, date, channelId, usergroupId) =>
  * or undefined if message not found
  */
 exports.getScheduledMessageId = async (date, channelId, usergroupId) => {
-    try {
-        return await ScheduledMessage.findOne({
-            raw: true,
-            attributes: ['messageId'],
-            where: {
-                date: date,
-                channelId: channelId,
-                usergroupId: usergroupId
-            },
-            order: [ [ 'createdAt', 'DESC' ] ]
-        })
-    } catch (err) {
-        console.log('Error while finding a scheduled message ', err)
-        return undefined
-    }
-}
+  try {
+    return await ScheduledMessage.findOne({
+      raw: true,
+      attributes: ["messageId"],
+      where: {
+        date: date,
+        channelId: channelId,
+        usergroupId: usergroupId,
+      },
+      order: [["createdAt", "DESC"]],
+    });
+  } catch (err) {
+    console.log("Error while finding a scheduled message ", err);
+    return undefined;
+  }
+};
+
+exports.getAllOffices = async () => {
+  return ["Helsinki", "Tampere"];
+};
+
+exports.getDefaultOfficeForUser = async (user) => {
+  return "Helsinki";
+};

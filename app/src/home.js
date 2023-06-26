@@ -74,17 +74,20 @@ const getDefaultSettingsBlock = async (userId) => {
  * Creates and returns a block containing an update button used to update the Home tab
  * and a default settings button used to open the default settings modal.
  */
-const getUpdateBlock = async () => {
-  // FIXME:
-  const offices = ["Helsinki", "Tampere"];
+const getUpdateBlock = async (selectedOffice) => {
+  const offices = await service.getAllOffices();
+  if (!selectedOffice) {
+    selectedOffice = offices[0];
+  }
   const updateBlock = [];
   updateBlock.push(
-    header("ILMOITTAUTUMISET :spiral_calendar_pad:"),
+    header(`${selectedOffice.toUpperCase()} :cityscape:`),
+    header(`ILMOITTAUTUMISET :spiral_calendar_pad:`),
     actions([
       button("Oletusasetukset", "settings_click", "updated"),
       button("Päivitä", "update_click", "updated"),
     ]),
-    selectMenu(offices, "office_select"),
+    selectMenu(offices, selectedOffice, "office_select"),
     mrkdwn(
       `(_Tiedot päivitetty ${DateTime.now()
         .setZone("Europe/Helsinki")
@@ -100,13 +103,15 @@ const getUpdateBlock = async () => {
  * Creates and returns a list of blocks containing the registrations to be displayed.
  * For every day there is a list of people registered for that day and buttons for user to register.
  */
-const getRegistrationsBlock = async (userId) => {
+const getRegistrationsBlock = async (userId, selectedOffice) => {
+  console.log(`registrationBlock, selectedOffice: ${selectedOffice}`);
   const registrationsBlock = [];
   registrationsBlock.push(
     plainText(
       ":writing_hand: = Käsin tehty ilmoittautuminen   :robot_face: = Oletusilmoittautuminen\n",
     ),
   );
+  registrationsBlock.push(plainText(selectedOffice));
   const dates = dfunc.listNWeekdays(DateTime.now(), SHOW_DAYS_UNTIL);
   const registrations = await service.getRegistrationsBetween(dates[0], dates[dates.length - 1]);
   const defaultSettings = await service.getDefaultSettingsForUser(userId);
@@ -142,7 +147,6 @@ const getRegistrationsBlock = async (userId) => {
       remoteColor = `${buttonValue.isRemote ? "primary" : null}`;
       emoji = "normal";
     }
-    //registrationsBlock.push(selectMenu(i.toString()));
     registrationsBlock.push(
       mrkdwn(userList),
       plainText("Oma ilmoittautumiseni:"),
@@ -159,9 +163,13 @@ const getRegistrationsBlock = async (userId) => {
 /**
  * Updates the Home tab.
  */
-const update = async (client, userId) => {
+const update = async (client, userId, office) => {
+  if (!office) {
+    office = await service.getDefaultOfficeForUser(userId);
+  }
+  console.log(`update home tab, office: ${office}`);
   let blocks = [];
-  blocks = blocks.concat(await getUpdateBlock(), await getRegistrationsBlock(userId));
+  blocks = blocks.concat(await getUpdateBlock(office), await getRegistrationsBlock(userId, office));
   client.views.publish({
     user_id: userId,
     view: {
