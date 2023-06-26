@@ -6,6 +6,7 @@ const { header } = require("./blocks/header");
 const { actions } = require("./blocks/actions");
 const { divider } = require("./blocks/divider");
 const { button } = require("./blocks/elements/button");
+const { selectMenu } = require("./blocks/elements/selectMenu");
 const { formatUserIdList } = require("./helperFunctions");
 const { generateNameAndMention } = require("./userCache");
 
@@ -81,6 +82,7 @@ const getUpdateBlock = async () => {
       button("Oletusasetukset", "settings_click", "updated"),
       button("Päivitä", "update_click", "updated"),
     ]),
+    selectMenu("office_select"),
     mrkdwn(
       `(_Tiedot päivitetty ${DateTime.now()
         .setZone("Europe/Helsinki")
@@ -138,9 +140,11 @@ const getRegistrationsBlock = async (userId) => {
       remoteColor = `${buttonValue.isRemote ? "primary" : null}`;
       emoji = "normal";
     }
+    //registrationsBlock.push(selectMenu(i.toString()));
     registrationsBlock.push(
       mrkdwn(userList),
       plainText("Oma ilmoittautumiseni:"),
+      selectMenu(i.toString()),
       actions([
         button("Toimistolla", "office_click", JSON.stringify(buttonValue), officeColor, emoji),
         button("Etänä", "remote_click", JSON.stringify(buttonValue), remoteColor, emoji),
