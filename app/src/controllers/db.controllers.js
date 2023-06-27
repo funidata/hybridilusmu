@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const { sequelize } = require("../models/index");
 
-const { Person, Signup, Defaultsignup, Job, ScheduledMessage } = require("../models");
+const { Person, Signup, Defaultsignup, Job, ScheduledMessage, Office } = require("../models");
 /**
  * Returns a row from the People table that matches the Slack user ID.
  * The row contains the following:
@@ -578,12 +578,25 @@ exports.getScheduledMessageId = async (date, channelId, usergroupId) => {
   }
 };
 
-exports.addOffice = async () => {
-  return true;
+exports.addOffice = async (officeName) => {
+  try {
+    return await Office.upsert({
+      officeName: officeName,
+    });
+  } catch (err) {
+    console.log("Error while creating an office", err);
+    return undefined;
+  }
 };
 
 exports.getAllOffices = async () => {
-  return ["Helsinki", "Tampere"];
+  try {
+    const result = await Office.findAll({ raw: true });
+    return result;
+  } catch (err) {
+    console.log("Error while finding all offices", err);
+    return undefined;
+  }
 };
 
 exports.addDefaultOfficeForUser = async (user, office) => {

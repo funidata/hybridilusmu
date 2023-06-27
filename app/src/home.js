@@ -74,8 +74,9 @@ const getDefaultSettingsBlock = async (userId) => {
  * Creates and returns a block containing an update button used to update the Home tab
  * and a default settings button used to open the default settings modal.
  */
-const getUpdateBlock = async (selectedOffice) => {
-  const offices = await service.getAllOffices();
+const getUpdateBlock = async (selectedOffice, offices) => {
+  console.log("updateBlock");
+  console.log(offices);
   const updateBlock = [];
   updateBlock.push(
     header(`${selectedOffice.toUpperCase()} :cityscape:`),
@@ -157,16 +158,30 @@ const getRegistrationsBlock = async (userId, selectedOffice) => {
   return registrationsBlock;
 };
 
+const getNoOfficesBlock = async () => {
+  const noOfficesBlock = [];
+  noOfficesBlock.push(header("LISÄÄ TOIMISTO!"), divider());
+  return noOfficesBlock;
+};
+
 /**
  * Updates the Home tab.
  */
 const update = async (client, userId, office) => {
-  if (!office) {
-    office = await service.getDefaultOfficeForUser(userId);
-  }
-  console.log(`update home tab, office: ${office}`);
   let blocks = [];
-  blocks = blocks.concat(await getUpdateBlock(office), await getRegistrationsBlock(userId, office));
+  const offices = await service.getAllOffices();
+  if (offices.length === 0) {
+    console.log("no offices found, push new view");
+    blocks = blocks.concat(await getNoOfficesBlock());
+  } else {
+    if (!office) {
+      office = await service.getDefaultOfficeForUser(userId);
+    }
+    blocks = blocks.concat(
+      await getUpdateBlock(office, offices),
+      await getRegistrationsBlock(userId, office),
+    );
+  }
   client.views.publish({
     user_id: userId,
     view: {
