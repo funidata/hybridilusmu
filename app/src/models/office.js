@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Defaultsignup, {
         foreignKey: "OfficeId",
       });
+      this.hasMany(models.Person, {
+        foreignKey: "DefaultOffice",
+      });
     }
   }
   Office.init(
