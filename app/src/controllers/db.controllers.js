@@ -579,6 +579,7 @@ exports.getScheduledMessageId = async (date, channelId, usergroupId) => {
 };
 
 exports.addOffice = async (officeName) => {
+  return undefined;
   try {
     return await Office.upsert({
       officeName: officeName,

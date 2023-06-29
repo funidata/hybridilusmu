@@ -22,7 +22,7 @@ const officesModalView = {
   type: "modal",
   title: {
     type: "plain_text",
-    text: "Toimistojen asetukset",
+    text: "Toimiston lisäys",
   },
   close: {
     type: "plain_text",
@@ -32,6 +32,7 @@ const officesModalView = {
     type: "plain_text",
     text: "Luo",
   },
+  callback_id: "submit_office",
 };
 
 /**
@@ -93,6 +94,8 @@ const getDefaultSettingsBlock = async (userId) => {
  */
 const getOfficeCreationBlock = async (userId) => {
   const officeSettingsBlock = [];
+  // TODO:
+  const offices = service.getAllOffices();
   officeSettingsBlock.push(
     mrkdwn("Toimistot:"),
     mrkdwn("Helsinki\nTampere"),

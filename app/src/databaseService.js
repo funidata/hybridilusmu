@@ -207,7 +207,7 @@ const getScheduledMessageId = async (date, channelId, usergroupId = null) => {
 const addScheduledMessage = async (messageId, date, channelId, usergroupId = null) =>
   db.addScheduledMessage(messageId, date, channelId, usergroupId);
 
-const addOffice = async () => db.addOffice();
+const addOffice = async (officeName) => db.addOffice(officeName);
 
 const getAllOffices = async () => db.getAllOffices();
 

@@ -1,6 +1,7 @@
 const textInput = (label, callback) => {
   const textInputElement = {
     type: "input",
+    block_id: "input_block",
     label: {
       type: "plain_text",
       text: label,
