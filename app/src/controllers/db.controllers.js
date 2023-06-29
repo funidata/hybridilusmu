@@ -606,5 +606,17 @@ exports.addDefaultOfficeForUser = async (user, office) => {
 };
 
 exports.getDefaultOfficeForUser = async (user) => {
-  return "Helsinki";
+  try {
+    const result = await Person.findOne({
+      raw: true,
+      attributes: ["DefaultOffice"],
+      where: {
+        slackId: user,
+      },
+    });
+    return result;
+  } catch (err) {
+    console.log("Error while finding the default office for user", err);
+    return undefined;
+  }
 };

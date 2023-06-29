@@ -95,10 +95,11 @@ const getDefaultSettingsBlock = async (userId) => {
 const getOfficeCreationBlock = async (userId) => {
   const officeSettingsBlock = [];
   // TODO:
-  const offices = service.getAllOffices();
+  const offices = (await service.getAllOffices()).map((office) => office.officeName);
+  console.log(offices);
   officeSettingsBlock.push(
     mrkdwn("Toimistot:"),
-    mrkdwn("Helsinki\nTampere"),
+    mrkdwn(offices.join("\n")),
     textInput("Lisää toimisto", "office_input"),
   );
 

@@ -214,13 +214,13 @@ const getAllOffices = async () => db.getAllOffices();
 const addDefaultOfficeForUser = async (user, office) => db.addDefaultOfficeForUser(user, office);
 
 const getDefaultOfficeForUser = async (user) => {
-  const result = await db.getDefaultOfficeForUser(user);
+  const result = (await db.getDefaultOfficeForUser(user)).DefaultOffice;
   if (result) {
     return result;
   }
   // If no default office found for user, default to first office
   const offices = await getAllOffices();
-  return offices[0];
+  return offices[0].officeName;
 };
 
 module.exports = {
