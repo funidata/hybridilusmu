@@ -9,12 +9,30 @@ const { button } = require("./blocks/elements/button");
 const { selectMenu } = require("./blocks/elements/selectMenu");
 const { formatUserIdList } = require("./helperFunctions");
 const { generateNameAndMention } = require("./userCache");
+const { textInput } = require("./blocks/elements/textInput");
+const { overflow } = require("./blocks/elements/overflow");
 
 const SHOW_DAYS_UNTIL = 10;
 const DAYS_IN_WEEK = 5;
 const format = { ...DateTime.DATETIME_MED, month: "long" };
 
 const modals = new Map();
+
+const officesModalView = {
+  type: "modal",
+  title: {
+    type: "plain_text",
+    text: "Toimistojen asetukset",
+  },
+  close: {
+    type: "plain_text",
+    text: "Eiku",
+  },
+  submit: {
+    type: "plain_text",
+    text: "Luo",
+  },
+};
 
 /**
  * Defines the default settings modal's title
@@ -69,23 +87,40 @@ const getDefaultSettingsBlock = async (userId) => {
   }
   return settingsBlock;
 };
+/**
+ * Creates and returns a block describing the office creation view.
+ * This is then displayed on the office creation modal view.
+ */
+const getOfficeCreationBlock = async (userId) => {
+  const officeSettingsBlock = [];
+  officeSettingsBlock.push(
+    mrkdwn("Toimistot:"),
+    mrkdwn("Helsinki\nTampere"),
+    textInput("Lisää toimisto", "office_input"),
+  );
+
+  return officeSettingsBlock;
+};
 
 /**
  * Creates and returns a block containing an update button used to update the Home tab
  * and a default settings button used to open the default settings modal.
  */
-const getUpdateBlock = async (selectedOffice, offices) => {
-  console.log("updateBlock");
-  console.log(offices);
+const getUpdateBlock = async (selectedOffice, offices, isAdmin) => {
   const updateBlock = [];
+  const overflowOptions = ["Toimistot", "Lisää toimisto"];
+  const actionElements = [
+    button("Oletusasetukset", "settings_click", "updated"),
+    button("Päivitä", "update_click", "updated"),
+  ];
+  if (isAdmin) {
+    actionElements.push(overflow(overflowOptions));
+  }
+
   updateBlock.push(
-    header(`${selectedOffice.toUpperCase()} :cityscape:`),
     header(`ILMOITTAUTUMISET :spiral_calendar_pad:`),
-    actions([
-      button("Oletusasetukset", "settings_click", "updated"),
-      button("Päivitä", "update_click", "updated"),
-    ]),
-    selectMenu(offices, selectedOffice, "office_select"),
+    //header(`${selectedOffice.toUpperCase()} :cityscape:`),
+    actions(actionElements),
     mrkdwn(
       `(_Tiedot päivitetty ${DateTime.now()
         .setZone("Europe/Helsinki")
@@ -158,29 +193,31 @@ const getRegistrationsBlock = async (userId, selectedOffice) => {
   return registrationsBlock;
 };
 
+/**
+ * Show in place of registration block when there are no offices added yet.
+ */
 const getNoOfficesBlock = async () => {
   const noOfficesBlock = [];
-  noOfficesBlock.push(header("LISÄÄ TOIMISTO!"), divider());
+  noOfficesBlock.push(plainText("Lisää toimisto rekisteröityäksesi"));
   return noOfficesBlock;
 };
 
 /**
  * Updates the Home tab.
  */
-const update = async (client, userId, office) => {
+const update = async (client, userId, userCache, selectedOffice) => {
   let blocks = [];
+  const isAdmin = (await userCache.getCachedUser(userId)).is_admin;
   const offices = await service.getAllOffices();
+  if (!selectedOffice) {
+    selectedOffice = await service.getDefaultOfficeForUser(userId);
+  }
+  blocks = blocks.concat(await getUpdateBlock(selectedOffice, offices, isAdmin));
   if (offices.length === 0) {
     console.log("no offices found, push new view");
     blocks = blocks.concat(await getNoOfficesBlock());
   } else {
-    if (!office) {
-      office = await service.getDefaultOfficeForUser(userId);
-    }
-    blocks = blocks.concat(
-      await getUpdateBlock(office, offices),
-      await getRegistrationsBlock(userId, office),
-    );
+    blocks = blocks.concat(await getRegistrationsBlock(userId, selectedOffice));
   }
   client.views.publish({
     user_id: userId,
@@ -189,6 +226,18 @@ const update = async (client, userId, office) => {
       blocks,
     },
   });
+};
+
+/**
+ * Opens the office creation modal view.
+ */
+const openOfficeCreationView = async (client, userId, triggerId) => {
+  const block = await getOfficeCreationBlock();
+  const res = await client.views.open({
+    trigger_id: triggerId,
+    view: { ...officesModalView, blocks: block },
+  });
+  modals.set(userId, res.view.id);
 };
 
 /**
@@ -234,4 +283,5 @@ module.exports = {
   openView,
   update,
   updateView,
+  openOfficesView: openOfficeCreationView,
 };
