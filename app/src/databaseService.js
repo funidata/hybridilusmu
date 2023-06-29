@@ -219,7 +219,7 @@ const getDefaultOfficeForUser = async (user) => {
     return result;
   }
   // If no default office found for user, default to first office
-  const offices = getAllOffices();
+  const offices = await getAllOffices();
   return offices[0];
 };
 
