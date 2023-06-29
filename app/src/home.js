@@ -94,9 +94,7 @@ const getDefaultSettingsBlock = async (userId) => {
  */
 const getOfficeCreationBlock = async (userId) => {
   const officeSettingsBlock = [];
-  // TODO:
   const offices = (await service.getAllOffices()).map((office) => office.officeName);
-  console.log(offices);
   officeSettingsBlock.push(
     mrkdwn("Toimistot:"),
     mrkdwn(offices.join("\n")),
