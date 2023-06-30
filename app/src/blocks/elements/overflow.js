@@ -10,7 +10,7 @@ const overflow = (options) => {
   const overflowElement = {
     type: "overflow",
     options: optionObjects,
-    action_id: "overflow",
+    action_id: "overflow_menu",
   };
   return overflowElement;
 };

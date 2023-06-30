@@ -3,15 +3,16 @@ const service = require("./databaseService");
 const { updateScheduledMessages } = require("./lateRegistration");
 
 exports.enableActionFunctions = ({ app, userCache }) => {
-  app.action("overflow", async ({ body, ack, client }) => {
+  app.action("overflow_menu", async ({ body, ack, client }) => {
     await ack();
     console.log("overflow babyyy");
     const selectedOption = body.actions[0].selected_option.value;
-    if (selectedOption === "Toimistot") {
+    if (selectedOption === "Toimistojen hallinta") {
       console.log("toimisto cheeck");
+      home.openOfficeControlView(client, body.user.id, body.trigger_id);
     } else if (selectedOption === "Lisää toimisto") {
       console.log("avataan toimiston lisäys modali");
-      home.openOfficesView(client, body.user.id, body.trigger_id);
+      home.openOfficeCreationView(client, body.user.id, body.trigger_id);
     }
   });
 

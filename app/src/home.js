@@ -18,7 +18,7 @@ const format = { ...DateTime.DATETIME_MED, month: "long" };
 
 const modals = new Map();
 
-const officesModalView = {
+const officeCreationModalView = {
   type: "modal",
   title: {
     type: "plain_text",
@@ -33,6 +33,18 @@ const officesModalView = {
     text: "Luo",
   },
   callback_id: "submit_office",
+};
+
+const officeControlModalView = {
+  type: "modal",
+  title: {
+    type: "plain_text",
+    text: "Toimistojen hallinta",
+  },
+  close: {
+    type: "plain_text",
+    text: "Sulje",
+  },
 };
 
 /**
@@ -92,16 +104,26 @@ const getDefaultSettingsBlock = async (userId) => {
  * Creates and returns a block describing the office creation view.
  * This is then displayed on the office creation modal view.
  */
-const getOfficeCreationBlock = async (userId) => {
-  const officeSettingsBlock = [];
+const getOfficeCreationBlock = async () => {
+  const officeCreationBlock = [];
   const offices = (await service.getAllOffices()).map((office) => office.officeName);
-  officeSettingsBlock.push(
-    mrkdwn("Toimistot:"),
+  officeCreationBlock.push(
+    mrkdwn("*Toimistot:*"),
     mrkdwn(offices.join("\n")),
     textInput("Lisää toimisto", "office_input"),
   );
 
-  return officeSettingsBlock;
+  return officeCreationBlock;
+};
+
+const getOfficeControlBlock = async () => {
+  const officeControlBlock = [];
+  const offices = await service.getAllOffices();
+  officeControlBlock.push(mrkdwn("*Toimistot:*"), divider());
+  for (const office of offices) {
+    officeControlBlock.push(mrkdwn(office.officeName), mrkdwn(office.updatedAt), divider());
+  }
+  return officeControlBlock;
 };
 
 /**
@@ -110,7 +132,7 @@ const getOfficeCreationBlock = async (userId) => {
  */
 const getUpdateBlock = async (selectedOffice, offices, isAdmin) => {
   const updateBlock = [];
-  const overflowOptions = ["Toimistot", "Lisää toimisto"];
+  const overflowOptions = ["Toimistojen hallinta", "Lisää toimisto"];
   const actionElements = [
     button("Oletusasetukset", "settings_click", "updated"),
     button("Päivitä", "update_click", "updated"),
@@ -237,7 +259,16 @@ const openOfficeCreationView = async (client, userId, triggerId) => {
   const block = await getOfficeCreationBlock();
   const res = await client.views.open({
     trigger_id: triggerId,
-    view: { ...officesModalView, blocks: block },
+    view: { ...officeCreationModalView, blocks: block },
+  });
+  modals.set(userId, res.view.id);
+};
+
+const openOfficeControlView = async (client, userId, triggerId) => {
+  const block = await getOfficeControlBlock();
+  const res = await client.views.open({
+    trigger_id: triggerId,
+    view: { ...officeControlModalView, blocks: block },
   });
   modals.set(userId, res.view.id);
 };
@@ -285,5 +316,6 @@ module.exports = {
   openView,
   update,
   updateView,
-  openOfficesView: openOfficeCreationView,
+  openOfficeCreationView,
+  openOfficeControlView,
 };
