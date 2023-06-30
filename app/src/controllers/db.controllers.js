@@ -579,13 +579,25 @@ exports.getScheduledMessageId = async (date, channelId, usergroupId) => {
 };
 
 exports.addOffice = async (officeName) => {
-  return undefined;
   try {
     return await Office.upsert({
       officeName: officeName,
     });
   } catch (err) {
     console.log("Error while creating an office", err);
+    return undefined;
+  }
+};
+
+exports.removeOffice = async (officeId) => {
+  try {
+    await Office.destroy({
+      where: {
+        id: officeId,
+      },
+    });
+  } catch (err) {
+    console.log("Error while removing an office ", err);
     return undefined;
   }
 };

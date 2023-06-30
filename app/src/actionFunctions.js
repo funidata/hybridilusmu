@@ -16,8 +16,9 @@ exports.enableActionFunctions = ({ app, userCache }) => {
   app.action("office_delete_click", async ({ body, ack, client }) => {
     await ack();
     const officeId = body.actions[0].value;
-
-    console.log(`poistetaan office: ${officeId}`);
+    await service.removeOffice(officeId);
+    home.update(client, body.user.id, userCache);
+    home.updateOfficeControlView(client, body.user.id);
   });
   /*app.action("office_select", async ({ body, ack, client }) => {
     const user = body.user.id;

@@ -209,6 +209,8 @@ const addScheduledMessage = async (messageId, date, channelId, usergroupId = nul
 
 const addOffice = async (officeName) => db.addOffice(officeName);
 
+const removeOffice = async (officeId) => db.removeOffice(officeId);
+
 const getAllOffices = async () => db.getAllOffices();
 
 const addDefaultOfficeForUser = async (user, office) => db.addDefaultOfficeForUser(user, office);
@@ -238,6 +240,7 @@ module.exports = {
   getScheduledMessageId,
   addScheduledMessage,
   addOffice,
+  removeOffice,
   getDefaultOfficeForUser,
   getAllOffices,
   addDefaultOfficeForUser,

@@ -129,6 +129,7 @@ const getOfficeControlBlock = async () => {
       header(office.officeName),
       mrkdwn(`_Luotu: ${createdAt}_\n_Muokattu: ${updatedAt}_`),
       actions([
+        button("Muokkaa", "office_modify_click", `${office.id}`, "primary"),
         button(
           "Poista",
           "office_delete_click",
@@ -288,6 +289,14 @@ const openOfficeCreationView = async (client, userId, triggerId) => {
   modals.set(userId, res.view.id);
 };
 
+const updateOfficeControlView = async (client, userId) => {
+  const block = await getOfficeControlBlock();
+  await client.views.update({
+    view_id: modals.get(userId),
+    view: { ...officeControlModalView, blocks: block },
+  });
+};
+
 const openOfficeControlView = async (client, userId, triggerId) => {
   const block = await getOfficeControlBlock();
   const res = await client.views.open({
@@ -342,4 +351,5 @@ module.exports = {
   updateView,
   openOfficeCreationView,
   openOfficeControlView,
+  updateOfficeControlView,
 };
