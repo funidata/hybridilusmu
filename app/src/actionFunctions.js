@@ -5,17 +5,20 @@ const { updateScheduledMessages } = require("./lateRegistration");
 exports.enableActionFunctions = ({ app, userCache }) => {
   app.action("overflow_menu", async ({ body, ack, client }) => {
     await ack();
-    console.log("overflow babyyy");
     const selectedOption = body.actions[0].selected_option.value;
     if (selectedOption === "Toimistojen hallinta") {
-      console.log("toimisto cheeck");
       home.openOfficeControlView(client, body.user.id, body.trigger_id);
     } else if (selectedOption === "Lisää toimisto") {
-      console.log("avataan toimiston lisäys modali");
       home.openOfficeCreationView(client, body.user.id, body.trigger_id);
     }
   });
 
+  app.action("office_delete_click", async ({ body, ack, client }) => {
+    await ack();
+    const officeId = body.actions[0].value;
+
+    console.log(`poistetaan office: ${officeId}`);
+  });
   /*app.action("office_select", async ({ body, ack, client }) => {
     const user = body.user.id;
     const office = body.actions[0].selected_option.value;

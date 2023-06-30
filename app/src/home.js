@@ -1,11 +1,13 @@
 const { DateTime } = require("luxon");
 const service = require("./databaseService");
+const helper = require("./helperFunctions");
 const dfunc = require("./dateFunctions");
 const { plainText, mrkdwn } = require("./blocks/section");
 const { header } = require("./blocks/header");
 const { actions } = require("./blocks/actions");
 const { divider } = require("./blocks/divider");
 const { button } = require("./blocks/elements/button");
+const { confirmation } = require("./blocks/elements/confirmation");
 const { selectMenu } = require("./blocks/elements/selectMenu");
 const { formatUserIdList } = require("./helperFunctions");
 const { generateNameAndMention } = require("./userCache");
@@ -121,8 +123,30 @@ const getOfficeControlBlock = async () => {
   const offices = await service.getAllOffices();
   officeControlBlock.push(mrkdwn("*Toimistot:*"), divider());
   for (const office of offices) {
-    officeControlBlock.push(mrkdwn(office.officeName), mrkdwn(office.updatedAt), divider());
+    const createdAt = helper.formatDates(office.createdAt);
+    const updatedAt = helper.formatDates(office.updatedAt);
+    officeControlBlock.push(
+      header(office.officeName),
+      mrkdwn(`_Luotu: ${createdAt}_\n_Muokattu: ${updatedAt}_`),
+      actions([
+        button(
+          "Poista",
+          "office_delete_click",
+          `${office.id}`,
+          "danger",
+          null,
+          confirmation(
+            "Varmastikko?",
+            `Olet poistamassa toimistoa: ${office.officeName}`,
+            "Poista",
+            "danger",
+          ),
+        ),
+      ]),
+      divider(),
+    );
   }
+
   return officeControlBlock;
 };
 
