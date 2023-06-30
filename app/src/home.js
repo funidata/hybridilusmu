@@ -54,7 +54,7 @@ const officeControlModalView = {
  * and what text is displayed as tooltip on the closing 'X' button.
  * These are basic attributes of the modal view.
  */
-const modalView = {
+const defaultSettingsModalView = {
   type: "modal",
   title: {
     type: "plain_text",
@@ -309,11 +309,11 @@ const openOfficeControlView = async (client, userId, triggerId) => {
 /**
  * Opens a modal view.
  */
-const openView = async (client, userId, triggerId) => {
+const openDefaultSettingsView = async (client, userId, triggerId) => {
   const block = await getDefaultSettingsBlock(userId);
   const res = await client.views.open({
     trigger_id: triggerId,
-    view: { ...modalView, blocks: block },
+    view: { ...defaultSettingsModalView, blocks: block },
   });
 
   modals.set(userId, res.view.id);
@@ -322,11 +322,11 @@ const openView = async (client, userId, triggerId) => {
 /**
  * Updates a modal view.
  */
-const updateView = async (client, userId) => {
+const updateDefaultSettingsView = async (client, userId) => {
   const block = await getDefaultSettingsBlock(userId);
   await client.views.update({
     view_id: modals.get(userId),
-    view: { ...modalView, blocks: block },
+    view: { ...defaultSettingsModalView, blocks: block },
   });
 };
 
@@ -346,9 +346,9 @@ const error = async (client, userId, message) => {
 module.exports = {
   error,
   getDefaultSettingsBlock,
-  openView,
+  openDefaultSettingsView,
   update,
-  updateView,
+  updateDefaultSettingsView,
   openOfficeCreationView,
   openOfficeControlView,
   updateOfficeControlView,

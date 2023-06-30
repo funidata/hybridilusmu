@@ -20,6 +20,12 @@ exports.enableActionFunctions = ({ app, userCache }) => {
     home.update(client, body.user.id, userCache);
     home.updateOfficeControlView(client, body.user.id);
   });
+
+  app.action("office_modify_click", async ({ body, ack, client }) => {
+    await ack();
+    const officeId = body.actions[0].value;
+    console.log(officeId);
+  });
   /*app.action("office_select", async ({ body, ack, client }) => {
     const user = body.user.id;
     const office = body.actions[0].selected_option.value;
@@ -40,7 +46,7 @@ exports.enableActionFunctions = ({ app, userCache }) => {
    * Opens a modal view for the default settings
    */
   app.action("settings_click", async ({ body, ack, client }) => {
-    home.openView(client, body.user.id, body.trigger_id);
+    home.openDefaultSettingsView(client, body.user.id, body.trigger_id);
     await ack();
   });
 
@@ -75,7 +81,7 @@ exports.enableActionFunctions = ({ app, userCache }) => {
     const data = JSON.parse(body.actions[0].value);
     await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultAtOffice);
     home.update(client, body.user.id, userCache);
-    home.updateView(client, body.user.id);
+    home.updateDefaultSettingsView(client, body.user.id);
     await ack();
   });
 
@@ -92,7 +98,7 @@ exports.enableActionFunctions = ({ app, userCache }) => {
       false,
     );
     home.update(client, body.user.id, userCache);
-    home.updateView(client, body.user.id);
+    home.updateDefaultSettingsView(client, body.user.id);
     await ack();
   });
 };
