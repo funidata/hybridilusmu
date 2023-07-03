@@ -1,5 +1,5 @@
 const helper = require("./helperFunctions");
-const home = require("./home");
+const home = require("./ui/home");
 
 exports.enableMiddleware = ({ app, userCache }) => {
   /**

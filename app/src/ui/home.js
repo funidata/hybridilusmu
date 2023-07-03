@@ -1,7 +1,7 @@
 const { DateTime } = require("luxon");
-const service = require("./databaseService");
-const helper = require("./helperFunctions");
-const dfunc = require("./dateFunctions");
+const service = require("../databaseService");
+const helper = require("../helperFunctions");
+const dfunc = require("../dateFunctions");
 const { plainText, mrkdwn } = require("./blocks/section");
 const { header } = require("./blocks/header");
 const { actions } = require("./blocks/actions");
@@ -9,8 +9,8 @@ const { divider } = require("./blocks/divider");
 const { button } = require("./blocks/elements/button");
 const { confirmation } = require("./blocks/elements/confirmation");
 const { selectMenu } = require("./blocks/elements/selectMenu");
-const { formatUserIdList } = require("./helperFunctions");
-const { generateNameAndMention } = require("./userCache");
+const { formatUserIdList } = require("../helperFunctions");
+const { generateNameAndMention } = require("../userCache");
 const { textInput } = require("./blocks/elements/textInput");
 const { overflow } = require("./blocks/elements/overflow");
 

@@ -1,5 +1,5 @@
 const service = require("./databaseService");
-const home = require("./home");
+const home = require("./ui/home");
 
 /**
  * These will handle inputs from modals

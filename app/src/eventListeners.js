@@ -1,4 +1,4 @@
-const home = require("./home");
+const home = require("./ui/home");
 const { unScheduleMessage } = require("./scheduler/scheduler");
 
 exports.enableEventListeners = ({ app, usergroups, userCache }) => {

@@ -1,4 +1,4 @@
-const home = require("./home");
+const home = require("./ui/home");
 const service = require("./databaseService");
 const { updateScheduledMessages } = require("./lateRegistration");
 
