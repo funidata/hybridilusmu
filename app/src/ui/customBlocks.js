@@ -11,7 +11,6 @@ const { actions } = require("./blocks/actions");
 const { button } = require("./blocks/elements/button");
 const { confirmation } = require("./blocks/elements/confirmation");
 const { overflow } = require("./blocks/elements/overflow");
-
 const { header } = require("./blocks/header");
 const { divider } = require("./blocks/divider");
 
@@ -149,7 +148,7 @@ const getRegistrationsBlock = async (userId, selectedOffice) => {
 
 /**
  * Creates and returns a block describing the office creation view.
- * This is then displayed on the office creation modal view.
+ * This will be displayed inside the office creation modal.
  */
 const getOfficeCreationBlock = async () => {
   const officeCreationBlock = [];
@@ -163,6 +162,10 @@ const getOfficeCreationBlock = async () => {
   return officeCreationBlock;
 };
 
+/**
+ * Creates and returns a block describing the office control view.
+ * This will be displayed inside the office control modal.
+ */
 const getOfficeControlBlock = async () => {
   const officeControlBlock = [];
   const offices = await service.getAllOffices();

@@ -17,10 +17,18 @@ const {
   getNoOfficesBlock,
 } = require("./customBlocks");
 
+/**
+ * List of modals opened by users.
+ * Each user can have a single modal open at once.
+ */
 const modals = new Map();
 
 /**
- * Updates the Home tab.
+ *
+ * @param {*} client Bolt client object.
+ * @param {string} userId Slack user id.
+ * @param {*} userCache User cache instance.
+ * @param {string} [selectedOffice] Name of the office that was selected.
  */
 const update = async (client, userId, userCache, selectedOffice) => {
   let blocks = [];
@@ -61,6 +69,9 @@ const openOfficeModifyView = async (client, userId, officeId) => {
 
 /**
  * Opens the office creation modal view.
+ * @param {*} client Bolt client object.
+ * @param {string} userId Slack user id.
+ * @param {string} triggerId Trigger id formed as a result of a user interaction.
  */
 const openOfficeCreationView = async (client, userId, triggerId) => {
   const block = await getOfficeCreationBlock();
@@ -71,6 +82,11 @@ const openOfficeCreationView = async (client, userId, triggerId) => {
   modals.set(userId, res.view.id);
 };
 
+/**
+ * Updates the office control modal view.
+ * @param {*} client Bolt client object.
+ * @param {string} userId Slack user id.
+ */
 const updateOfficeControlView = async (client, userId) => {
   const block = await getOfficeControlBlock();
   await client.views.update({
@@ -79,6 +95,12 @@ const updateOfficeControlView = async (client, userId) => {
   });
 };
 
+/**
+ * Opens the office control modal view.
+ * @param {*} client Bolt client object.
+ * @param {string} userId Slack user id.
+ * @param {string} triggerId Trigger id formed as a result of a user interaction.
+ */
 const openOfficeControlView = async (client, userId, triggerId) => {
   const block = await getOfficeControlBlock();
   const res = await client.views.open({
@@ -89,7 +111,10 @@ const openOfficeControlView = async (client, userId, triggerId) => {
 };
 
 /**
- * Opens a modal view.
+ * Opens the default settings modal view.
+ * @param {*} client Bolt client object.
+ * @param {string} userId Slack user id.
+ * @param {string} triggerId Trigger id formed as a result of a user interaction.
  */
 const openDefaultSettingsView = async (client, userId, triggerId) => {
   const block = await getDefaultSettingsBlock(userId);
@@ -102,7 +127,9 @@ const openDefaultSettingsView = async (client, userId, triggerId) => {
 };
 
 /**
- * Updates a modal view.
+ * Updates the default settings modal view.
+ * @param {*} client Bolt client object.
+ * @param {string} userId Slack user id.
  */
 const updateDefaultSettingsView = async (client, userId) => {
   const block = await getDefaultSettingsBlock(userId);
@@ -114,6 +141,9 @@ const updateDefaultSettingsView = async (client, userId) => {
 
 /**
  * Displays an error page on the Home tab.
+ * @param {*} client Bolt client object.
+ * @param {string} userId Slack user id.
+ * @param {string} message Message to be shown in the error block.
  */
 const error = async (client, userId, message) => {
   client.views.publish({
