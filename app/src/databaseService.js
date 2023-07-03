@@ -227,6 +227,8 @@ const getDefaultOfficeForUser = async (user) => {
   return offices[0].officeName;
 };
 
+const updateOffice = async (office, newName) => db.updateOffice(office, newName);
+
 module.exports = {
   changeRegistration,
   changeDefaultRegistration,
@@ -247,4 +249,5 @@ module.exports = {
   getAllOffices,
   getOffice,
   addDefaultOfficeForUser,
+  updateOffice,
 };

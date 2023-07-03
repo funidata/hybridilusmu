@@ -604,7 +604,7 @@ exports.removeOffice = async (officeId) => {
 
 exports.getAllOffices = async () => {
   try {
-    const result = await Office.findAll({ raw: true });
+    const result = await Office.findAll({ raw: true, order: [["id", "ASC"]] });
     return result;
   } catch (err) {
     console.log("Error while finding all offices", err);
@@ -639,6 +639,20 @@ exports.getDefaultOfficeForUser = async (user) => {
     return result;
   } catch (err) {
     console.log("Error while finding the default office for user", err);
+    return undefined;
+  }
+};
+
+exports.updateOffice = async (office, newName) => {
+  try {
+    const result = await Office.update({ officeName: newName }, { where: { id: office } });
+    // Number of affected rows
+    if (result[0] === 0) {
+      return null;
+    }
+    return result;
+  } catch (err) {
+    console.log("Error while updating office", err);
     return undefined;
   }
 };

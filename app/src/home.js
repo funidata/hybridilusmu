@@ -126,8 +126,11 @@ const getDefaultSettingsBlock = async (userId) => {
  */
 const getOfficeModifyBlock = async (officeId) => {
   const officeModifyBlock = [];
-  const office = await service.getOffice(officeId);
-  officeModifyBlock.push(header(office.officeName), textInput("Muokkaa nimeä", "office_input"));
+  const officeName = (await service.getOffice(officeId)).officeName;
+  officeModifyBlock.push(
+    header(officeName),
+    textInput("Muokkaa toimiston nimeä", "office_input", officeName),
+  );
 
   return officeModifyBlock;
 };
@@ -216,7 +219,6 @@ const getUpdateBlock = async (selectedOffice, offices, isAdmin) => {
  * For every day there is a list of people registered for that day and buttons for user to register.
  */
 const getRegistrationsBlock = async (userId, selectedOffice) => {
-  console.log(`registrationBlock, selectedOffice: ${selectedOffice}`);
   const registrationsBlock = [];
   registrationsBlock.push(
     plainText(
@@ -275,6 +277,7 @@ const getRegistrationsBlock = async (userId, selectedOffice) => {
 /**
  * Show in place of registration block when there are no offices added yet.
  */
+// TODO:
 const getNoOfficesBlock = async () => {
   const noOfficesBlock = [];
   noOfficesBlock.push(plainText("Lisää toimisto rekisteröityäksesi"));
@@ -307,11 +310,17 @@ const update = async (client, userId, userCache, selectedOffice) => {
   });
 };
 
+/**
+ * Opens the office modifying modal view.
+ * @param {*} client Bolt client object.
+ * @param {string} userId Slack user id.
+ * @param {string} officeId ID of the office we're modifying.
+ */
 const openOfficeModifyView = async (client, userId, officeId) => {
   const block = await getOfficeModifyBlock(officeId);
   await client.views.update({
     view_id: modals.get(userId),
-    view: { ...officeModifyModalView, blocks: block },
+    view: { ...officeModifyModalView, blocks: block, private_metadata: officeId },
   });
 };
 
