@@ -17,4 +17,13 @@ exports.enableViewListeners = ({ app, userCache }) => {
       home.error(client, user, msg);
     }
   });
+
+  app.view("modify_office", async ({ ack, body, view, client }) => {
+    await ack();
+    const user = body.user.id;
+    console.log(body);
+    console.log(view);
+    const newOfficeName = view.state.values.input_block.office_input.value;
+    console.log(newOfficeName);
+  });
 };

@@ -213,6 +213,8 @@ const removeOffice = async (officeId) => db.removeOffice(officeId);
 
 const getAllOffices = async () => db.getAllOffices();
 
+const getOffice = async (officeId) => db.getOffice(officeId);
+
 const addDefaultOfficeForUser = async (user, office) => db.addDefaultOfficeForUser(user, office);
 
 const getDefaultOfficeForUser = async (user) => {
@@ -243,5 +245,6 @@ module.exports = {
   removeOffice,
   getDefaultOfficeForUser,
   getAllOffices,
+  getOffice,
   addDefaultOfficeForUser,
 };

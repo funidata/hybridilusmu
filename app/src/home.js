@@ -20,6 +20,23 @@ const format = { ...DateTime.DATETIME_MED, month: "long" };
 
 const modals = new Map();
 
+const officeModifyModalView = {
+  type: "modal",
+  title: {
+    type: "plain_text",
+    text: "Toimiston muokkaus",
+  },
+  close: {
+    type: "plain_text",
+    text: "Eiku",
+  },
+  submit: {
+    type: "plain_text",
+    text: "Muokkaa",
+  },
+  callback_id: "modify_office",
+};
+
 const officeCreationModalView = {
   type: "modal",
   title: {
@@ -102,6 +119,19 @@ const getDefaultSettingsBlock = async (userId) => {
   }
   return settingsBlock;
 };
+
+/**
+ * Creates and returns a block describing the office modifying view.
+ * This is then displayed on the office modifying modal view.
+ */
+const getOfficeModifyBlock = async (officeId) => {
+  const officeModifyBlock = [];
+  const office = await service.getOffice(officeId);
+  officeModifyBlock.push(header(office.officeName), textInput("Muokkaa nimeä", "office_input"));
+
+  return officeModifyBlock;
+};
+
 /**
  * Creates and returns a block describing the office creation view.
  * This is then displayed on the office creation modal view.
@@ -277,6 +307,14 @@ const update = async (client, userId, userCache, selectedOffice) => {
   });
 };
 
+const openOfficeModifyView = async (client, userId, officeId) => {
+  const block = await getOfficeModifyBlock(officeId);
+  await client.views.update({
+    view_id: modals.get(userId),
+    view: { ...officeModifyModalView, blocks: block },
+  });
+};
+
 /**
  * Opens the office creation modal view.
  */
@@ -352,4 +390,5 @@ module.exports = {
   openOfficeCreationView,
   openOfficeControlView,
   updateOfficeControlView,
+  openOfficeModifyView,
 };

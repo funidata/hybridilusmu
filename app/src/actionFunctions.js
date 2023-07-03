@@ -25,6 +25,7 @@ exports.enableActionFunctions = ({ app, userCache }) => {
     await ack();
     const officeId = body.actions[0].value;
     console.log(officeId);
+    home.openOfficeModifyView(client, body.user.id, officeId);
   });
   /*app.action("office_select", async ({ body, ack, client }) => {
     const user = body.user.id;

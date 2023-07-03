@@ -612,6 +612,16 @@ exports.getAllOffices = async () => {
   }
 };
 
+exports.getOffice = async (officeId) => {
+  try {
+    const result = await Office.findOne({ raw: true, where: { id: officeId } });
+    return result;
+  } catch (err) {
+    console.log("Error while finding an office", err);
+    return undefined;
+  }
+};
+
 exports.addDefaultOfficeForUser = async (user, office) => {
   console.log(`added default office ${office} for user ${user}`);
   return true;
