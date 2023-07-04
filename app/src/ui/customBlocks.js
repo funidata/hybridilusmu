@@ -8,9 +8,11 @@ const { generateNameAndMention } = require("../userCache");
 const { textInput } = require("./blocks/elements/textInput");
 const { plainText, mrkdwn } = require("./blocks/section");
 const { actions } = require("./blocks/actions");
+const { context } = require("./blocks/context");
 const { button } = require("./blocks/elements/button");
 const { confirmation } = require("./blocks/elements/confirmation");
 const { overflow } = require("./blocks/elements/overflow");
+const { selectMenu } = require("./blocks/elements/selectMenu");
 const { header } = require("./blocks/header");
 const { divider } = require("./blocks/divider");
 
@@ -35,10 +37,10 @@ const getUpdateBlock = async (selectedOffice, offices, isAdmin) => {
   }
 
   updateBlock.push(
+    header(`${selectedOffice.toUpperCase()}`),
     header(`ILMOITTAUTUMISET :spiral_calendar_pad:`),
-    //header(`${selectedOffice.toUpperCase()} :cityscape:`),
     actions(actionElements),
-    mrkdwn(
+    context(
       `(_Tiedot päivitetty ${DateTime.now()
         .setZone("Europe/Helsinki")
         .setLocale("fi")
@@ -55,7 +57,15 @@ const getUpdateBlock = async (selectedOffice, offices, isAdmin) => {
  */
 const getDefaultSettingsBlock = async (userId) => {
   const settingsBlock = [];
-  settingsBlock.push(mrkdwn("Oletusarvoisesti olen..."));
+  const offices = await service.getAllOffices();
+  const initialOffice = await service.getDefaultOfficeForUser(userId);
+  settingsBlock.push(
+    selectMenu("Valitse toimisto", offices, initialOffice, "office_select"),
+    context(
+      "Näet vain valitsemasi toimiston ilmoittautumiset, lisäksi kaikki valintasi rekisteröidään valitsemaasi toimistoon",
+    ),
+    mrkdwn("Oletusarvoisesti olen..."),
+  );
   const settings = await service.getDefaultSettingsForUser(userId);
   for (let i = 0; i < DAYS_IN_WEEK; i += 1) {
     const weekday = dfunc.weekdays[i];
@@ -175,7 +185,7 @@ const getOfficeControlBlock = async () => {
     const updatedAt = formatDates(office.updatedAt);
     officeControlBlock.push(
       header(office.officeName),
-      mrkdwn(`_Luotu: ${createdAt}_\n_Muokattu: ${updatedAt}_`),
+      context(`_Luotu: ${createdAt}_\n_Muokattu: ${updatedAt}_`),
       actions([
         button("Muokkaa", "office_modify_click", `${office.id}`, "primary"),
         button(

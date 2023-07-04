@@ -1,10 +1,10 @@
-const selectMenu = (offices, initialOffice, callback) => {
+const selectMenu = (label, offices, initialOffice, callback) => {
   const options = offices.map((office) => ({
     text: {
       type: "plain_text",
-      text: office,
+      text: office.officeName,
     },
-    value: office,
+    value: office.officeName,
   }));
   const initialOption = options.find(({ value }) => value === initialOffice);
 
@@ -12,7 +12,7 @@ const selectMenu = (offices, initialOffice, callback) => {
     type: "section",
     text: {
       type: "mrkdwn",
-      text: "Toimisto",
+      text: label,
     },
     accessory: {
       action_id: callback,

@@ -26,13 +26,15 @@ exports.enableActionFunctions = ({ app, userCache }) => {
     const officeId = body.actions[0].value;
     home.openOfficeModifyView(client, body.user.id, officeId);
   });
-  /*app.action("office_select", async ({ body, ack, client }) => {
+
+  app.action("office_select", async ({ body, ack, client }) => {
     const user = body.user.id;
     const office = body.actions[0].selected_option.value;
-    await service.addDefaultOfficeForUser(user, office);
-    home.update(client, user, office);
+    console.log(`selected office ${office}`);
+    //await service.addDefaultOfficeForUser(user, office);
+    //home.update(client, user, userCache, office);
     await ack();
-  });*/
+  });
 
   /**
    * Updates the Home tab for the specified user.
