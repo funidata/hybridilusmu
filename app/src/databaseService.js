@@ -93,9 +93,13 @@ const getAllJobs = async () => db.getAllJobs();
  * @param {string} lastDate - Date string in the ISO date format.
  * @returns {Dictionary}
  */
-const getRegistrationsBetween = async (firstDate, lastDate) => {
-  const normalRegistrations = await db.getAllRegistrationsForDateInterval(firstDate, lastDate);
-  const defaultRegistrations = await db.getAllDefaultOfficeSettings();
+const getRegistrationsBetween = async (firstDate, lastDate, office) => {
+  const normalRegistrations = await db.getAllRegistrationsForDateInterval(
+    firstDate,
+    lastDate,
+    office,
+  );
+  const defaultRegistrations = await db.getAllDefaultOfficeSettings(office);
   const defaultIds = {};
   for (let i = 0; i < 5; i += 1) {
     defaultIds[dfunc.weekdays[i]] = [];

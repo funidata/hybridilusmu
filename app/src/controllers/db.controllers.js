@@ -233,7 +233,7 @@ exports.getDefaultSettingsForUser = async (userId) => {
  * @param {String} endDate - Ending date in the ISO date format.
  * @returns {Array}
  */
-exports.getAllRegistrationsForDateInterval = async (startDate, endDate) => {
+exports.getAllRegistrationsForDateInterval = async (startDate, endDate, office) => {
   try {
     const registrations = await Signup.findAll({
       attributes: ["officeDate", "atOffice"],
@@ -242,12 +242,14 @@ exports.getAllRegistrationsForDateInterval = async (startDate, endDate) => {
           [Op.gte]: startDate,
           [Op.lte]: endDate,
         },
+        OfficeId: office.id,
       },
       include: {
         model: Person,
         as: "person",
       },
     });
+    console.log(registrations);
     return registrations.map((s) => ({
       slackId: s.dataValues.person.dataValues.slackId,
       date: s.dataValues.officeDate,
@@ -299,12 +301,13 @@ exports.getRegistrationsForUserForDateInterval = async (userId, startDate, endDa
  * Returns an array, where one element is an object containing a Slack user ID and weekday.
  * @returns {Array}
  */
-exports.getAllDefaultOfficeSettings = async () => {
+exports.getAllDefaultOfficeSettings = async (office) => {
   try {
     const registrations = await Defaultsignup.findAll({
       attributes: ["weekday"],
       where: {
         atOffice: true,
+        OfficeId: office.id,
       },
       include: {
         model: Person,

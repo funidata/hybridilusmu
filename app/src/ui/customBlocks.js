@@ -111,7 +111,11 @@ const getRegistrationsBlock = async (userId, selectedOffice) => {
   );
   //registrationsBlock.push(plainText(selectedOffice.officeName));
   const dates = dfunc.listNWeekdays(DateTime.now(), SHOW_DAYS_UNTIL);
-  const registrations = await service.getRegistrationsBetween(dates[0], dates[dates.length - 1]);
+  const registrations = await service.getRegistrationsBetween(
+    dates[0],
+    dates[dates.length - 1],
+    selectedOffice,
+  );
   const defaultSettings = await service.getDefaultSettingsForUser(userId);
   const userRegs = await service.getRegistrationsForUserBetween(
     userId,
