@@ -24,7 +24,7 @@ const {
 const modals = new Map();
 
 /**
- *
+ * Updates the home view.
  * @param {*} client Bolt client object.
  * @param {string} userId Slack user id.
  * @param {*} userCache User cache instance.
@@ -89,10 +89,16 @@ const openOfficeCreationView = async (client, userId, triggerId) => {
  */
 const updateOfficeControlView = async (client, userId) => {
   const block = await getOfficeControlBlock();
-  await client.views.update({
-    view_id: modals.get(userId),
-    view: { ...officeControlModalView, blocks: block },
-  });
+  try {
+    await client.views.update({
+      view_id: modals.get(userId),
+      view: { ...officeControlModalView, blocks: block },
+    });
+  } catch (err) {
+    const msg = "Error while updating office control view";
+    console.log(msg, err);
+    await error(client, userId, msg);
+  }
 };
 
 /**
@@ -131,12 +137,20 @@ const openDefaultSettingsView = async (client, userId, triggerId) => {
  * @param {*} client Bolt client object.
  * @param {string} userId Slack user id.
  */
-const updateDefaultSettingsView = async (client, userId) => {
-  const block = await getDefaultSettingsBlock(userId);
-  await client.views.update({
-    view_id: modals.get(userId),
-    view: { ...defaultSettingsModalView, blocks: block },
-  });
+const updateDefaultSettingsView = async (client, userId, selectedOffice) => {
+  const block = await getDefaultSettingsBlock(userId, selectedOffice);
+  // try/catch because an error might occur if the app happens to
+  // restart *while* a user is using the modal
+  try {
+    await client.views.update({
+      view_id: modals.get(userId),
+      view: { ...defaultSettingsModalView, blocks: block },
+    });
+  } catch (err) {
+    const msg = "Error while updating default settings modal";
+    console.log(msg, err);
+    await error(client, userId, msg);
+  }
 };
 
 /**

@@ -215,16 +215,17 @@ const getAllOffices = async () => db.getAllOffices();
 
 const getOffice = async (officeId) => db.getOffice(officeId);
 
-const addDefaultOfficeForUser = async (user, office) => db.addDefaultOfficeForUser(user, office);
+const addDefaultOfficeForUser = async (user, officeId) =>
+  db.addDefaultOfficeForUser(user, officeId);
 
 const getDefaultOfficeForUser = async (user) => {
-  const result = (await db.getDefaultOfficeForUser(user)).DefaultOffice;
+  const result = await db.getDefaultOfficeForUser(user);
   if (result) {
     return result;
   }
   // If no default office found for user, default to first office
   const offices = await getAllOffices();
-  return offices[0].officeName;
+  return offices[0];
 };
 
 const updateOffice = async (office, newName) => db.updateOffice(office, newName);

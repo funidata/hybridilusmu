@@ -37,7 +37,7 @@ const getUpdateBlock = async (selectedOffice, offices, isAdmin) => {
   }
 
   updateBlock.push(
-    header(`${selectedOffice.toUpperCase()}`),
+    header(`${selectedOffice.officeName.toUpperCase()}`),
     header(`ILMOITTAUTUMISET :spiral_calendar_pad:`),
     actions(actionElements),
     context(
@@ -55,14 +55,16 @@ const getUpdateBlock = async (selectedOffice, offices, isAdmin) => {
  * Creates and returns a block describing the default settings view.
  * This is then displayed on the default settings modal view.
  */
-const getDefaultSettingsBlock = async (userId) => {
+const getDefaultSettingsBlock = async (userId, selectedOffice) => {
   const settingsBlock = [];
+  if (!selectedOffice) {
+    selectedOffice = await service.getDefaultOfficeForUser(userId);
+  }
   const offices = await service.getAllOffices();
-  const initialOffice = await service.getDefaultOfficeForUser(userId);
   settingsBlock.push(
-    selectMenu("Valitse toimisto", offices, initialOffice, "office_select"),
+    selectMenu("Valittu toimisto", offices, selectedOffice, "office_select"),
     context(
-      "Näet vain valitsemasi toimiston ilmoittautumiset, lisäksi kaikki valintasi rekisteröidään valitsemaasi toimistoon",
+      "Näet vain valitsemasi toimiston ilmoittautumiset, lisäksi kaikki valintasi rekisteröidään valitsemaasi toimistoon.",
     ),
     mrkdwn("Oletusarvoisesti olen..."),
   );
@@ -107,7 +109,7 @@ const getRegistrationsBlock = async (userId, selectedOffice) => {
       ":writing_hand: = Käsin tehty ilmoittautuminen   :robot_face: = Oletusilmoittautuminen\n",
     ),
   );
-  registrationsBlock.push(plainText(selectedOffice));
+  //registrationsBlock.push(plainText(selectedOffice.officeName));
   const dates = dfunc.listNWeekdays(DateTime.now(), SHOW_DAYS_UNTIL);
   const registrations = await service.getRegistrationsBetween(dates[0], dates[dates.length - 1]);
   const defaultSettings = await service.getDefaultSettingsForUser(userId);

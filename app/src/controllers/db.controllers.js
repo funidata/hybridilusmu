@@ -622,21 +622,37 @@ exports.getOffice = async (officeId) => {
   }
 };
 
-exports.addDefaultOfficeForUser = async (user, office) => {
-  console.log(`added default office ${office} for user ${user}`);
+exports.addDefaultOfficeForUser = async (user, officeId) => {
+  console.log(`added default office ${officeId} for user ${user}`);
+  try {
+    const result = await Person.update({ DefaultOffice: officeId }, { where: { slackId: user } });
+    if (result[0] === 0) {
+      return null;
+    }
+  } catch (err) {
+    console.log("Error while setting a default office for user", err);
+    return undefined;
+  }
   return true;
 };
 
 exports.getDefaultOfficeForUser = async (user) => {
   try {
     const result = await Person.findOne({
-      raw: true,
-      attributes: ["DefaultOffice"],
+      //raw: true,
+      attributes: [],
       where: {
         slackId: user,
       },
+      include: {
+        model: Office,
+        //attributes: ["id", "officeName"],
+        /*through: {
+          attributes: [],
+        },*/
+      },
     });
-    return result;
+    return result.Office.dataValues;
   } catch (err) {
     console.log("Error while finding the default office for user", err);
     return undefined;

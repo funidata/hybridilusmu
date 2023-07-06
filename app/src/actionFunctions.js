@@ -28,12 +28,12 @@ exports.enableActionFunctions = ({ app, userCache }) => {
   });
 
   app.action("office_select", async ({ body, ack, client }) => {
-    const user = body.user.id;
-    const office = body.actions[0].selected_option.value;
-    console.log(`selected office ${office}`);
-    //await service.addDefaultOfficeForUser(user, office);
-    //home.update(client, user, userCache, office);
     await ack();
+    const user = body.user.id;
+    const office = JSON.parse(body.actions[0].selected_option.value);
+    await service.addDefaultOfficeForUser(user, office.id);
+    home.update(client, user, userCache, office);
+    home.updateDefaultSettingsView(client, user, office);
   });
 
   /**
