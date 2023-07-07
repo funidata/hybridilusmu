@@ -116,7 +116,7 @@ exports.addRegistrationForUser = async (userId, officeId, date, atOffice) => {
  * @param {String} weekday - Weekday as in "Maanantai".
  * @param {Boolean} atOffice - True, if we want to add an office registration. False otherwise.
  */
-exports.addDefaultRegistrationForUser = async (userId, weekday, atOffice) => {
+exports.addDefaultRegistrationForUser = async (userId, officeId, weekday, atOffice) => {
   try {
     await sequelize.transaction(async (t) => {
       const person = await getUser(userId, t);
@@ -128,6 +128,7 @@ exports.addDefaultRegistrationForUser = async (userId, weekday, atOffice) => {
             weekday,
             atOffice,
             PersonId: person.id,
+            OfficeId: officeId,
           },
           {
             transaction: t,
@@ -139,6 +140,7 @@ exports.addDefaultRegistrationForUser = async (userId, weekday, atOffice) => {
         await Defaultsignup.update(
           {
             atOffice,
+            OfficeId: officeId,
           },
           {
             where: { id: row.id },

@@ -81,7 +81,13 @@ exports.enableActionFunctions = ({ app, userCache }) => {
    */
   app.action("default_office_click", async ({ body, ack, client }) => {
     const data = JSON.parse(body.actions[0].value);
-    await service.changeDefaultRegistration(body.user.id, data.weekday, !data.defaultAtOffice);
+    console.log(data);
+    await service.changeDefaultRegistration(
+      body.user.id,
+      data.officeId,
+      data.weekday,
+      !data.defaultAtOffice,
+    );
     home.update(client, body.user.id, userCache);
     home.updateDefaultSettingsView(client, body.user.id);
     await ack();
@@ -95,6 +101,7 @@ exports.enableActionFunctions = ({ app, userCache }) => {
     const data = JSON.parse(body.actions[0].value);
     await service.changeDefaultRegistration(
       body.user.id,
+      data.oddiceId,
       data.weekday,
       !data.defaultIsRemote,
       false,

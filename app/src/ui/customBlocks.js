@@ -73,6 +73,7 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
     const weekday = dfunc.weekdays[i];
     const buttonValue = {
       weekday,
+      officeId: selectedOffice.id,
       defaultAtOffice: settings[weekday] === null ? false : settings[weekday],
       defaultIsRemote: settings[weekday] === null ? false : !settings[weekday],
     };

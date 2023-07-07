@@ -30,9 +30,15 @@ const changeRegistration = async (userId, officeId, date, addRegistration, atOff
  * false, if we want to add a "remote" one.
  * This is only taken into account if @addRegistration is true.
  */
-const changeDefaultRegistration = async (userId, weekday, addRegistration, atOffice = true) => {
+const changeDefaultRegistration = async (
+  userId,
+  officeId,
+  weekday,
+  addRegistration,
+  atOffice = true,
+) => {
   if (addRegistration) {
-    await db.addDefaultRegistrationForUser(userId, weekday, atOffice);
+    await db.addDefaultRegistrationForUser(userId, officeId, weekday, atOffice);
   } else {
     await db.removeDefaultRegistration(userId, weekday);
   }
