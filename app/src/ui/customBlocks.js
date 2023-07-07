@@ -136,6 +136,7 @@ const getRegistrationsBlock = async (userId, selectedOffice) => {
     const weekday = dfunc.getWeekday(DateTime.fromISO(date));
     const buttonValue = {
       date,
+      officeId: selectedOffice.id,
       atOffice: userRegs[date] === null ? false : userRegs[date],
       isRemote: userRegs[date] === null ? false : !userRegs[date],
       atOfficeDefault: defaultSettings[weekday] === null ? false : defaultSettings[weekday],

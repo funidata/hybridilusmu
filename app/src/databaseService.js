@@ -12,9 +12,9 @@ const dfunc = require("./dateFunctions");
  * false, if we want to add a "remote" one.
  * This is only taken into account if @addRegistration is true.
  */
-const changeRegistration = async (userId, date, addRegistration, atOffice = true) => {
+const changeRegistration = async (userId, officeId, date, addRegistration, atOffice = true) => {
   if (addRegistration) {
-    await db.addRegistrationForUser(userId, date, atOffice);
+    await db.addRegistrationForUser(userId, officeId, date, atOffice);
   } else {
     await db.removeRegistration(userId, date);
   }

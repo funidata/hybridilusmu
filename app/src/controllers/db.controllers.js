@@ -66,7 +66,7 @@ const getDefaultRegistrationsForUserAndWeekday = async (personId, weekday, trans
  * @param {String} date - Date in the ISO date format.
  * @param {Boolean} atOffice - True, if we want to add an office registration. False otherwise.
  */
-exports.addRegistrationForUser = async (userId, date, atOffice) => {
+exports.addRegistrationForUser = async (userId, officeId, date, atOffice) => {
   try {
     await sequelize.transaction(async (t) => {
       const person = await getUser(userId, t);
@@ -78,6 +78,7 @@ exports.addRegistrationForUser = async (userId, date, atOffice) => {
             officeDate: date,
             atOffice,
             PersonId: person.id,
+            OfficeId: officeId,
           },
           {
             transaction: t,
@@ -89,6 +90,7 @@ exports.addRegistrationForUser = async (userId, date, atOffice) => {
         await Signup.update(
           {
             atOffice,
+            OfficeId: officeId,
           },
           {
             where: { id: row.id },
@@ -249,7 +251,6 @@ exports.getAllRegistrationsForDateInterval = async (startDate, endDate, office) 
         as: "person",
       },
     });
-    console.log(registrations);
     return registrations.map((s) => ({
       slackId: s.dataValues.person.dataValues.slackId,
       date: s.dataValues.officeDate,
