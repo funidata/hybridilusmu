@@ -57,7 +57,6 @@ exports.enableActionFunctions = ({ app, userCache }) => {
    */
   app.action("office_click", async ({ body, ack, client }) => {
     const data = JSON.parse(body.actions[0].value);
-    console.log(data);
     await service.changeRegistration(body.user.id, data.officeId, data.date, !data.atOffice);
     await updateScheduledMessages(app, data.date);
     home.update(client, body.user.id, userCache);
@@ -70,7 +69,6 @@ exports.enableActionFunctions = ({ app, userCache }) => {
    */
   app.action("remote_click", async ({ body, ack, client }) => {
     const data = JSON.parse(body.actions[0].value);
-    console.log(data);
     await service.changeRegistration(body.user.id, data.officeId, data.date, !data.isRemote, false);
     await updateScheduledMessages(app, data.date);
     home.update(client, body.user.id, userCache);
@@ -83,7 +81,6 @@ exports.enableActionFunctions = ({ app, userCache }) => {
    */
   app.action("default_office_click", async ({ body, ack, client }) => {
     const data = JSON.parse(body.actions[0].value);
-    console.log(data);
     await service.changeDefaultRegistration(
       body.user.id,
       data.officeId,

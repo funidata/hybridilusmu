@@ -21,6 +21,13 @@ const SHOW_DAYS_UNTIL = 10;
 
 const format = { ...DateTime.DATETIME_MED, month: "long" };
 
+const isAtTheOffice = (registration, office) => {
+  return registration ? registration.status && registration.officeId === office.id : false;
+};
+const isRemote = (registration, office) => {
+  return registration ? !registration.status && registration.officeId === office.id : false;
+};
+
 /**
  * Creates and returns a block containing an update button used to update the Home tab
  * and a default settings button used to open the default settings modal.
@@ -62,7 +69,7 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
   }
   const offices = await service.getAllOffices();
   settingsBlock.push(
-    selectMenu("Valittu toimisto", offices, selectedOffice, "office_select"),
+    selectMenu("Valitse toimisto", offices, selectedOffice, "office_select"),
     context(
       "Näet vain valitsemasi toimiston ilmoittautumiset, lisäksi kaikki valintasi rekisteröidään valitsemaasi toimistoon.",
     ),
@@ -74,8 +81,8 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
     const buttonValue = {
       weekday,
       officeId: selectedOffice.id,
-      defaultAtOffice: settings[weekday] === null ? false : settings[weekday],
-      defaultIsRemote: settings[weekday] === null ? false : !settings[weekday],
+      defaultAtOffice: isAtTheOffice(settings[weekday], selectedOffice),
+      defaultIsRemote: isRemote(settings[weekday], selectedOffice),
     };
     if (weekday === "Keskiviikko") settingsBlock.push(mrkdwn(`*${weekday}isin*`));
     else settingsBlock.push(mrkdwn(`*${weekday}sin*`));
@@ -123,25 +130,16 @@ const getRegistrationListForDate = async (
     }
   }
 
-  const isAtTheOffice = (registration) => {
-    return registration
-      ? registration.status && registration.officeId === selectedOffice.id
-      : false;
-  };
-  const isRemote = (registration) => {
-    return registration
-      ? !registration.status && registration.officeId === selectedOffice.id
-      : false;
-  };
   const weekday = dfunc.getWeekday(DateTime.fromISO(date));
 
   const buttonValue = {
     date,
     officeId: selectedOffice.id,
-    atOffice: isAtTheOffice(userRegistrations[date]),
-    isRemote: isRemote(userRegistrations[date]),
-    atOfficeDefault: isAtTheOffice(defaultSettings[weekday]) && !userRegistrations[date],
-    isRemoteDefault: isRemote(defaultSettings[weekday]) && !userRegistrations[date],
+    atOffice: isAtTheOffice(userRegistrations[date], selectedOffice),
+    isRemote: isRemote(userRegistrations[date], selectedOffice),
+    atOfficeDefault:
+      isAtTheOffice(defaultSettings[weekday], selectedOffice) && !userRegistrations[date],
+    isRemoteDefault: isRemote(defaultSettings[weekday], selectedOffice) && !userRegistrations[date],
   };
 
   let officeColor = `${buttonValue.atOfficeDefault ? "primary" : null}`;
