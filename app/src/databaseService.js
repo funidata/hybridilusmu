@@ -100,11 +100,7 @@ const getAllJobs = async () => db.getAllJobs();
  * @returns {Dictionary}
  */
 const getRegistrationsBetween = async (firstDate, lastDate, office) => {
-  const normalRegistrations = await db.getAllRegistrationsForDateInterval(
-    firstDate,
-    lastDate,
-    office,
-  );
+  const normalRegistrations = await db.getAllRegistrationsForDateInterval(firstDate, lastDate);
   const defaultRegistrations = await db.getAllDefaultOfficeSettings(office);
   const defaultIds = {};
   for (let i = 0; i < 5; i += 1) {
@@ -127,7 +123,7 @@ const getRegistrationsBetween = async (firstDate, lastDate, office) => {
     date = date.plus({ days: 1 });
   }
   normalRegistrations.forEach((entry) => {
-    if (entry.status) {
+    if (entry.status && entry.officeId === office.id) {
       result[entry.date].add(entry.slackId);
     } else if (result[entry.date].has(entry.slackId)) {
       result[entry.date].delete(entry.slackId);

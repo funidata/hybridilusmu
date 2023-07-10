@@ -100,6 +100,71 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
 };
 
 /**
+ * Creates the registration list and registration buttons for a single
+ * day inside the registrationsBlock.
+ */
+const getRegistrationListForDate = async (
+  registrationsBlock,
+  date,
+  registrations,
+  selectedOffice,
+  userRegistrations,
+  defaultSettings,
+) => {
+  registrationsBlock.push(header(dfunc.toPrettyFormat(date)));
+  let userList = "";
+  if (registrations[date].size === 0) {
+    userList += "Kukaan ei ole ilmoittautunut toimistolle!";
+  } else {
+    userList += "Toimistolla aikoo olla:\n";
+    const registrationList = formatUserIdList([...registrations[date]], generateNameAndMention);
+    for (const user of registrationList) {
+      userList += `${user}\n`;
+    }
+  }
+
+  const isAtTheOffice = (registration) => {
+    return registration
+      ? registration.status && registration.officeId === selectedOffice.id
+      : false;
+  };
+  const isRemote = (registration) => {
+    return registration
+      ? !registration.status && registration.officeId === selectedOffice.id
+      : false;
+  };
+  const weekday = dfunc.getWeekday(DateTime.fromISO(date));
+
+  const buttonValue = {
+    date,
+    officeId: selectedOffice.id,
+    atOffice: isAtTheOffice(userRegistrations[date]),
+    isRemote: isRemote(userRegistrations[date]),
+    atOfficeDefault: isAtTheOffice(defaultSettings[weekday]) && !userRegistrations[date],
+    isRemoteDefault: isRemote(defaultSettings[weekday]) && !userRegistrations[date],
+  };
+
+  let officeColor = `${buttonValue.atOfficeDefault ? "primary" : null}`;
+  let remoteColor = `${buttonValue.isRemoteDefault ? "primary" : null}`;
+  let emoji = "default";
+  if (buttonValue.atOffice || buttonValue.isRemote) {
+    officeColor = `${buttonValue.atOffice ? "primary" : null}`;
+    remoteColor = `${buttonValue.isRemote ? "primary" : null}`;
+    emoji = "normal";
+  }
+
+  registrationsBlock.push(
+    mrkdwn(userList),
+    plainText("Oma ilmoittautumiseni:\n"),
+    actions([
+      button("Toimistolla", "office_click", JSON.stringify(buttonValue), officeColor, emoji),
+      button("Etänä", "remote_click", JSON.stringify(buttonValue), remoteColor, emoji),
+    ]),
+    divider(),
+  );
+};
+
+/**
  * Creates and returns a list of blocks containing the registrations to be displayed.
  * For every day there is a list of people registered for that day and buttons for user to register.
  */
@@ -109,8 +174,8 @@ const getRegistrationsBlock = async (userId, selectedOffice) => {
     plainText(
       ":writing_hand: = Käsin tehty ilmoittautuminen   :robot_face: = Oletusilmoittautuminen\n",
     ),
+    context("Voit myös perua ilmoittautumisen klikkaamalla painikkeista uudestaan."),
   );
-  //registrationsBlock.push(plainText(selectedOffice.officeName));
   const dates = dfunc.listNWeekdays(DateTime.now(), SHOW_DAYS_UNTIL);
   const registrations = await service.getRegistrationsBetween(
     dates[0],
@@ -118,49 +183,22 @@ const getRegistrationsBlock = async (userId, selectedOffice) => {
     selectedOffice,
   );
   const defaultSettings = await service.getDefaultSettingsForUser(userId);
-  const userRegs = await service.getRegistrationsForUserBetween(
+  const userRegistrations = await service.getRegistrationsForUserBetween(
     userId,
     dates[0],
     dates[dates.length - 1],
   );
-  for (let i = 0; i < dates.length; i += 1) {
-    const date = dates[i];
-    registrationsBlock.push(header(dfunc.toPrettyFormat(date)));
-    let userList =
-      registrations[date].size === 0
-        ? "Kukaan ei ole ilmoittautunut toimistolle!"
-        : "Toimistolla aikoo olla:\n";
-    const registrationList = formatUserIdList([...registrations[date]], generateNameAndMention);
-    for (const user of registrationList) {
-      userList += `${user}\n`;
-    }
-    const weekday = dfunc.getWeekday(DateTime.fromISO(date));
-    const buttonValue = {
+  for (const date of dates) {
+    getRegistrationListForDate(
+      registrationsBlock,
       date,
-      officeId: selectedOffice.id,
-      atOffice: userRegs[date] === null ? false : userRegs[date],
-      isRemote: userRegs[date] === null ? false : !userRegs[date],
-      atOfficeDefault: defaultSettings[weekday] === null ? false : defaultSettings[weekday],
-      isRemoteDefault: defaultSettings[weekday] === null ? false : !defaultSettings[weekday],
-    };
-    let officeColor = `${buttonValue.atOfficeDefault ? "primary" : null}`;
-    let remoteColor = `${buttonValue.isRemoteDefault ? "primary" : null}`;
-    let emoji = "default";
-    if (buttonValue.atOffice || buttonValue.isRemote) {
-      officeColor = `${buttonValue.atOffice ? "primary" : null}`;
-      remoteColor = `${buttonValue.isRemote ? "primary" : null}`;
-      emoji = "normal";
-    }
-    registrationsBlock.push(
-      mrkdwn(userList),
-      plainText("Oma ilmoittautumiseni:"),
-      actions([
-        button("Toimistolla", "office_click", JSON.stringify(buttonValue), officeColor, emoji),
-        button("Etänä", "remote_click", JSON.stringify(buttonValue), remoteColor, emoji),
-      ]),
-      divider(),
+      registrations,
+      selectedOffice,
+      userRegistrations,
+      defaultSettings,
     );
   }
+
   return registrationsBlock;
 };
 

@@ -241,13 +241,15 @@ exports.getDefaultSettingsForUser = async (userId) => {
 exports.getAllRegistrationsForDateInterval = async (startDate, endDate, office) => {
   try {
     const registrations = await Signup.findAll({
-      attributes: ["officeDate", "atOffice"],
+      attributes: ["officeDate", "atOffice", "OfficeId"],
       where: {
         officeDate: {
           [Op.gte]: startDate,
           [Op.lte]: endDate,
         },
-        OfficeId: office.id,
+        ...(office && {
+          OfficeId: office,
+        }),
       },
       include: {
         model: Person,
@@ -258,6 +260,7 @@ exports.getAllRegistrationsForDateInterval = async (startDate, endDate, office) 
       slackId: s.dataValues.person.dataValues.slackId,
       date: s.dataValues.officeDate,
       status: s.dataValues.atOffice,
+      officeId: s.dataValues.OfficeId,
     }));
   } catch (error) {
     console.log("Error while finding registrations:", error);
