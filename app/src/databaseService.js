@@ -147,7 +147,6 @@ const getRegistrationsBetween = async (firstDate, lastDate, office) => {
  */
 const getDefaultSettingsForUser = async (userId) => {
   const unorderedSettings = await db.getDefaultSettingsForUser(userId);
-  console.log(unorderedSettings);
   const result = {};
   for (let i = 0; i < 5; i += 1) {
     let found = false;
@@ -236,6 +235,7 @@ const getDefaultOfficeForUser = async (user) => {
   }
   // If no default office found for user, default to first office
   const offices = await getAllOffices();
+  await addDefaultOfficeForUser(user, offices[0].id);
   return offices[0];
 };
 
