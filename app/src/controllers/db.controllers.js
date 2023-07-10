@@ -211,7 +211,7 @@ exports.removeDefaultRegistration = async (userId, weekday) => {
 exports.getDefaultSettingsForUser = async (userId) => {
   try {
     const defaultSettings = await Defaultsignup.findAll({
-      attributes: ["weekday", "atOffice"],
+      attributes: ["weekday", "atOffice", "OfficeId"],
       include: {
         model: Person,
         as: "person",
@@ -223,6 +223,7 @@ exports.getDefaultSettingsForUser = async (userId) => {
     return defaultSettings.map((s) => ({
       weekday: s.dataValues.weekday,
       status: s.dataValues.atOffice,
+      officeId: s.dataValues.OfficeId,
     }));
   } catch (error) {
     console.log("Error while finding default registrations:", error);
@@ -274,7 +275,7 @@ exports.getAllRegistrationsForDateInterval = async (startDate, endDate, office) 
 exports.getRegistrationsForUserForDateInterval = async (userId, startDate, endDate) => {
   try {
     const registrations = await Signup.findAll({
-      attributes: ["officeDate", "atOffice"],
+      attributes: ["officeDate", "atOffice", "OfficeId"],
       where: {
         officeDate: {
           [Op.gte]: startDate,
@@ -292,6 +293,7 @@ exports.getRegistrationsForUserForDateInterval = async (userId, startDate, endDa
     return registrations.map((s) => ({
       date: s.dataValues.officeDate,
       status: s.dataValues.atOffice,
+      officeId: s.dataValues.OfficeId,
     }));
   } catch (error) {
     console.log("Error while finding registrations:", error);

@@ -147,12 +147,13 @@ const getRegistrationsBetween = async (firstDate, lastDate, office) => {
  */
 const getDefaultSettingsForUser = async (userId) => {
   const unorderedSettings = await db.getDefaultSettingsForUser(userId);
+  console.log(unorderedSettings);
   const result = {};
   for (let i = 0; i < 5; i += 1) {
     let found = false;
     unorderedSettings.every((entry) => {
       if (entry.weekday === dfunc.weekdays[i]) {
-        result[entry.weekday] = entry.status;
+        result[entry.weekday] = { status: entry.status, officeId: entry.officeId };
         found = true;
         return false;
       }
@@ -186,7 +187,7 @@ const getRegistrationsForUserBetween = async (userId, firstDate, lastDate) => {
     date = date.plus({ days: 1 });
   }
   userRegs.forEach((entry) => {
-    result[entry.date] = entry.status;
+    result[entry.date] = { status: entry.status, officeId: entry.officeId };
   });
   return result;
 };
