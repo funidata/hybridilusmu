@@ -23,7 +23,8 @@ exports.enableViewListeners = ({ app, userCache }) => {
     await ack();
     const user = body.user.id;
     const officeId = view.private_metadata;
-    const newOfficeName = view.state.values.input_block.office_input.value;
+    const newOfficeName = view.state.values.office_name_input.office_name_input.value;
+    const newOfficeEmoji = view.state.values.office_emoji_input.office_emoji_input.value;
     const result = await service.updateOffice(officeId, newOfficeName);
     if (result) {
       console.log(`${user} updated an office name to: ${newOfficeName}`);

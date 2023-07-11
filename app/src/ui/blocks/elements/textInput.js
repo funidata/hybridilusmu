@@ -5,10 +5,10 @@
  * @param {string} initialValue Optional initial value for the input field
  * @returns Object describing the input element.
  */
-const textInput = (label, callback, initialValue) => {
+const textInput = (label, callback, initialValue, hint) => {
   const textInputElement = {
     type: "input",
-    block_id: "input_block",
+    block_id: callback,
     label: {
       type: "plain_text",
       text: label,
@@ -20,11 +20,12 @@ const textInput = (label, callback, initialValue) => {
         type: "plain_text",
         text: "Syötä tekstiä",
       },
-      initial_value: initialValue,
       min_length: 2,
       max_length: 30,
     },
   };
+  if (initialValue) textInputElement.element.initial_value = initialValue;
+  if (hint) textInputElement.hint = { type: "plain_text", text: hint };
   return textInputElement;
 };
 

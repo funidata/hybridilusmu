@@ -291,10 +291,17 @@ const getOfficeControlBlock = async () => {
  */
 const getOfficeModifyBlock = async (officeId) => {
   const officeModifyBlock = [];
-  const officeName = (await service.getOffice(officeId)).officeName;
+  const { officeName, officeEmoji } = await service.getOffice(officeId);
+
   officeModifyBlock.push(
     header(officeName),
-    textInput("Muokkaa toimiston nimeä", "office_input", officeName),
+    textInput("Toimiston nimi", "office_name_input", officeName),
+    textInput(
+      "Toimiston emoji",
+      "office_emoji_input",
+      officeEmoji,
+      "Huom. myös custom- emojit toimivat, esim. :my_office:",
+    ),
   );
 
   return officeModifyBlock;
