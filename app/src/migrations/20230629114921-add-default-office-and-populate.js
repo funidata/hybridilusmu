@@ -15,7 +15,7 @@ module.exports = {
     await queryInterface.bulkUpdate("Defaultsignups", { OfficeId: 1 }, {});
   },
 
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface) {
     await queryInterface.bulkUpdate("Signups", { OfficeId: null }, {});
 
     await queryInterface.bulkUpdate("Defaultsignups", { OfficeId: null }, {});
