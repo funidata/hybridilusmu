@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up(queryInterface) {
     await queryInterface.bulkInsert("Offices", [
       {
         id: 1,
