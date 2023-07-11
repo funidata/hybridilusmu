@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
   Office.init(
     {
       officeName: DataTypes.STRING,
+      officeEmoji: DataTypes.STRING,
     },
     {
       sequelize,
