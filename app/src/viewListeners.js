@@ -8,7 +8,8 @@ exports.enableViewListeners = ({ app, userCache }) => {
   app.view("submit_office", async ({ ack, body, view, client }) => {
     await ack();
     const user = body.user.id;
-    const officeName = view.state.values.input_block.office_input.value;
+    const officeName = view.state.values.office_name_input.office_name_input.value;
+    const officeEmoji = view.state.values.office_emoji_input.office_emoji_input.value;
     const result = await service.addOffice(officeName);
     if (result) {
       console.log(`Created a new office: ${officeName}`);

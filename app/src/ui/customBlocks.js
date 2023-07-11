@@ -46,6 +46,7 @@ const getUpdateBlock = async (selectedOffice, offices, isAdmin) => {
 
   updateBlock.push(
     header(`${selectedOffice.officeName.toUpperCase()}`),
+    // TODO: Add office emoji to header
     header(`ILMOITTAUTUMISET :spiral_calendar_pad:`),
     actions(actionElements),
     context(
@@ -242,7 +243,13 @@ const getOfficeCreationBlock = async () => {
   officeCreationBlock.push(
     mrkdwn("*Toimistot:*"),
     mrkdwn(offices.join("\n")),
-    textInput("Lisää toimisto", "office_input"),
+    textInput("Toimiston nimi", "office_name_input"),
+    textInput(
+      "Toimiston emoji",
+      "office_emoji_input",
+      null,
+      "Huom. myös custom- emojit toimivat, esim. :my_office:",
+    ),
   );
 
   return officeCreationBlock;
