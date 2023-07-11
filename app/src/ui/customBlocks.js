@@ -10,6 +10,7 @@ const { plainText, mrkdwn } = require("./blocks/section");
 const { actions } = require("./blocks/actions");
 const { context } = require("./blocks/context");
 const { button } = require("./blocks/elements/button");
+const { defaultSettingButton } = require("./blocks/elements/defaultSettingButton");
 const { confirmation } = require("./blocks/elements/confirmation");
 const { overflow } = require("./blocks/elements/overflow");
 const { selectMenu } = require("./blocks/elements/selectMenu");
@@ -78,27 +79,58 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
   const settings = await service.getDefaultSettingsForUser(userId);
   for (let i = 0; i < DAYS_IN_WEEK; i += 1) {
     const weekday = dfunc.weekdays[i];
+    const registration = settings[weekday];
     const buttonValue = {
       weekday,
       officeId: selectedOffice.id,
-      defaultAtOffice: isAtTheOffice(settings[weekday], selectedOffice),
-      defaultIsRemote: isRemote(settings[weekday], selectedOffice),
+      defaultAtOffice: isAtTheOffice(registration, selectedOffice),
+      defaultIsRemote: isRemote(registration, selectedOffice),
     };
+    const officeStyle = buttonValue.defaultAtOffice
+      ? "primary"
+      : registration && registration.officeId !== buttonValue.officeId && registration.status
+      ? "danger"
+      : null;
+    const remoteStyle = buttonValue.defaultIsRemote
+      ? "primary"
+      : registration && registration.officeId !== buttonValue.officeId && !registration?.status
+      ? "danger"
+      : null;
+    // const emoji = settings[weekday].officeEmoji
+    // TODO: after adding emoji column to offices table, replace the code below with the above commented one
+    const emoji =
+      registration?.officeId === 8
+        ? ":city_sunset:"
+        : registration?.officeId === 1
+        ? ":cityscape:"
+        : null;
+
+    const confirmLabel = "Varmastikko?";
+    const confirmText = `Sinulla on jo oletusasetus toimistolle ${registration?.officeName}. Haluatko korvata sen?`;
+
     if (weekday === "Keskiviikko") settingsBlock.push(mrkdwn(`*${weekday}isin*`));
     else settingsBlock.push(mrkdwn(`*${weekday}sin*`));
     settingsBlock.push(
       actions([
-        button(
+        defaultSettingButton(
           "Toimistolla",
           "default_office_click",
           JSON.stringify(buttonValue),
-          `${buttonValue.defaultAtOffice ? "primary" : null}`,
+          officeStyle,
+          emoji,
+          registration && registration.officeId !== buttonValue.officeId
+            ? confirmation(confirmLabel, confirmText)
+            : null,
         ),
-        button(
+        defaultSettingButton(
           "Etänä",
           "default_remote_click",
           JSON.stringify(buttonValue),
-          `${buttonValue.defaultIsRemote ? "primary" : null}`,
+          remoteStyle,
+          emoji,
+          registration && registration.officeId !== buttonValue.officeId
+            ? confirmation(confirmLabel, confirmText)
+            : null,
         ),
       ]),
     );

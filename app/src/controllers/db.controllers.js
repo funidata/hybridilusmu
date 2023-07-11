@@ -212,18 +212,25 @@ exports.getDefaultSettingsForUser = async (userId) => {
   try {
     const defaultSettings = await Defaultsignup.findAll({
       attributes: ["weekday", "atOffice", "OfficeId"],
-      include: {
-        model: Person,
-        as: "person",
-        where: {
-          slackId: userId,
+      include: [
+        {
+          model: Person,
+          as: "person",
+          where: {
+            slackId: userId,
+          },
         },
-      },
+        {
+          model: Office,
+          attributes: ["officeName"],
+        },
+      ],
     });
     return defaultSettings.map((s) => ({
       weekday: s.dataValues.weekday,
       status: s.dataValues.atOffice,
       officeId: s.dataValues.OfficeId,
+      officeName: s.dataValues.Office.officeName,
     }));
   } catch (error) {
     console.log("Error while finding default registrations:", error);

@@ -148,7 +148,11 @@ const getDefaultSettingsForUser = async (userId) => {
     let found = false;
     unorderedSettings.every((entry) => {
       if (entry.weekday === dfunc.weekdays[i]) {
-        result[entry.weekday] = { status: entry.status, officeId: entry.officeId };
+        result[entry.weekday] = {
+          status: entry.status,
+          officeId: entry.officeId,
+          officeName: entry.officeName,
+        };
         found = true;
         return false;
       }
