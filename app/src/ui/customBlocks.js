@@ -28,6 +28,13 @@ const isAtTheOffice = (registration, office) => {
 const isRemote = (registration, office) => {
   return registration ? !registration.status && registration.officeId === office.id : false;
 };
+const isAtAnotherOffice = (registration, selectedOffice) => {
+  return registration && registration.status && registration.officeId !== selectedOffice.id;
+};
+// What does it mean to be remote at another office? Better not to overthink it...
+const isRemoteAtAnotherOffice = (registration, selectedOffice) => {
+  return registration && !registration.status && registration.officeId !== selectedOffice.id;
+};
 
 const formatOffice = (office, upperCase) => {
   const { officeName, officeEmoji } = office;
@@ -93,15 +100,15 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
     };
     const officeStyle = buttonValue.defaultAtOffice
       ? "primary"
-      : registration && registration.officeId !== buttonValue.officeId && registration.status
+      : isAtAnotherOffice(registration, selectedOffice.id)
       ? "danger"
       : null;
     const remoteStyle = buttonValue.defaultIsRemote
       ? "primary"
-      : registration && registration.officeId !== buttonValue.officeId && !registration?.status
+      : isRemoteAtAnotherOffice(registration, selectedOffice.id)
       ? "danger"
       : null;
-    const emoji = registration.officeEmoji;
+    const emoji = registration?.officeEmoji;
     const confirmLabel = "Varmastikko?";
     const confirmText = `Sinulla on jo oletusasetus toimistolle ${registration?.officeName}. Haluatko korvata sen?`;
 
@@ -136,6 +143,50 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
 };
 
 /**
+ * Handles the logic for providing the correct colors and emojis for the
+ * registration buttons. Green if registration is for the selected office, red if
+ * a registration is for another office. There is also different emojis for normal
+ * registrations and default registrations.
+ * @param {{}} registration A normal registration object for a given day.
+ * @param {{}} defaultRegistration A default registration object for a given day.
+ * @param {{}} selectedOffice Office object of the current office.
+ * @returns {}
+ */
+const stylizeRegisterButtons = (registration, defaultRegistration, selectedOffice) => {
+  let officeButtonColor = null;
+  let remoteButtonColor = null;
+  let emojis = { registrationEmoji: null, officeEmoji: null };
+
+  if (registration) {
+    emojis.registrationEmoji = "normal";
+    emojis.officeEmoji = registration.officeEmoji;
+    if (isAtTheOffice(registration, selectedOffice)) {
+      officeButtonColor = "primary";
+    } else if (isAtAnotherOffice(registration, selectedOffice)) {
+      officeButtonColor = "danger";
+    } else if (isRemote(registration, selectedOffice)) {
+      remoteButtonColor = "primary";
+    } else if (isRemoteAtAnotherOffice(registration, selectedOffice)) {
+      remoteButtonColor = "danger";
+    }
+  } else if (defaultRegistration) {
+    emojis.registrationEmoji = "default";
+    emojis.officeEmoji = defaultRegistration.officeEmoji;
+    if (isAtTheOffice(defaultRegistration, selectedOffice)) {
+      officeButtonColor = "primary";
+    } else if (isAtAnotherOffice(defaultRegistration, selectedOffice)) {
+      officeButtonColor = "danger";
+    } else if (isRemote(defaultRegistration, selectedOffice)) {
+      remoteButtonColor = "primary";
+    } else if (isRemoteAtAnotherOffice(defaultRegistration, selectedOffice)) {
+      remoteButtonColor = "danger";
+    }
+  }
+
+  return { officeButtonColor, remoteButtonColor, emojis };
+};
+
+/**
  * Creates the registration list and registration buttons for a single
  * day inside the registrationsBlock.
  */
@@ -160,32 +211,30 @@ const getRegistrationListForDate = async (
   }
 
   const weekday = dfunc.getWeekday(DateTime.fromISO(date));
+  const registration = userRegistrations[date];
+  const defaultRegistration = defaultSettings[weekday];
 
   const buttonValue = {
     date,
     officeId: selectedOffice.id,
-    atOffice: isAtTheOffice(userRegistrations[date], selectedOffice),
-    isRemote: isRemote(userRegistrations[date], selectedOffice),
-    atOfficeDefault:
-      isAtTheOffice(defaultSettings[weekday], selectedOffice) && !userRegistrations[date],
-    isRemoteDefault: isRemote(defaultSettings[weekday], selectedOffice) && !userRegistrations[date],
+    atOffice: isAtTheOffice(registration, selectedOffice),
+    isRemote: isRemote(registration, selectedOffice),
+    atOfficeDefault: isAtTheOffice(defaultRegistration, selectedOffice) && !registration,
+    isRemoteDefault: isRemote(defaultRegistration, selectedOffice) && !registration,
   };
 
-  let officeColor = `${buttonValue.atOfficeDefault ? "primary" : null}`;
-  let remoteColor = `${buttonValue.isRemoteDefault ? "primary" : null}`;
-  let emoji = "default";
-  if (buttonValue.atOffice || buttonValue.isRemote) {
-    officeColor = `${buttonValue.atOffice ? "primary" : null}`;
-    remoteColor = `${buttonValue.isRemote ? "primary" : null}`;
-    emoji = "normal";
-  }
+  const { officeButtonColor, remoteButtonColor, emojis } = stylizeRegisterButtons(
+    registration,
+    defaultRegistration,
+    selectedOffice,
+  );
 
   registrationsBlock.push(
     mrkdwn(userList),
     plainText("Oma ilmoittautumiseni:\n"),
     actions([
-      button("Toimistolla", "office_click", JSON.stringify(buttonValue), officeColor, emoji),
-      button("Etänä", "remote_click", JSON.stringify(buttonValue), remoteColor, emoji),
+      button("Toimistolla", "office_click", JSON.stringify(buttonValue), officeButtonColor, emojis),
+      button("Etänä", "remote_click", JSON.stringify(buttonValue), remoteButtonColor, emojis),
     ]),
     divider(),
   );

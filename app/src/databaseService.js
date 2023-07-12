@@ -187,7 +187,12 @@ const getRegistrationsForUserBetween = async (userId, firstDate, lastDate) => {
     date = date.plus({ days: 1 });
   }
   userRegs.forEach((entry) => {
-    result[entry.date] = { status: entry.status, officeId: entry.officeId };
+    result[entry.date] = {
+      status: entry.status,
+      officeId: entry.officeId,
+      officeName: entry.officeName,
+      officeEmoji: entry.officeEmoji,
+    };
   });
   return result;
 };

@@ -293,18 +293,26 @@ exports.getRegistrationsForUserForDateInterval = async (userId, startDate, endDa
           [Op.lte]: endDate,
         },
       },
-      include: {
-        model: Person,
-        as: "person",
-        where: {
-          slackId: userId,
+      include: [
+        {
+          model: Person,
+          as: "person",
+          where: {
+            slackId: userId,
+          },
         },
-      },
+        {
+          model: Office,
+          attributes: ["officeName", "officeEmoji"],
+        },
+      ],
     });
     return registrations.map((s) => ({
       date: s.dataValues.officeDate,
       status: s.dataValues.atOffice,
       officeId: s.dataValues.OfficeId,
+      officeName: s.dataValues.Office.officeName,
+      officeEmoji: s.dataValues.Office.officeEmoji,
     }));
   } catch (error) {
     console.log("Error while finding registrations:", error);

@@ -1,4 +1,4 @@
-const button = (text, callback, value, style, registrationStatus = null, confirm = null) => {
+const button = (text, callback, value, style, emoji = null, confirm = null) => {
   const buttonElement = {
     type: "button",
     text: {
@@ -11,8 +11,10 @@ const button = (text, callback, value, style, registrationStatus = null, confirm
   };
   if (style === "primary" || style === "danger") {
     buttonElement.style = style;
-    if (registrationStatus === "normal") buttonElement.text.text = `${text} :writing_hand:`;
-    if (registrationStatus === "default") buttonElement.text.text = `${text} :robot_face:`;
+    if (emoji?.registrationEmoji === "normal")
+      buttonElement.text.text = `${text} :writing_hand: ${emoji.officeEmoji}`;
+    if (emoji?.registrationEmoji === "default")
+      buttonElement.text.text = `${text} :robot_face: ${emoji.officeEmoji}`;
   }
   if (confirm) {
     buttonElement.confirm = confirm;
