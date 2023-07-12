@@ -38,7 +38,7 @@ const formatOffice = (office, upperCase) => {
  * Creates and returns a block containing an update button used to update the Home tab
  * and a default settings button used to open the default settings modal.
  */
-const getUpdateBlock = async (selectedOffice, offices, isAdmin) => {
+const getUpdateBlock = async (selectedOffice, isAdmin) => {
   const updateBlock = [];
   const overflowOptions = ["Toimistojen hallinta", "Lisää toimisto"];
   const actionElements = [
@@ -313,12 +313,20 @@ const getOfficeModifyBlock = async (officeId) => {
 };
 
 /**
- * Show in place of registration block when there are no offices added yet.
+ * A limited view shown when there are no offices present.
+ * This should only happen when all offices, including the default one, are
+ * deleted.
  */
-// TODO:
-const getNoOfficesBlock = async () => {
+const getNoOfficesBlock = async (admin) => {
   const noOfficesBlock = [];
-  noOfficesBlock.push(plainText("Lisää toimisto rekisteröityäksesi"));
+  if (!admin) {
+    noOfficesBlock.push(plainText("Odota, että työtilan ylläpitäjä luo toimiston..."));
+    return noOfficesBlock;
+  }
+  const overflowOptions = ["Toimistojen hallinta", "Lisää toimisto"];
+  const actionElements = [button("Päivitä", "update_click", "updated"), overflow(overflowOptions)];
+  noOfficesBlock.push(header("LUO TOIMISTO"), divider(), actions(actionElements), divider());
+
   return noOfficesBlock;
 };
 
