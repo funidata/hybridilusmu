@@ -34,14 +34,12 @@ const update = async (client, userId, userCache, selectedOffice) => {
   let blocks = [];
   const isAdmin = (await userCache.getCachedUser(userId)).is_admin;
   const offices = await service.getAllOffices();
-  if (!selectedOffice) {
-    selectedOffice = await service.getDefaultOfficeForUser(userId);
-  }
   if (offices.length === 0) {
-    // TODO: What to do when no offices are found AKA an admin deleted all the offices?
-    console.log("no offices found, push new view");
     blocks = blocks.concat(await getNoOfficesBlock(isAdmin));
   } else {
+    if (!selectedOffice) {
+      selectedOffice = await service.getDefaultOfficeForUser(userId);
+    }
     blocks = blocks.concat(await getUpdateBlock(selectedOffice, isAdmin));
     blocks = blocks.concat(await getRegistrationsBlock(userId, selectedOffice));
   }
