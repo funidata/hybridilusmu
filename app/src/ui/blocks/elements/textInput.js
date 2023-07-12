@@ -5,7 +5,7 @@
  * @param {string} initialValue Optional initial value for the input field
  * @returns Object describing the input element.
  */
-const textInput = (label, callback, initialValue, hint) => {
+const textInput = (label, callback, initialValue, hint, optional) => {
   const textInputElement = {
     type: "input",
     block_id: callback,
@@ -13,6 +13,7 @@ const textInput = (label, callback, initialValue, hint) => {
       type: "plain_text",
       text: label,
     },
+    optional: optional ? optional : false,
     element: {
       type: "plain_text_input",
       action_id: callback,

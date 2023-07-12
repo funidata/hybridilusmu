@@ -222,7 +222,7 @@ exports.getDefaultSettingsForUser = async (userId) => {
         },
         {
           model: Office,
-          attributes: ["officeName"],
+          attributes: ["officeName", "officeEmoji"],
         },
       ],
     });
@@ -231,6 +231,7 @@ exports.getDefaultSettingsForUser = async (userId) => {
       status: s.dataValues.atOffice,
       officeId: s.dataValues.OfficeId,
       officeName: s.dataValues.Office.officeName,
+      officeEmoji: s.dataValues.Office.officeEmoji,
     }));
   } catch (error) {
     console.log("Error while finding default registrations:", error);
@@ -596,10 +597,11 @@ exports.getScheduledMessageId = async (date, channelId, usergroupId) => {
   }
 };
 
-exports.addOffice = async (officeName) => {
+exports.addOffice = async (officeName, officeEmoji) => {
   try {
     return await Office.upsert({
       officeName: officeName,
+      officeEmoji: officeEmoji,
     });
   } catch (err) {
     console.log("Error while creating an office", err);
@@ -677,9 +679,12 @@ exports.getDefaultOfficeForUser = async (user) => {
   }
 };
 
-exports.updateOffice = async (office, newName) => {
+exports.updateOffice = async (office, newName, newEmoji) => {
   try {
-    const result = await Office.update({ officeName: newName }, { where: { id: office } });
+    const result = await Office.update(
+      { officeName: newName, officeEmoji: newEmoji },
+      { where: { id: office } },
+    );
     // Number of affected rows
     if (result[0] === 0) {
       return null;

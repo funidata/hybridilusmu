@@ -29,6 +29,11 @@ const isRemote = (registration, office) => {
   return registration ? !registration.status && registration.officeId === office.id : false;
 };
 
+const formatOffice = (office, upperCase) => {
+  const { officeName, officeEmoji } = office;
+  return `${upperCase ? officeName.toUpperCase() : officeName} ${officeEmoji ? officeEmoji : ""}`;
+};
+
 /**
  * Creates and returns a block containing an update button used to update the Home tab
  * and a default settings button used to open the default settings modal.
@@ -45,8 +50,7 @@ const getUpdateBlock = async (selectedOffice, offices, isAdmin) => {
   }
 
   updateBlock.push(
-    header(`${selectedOffice.officeName.toUpperCase()}`),
-    // TODO: Add office emoji to header
+    header(formatOffice(selectedOffice, true)),
     header(`ILMOITTAUTUMISET :spiral_calendar_pad:`),
     actions(actionElements),
     context(
@@ -71,7 +75,7 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
   }
   const offices = await service.getAllOffices();
   settingsBlock.push(
-    selectMenu("Valitse toimisto", offices, selectedOffice, "office_select"),
+    selectMenu("Valitse toimisto", offices, selectedOffice, "office_select", formatOffice),
     context(
       "Näet vain valitsemasi toimiston ilmoittautumiset, lisäksi kaikki valintasi rekisteröidään valitsemaasi toimistoon.",
     ),
@@ -97,15 +101,7 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
       : registration && registration.officeId !== buttonValue.officeId && !registration?.status
       ? "danger"
       : null;
-    // const emoji = settings[weekday].officeEmoji
-    // TODO: after adding emoji column to offices table, replace the code below with the above commented one
-    const emoji =
-      registration?.officeId === 8
-        ? ":city_sunset:"
-        : registration?.officeId === 1
-        ? ":cityscape:"
-        : null;
-
+    const emoji = registration.officeEmoji;
     const confirmLabel = "Varmastikko?";
     const confirmText = `Sinulla on jo oletusasetus toimistolle ${registration?.officeName}. Haluatko korvata sen?`;
 
@@ -239,16 +235,17 @@ const getRegistrationsBlock = async (userId, selectedOffice) => {
  */
 const getOfficeCreationBlock = async () => {
   const officeCreationBlock = [];
-  const offices = (await service.getAllOffices()).map((office) => office.officeName);
+  const offices = (await service.getAllOffices()).map((office) => formatOffice(office));
   officeCreationBlock.push(
     mrkdwn("*Toimistot:*"),
-    mrkdwn(offices.join("\n")),
+    mrkdwn(offices.length > 0 ? offices.join("\n") : "n/a"),
     textInput("Toimiston nimi", "office_name_input"),
     textInput(
       "Toimiston emoji",
       "office_emoji_input",
       null,
       "Huom. myös custom- emojit toimivat, esim. :my_office:",
+      true,
     ),
   );
 
@@ -262,12 +259,12 @@ const getOfficeCreationBlock = async () => {
 const getOfficeControlBlock = async () => {
   const officeControlBlock = [];
   const offices = await service.getAllOffices();
-  officeControlBlock.push(mrkdwn("*Toimistot:*"), divider());
+  officeControlBlock.push(divider());
   for (const office of offices) {
     const createdAt = formatDates(office.createdAt);
     const updatedAt = formatDates(office.updatedAt);
     officeControlBlock.push(
-      header(office.officeName),
+      header(formatOffice(office)),
       context(`_Luotu: ${createdAt}_\n_Muokattu: ${updatedAt}_`),
       actions([
         button("Muokkaa", "office_modify_click", `${office.id}`, "primary"),
@@ -298,16 +295,17 @@ const getOfficeControlBlock = async () => {
  */
 const getOfficeModifyBlock = async (officeId) => {
   const officeModifyBlock = [];
-  const { officeName, officeEmoji } = await service.getOffice(officeId);
+  const office = await service.getOffice(officeId);
 
   officeModifyBlock.push(
-    header(officeName),
-    textInput("Toimiston nimi", "office_name_input", officeName),
+    header(formatOffice(office)),
+    textInput("Toimiston nimi", "office_name_input", office.officeName),
     textInput(
       "Toimiston emoji",
       "office_emoji_input",
-      officeEmoji,
+      office.officeEmoji,
       "Huom. myös custom- emojit toimivat, esim. :my_office:",
+      true,
     ),
   );
 

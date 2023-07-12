@@ -152,6 +152,7 @@ const getDefaultSettingsForUser = async (userId) => {
           status: entry.status,
           officeId: entry.officeId,
           officeName: entry.officeName,
+          officeEmoji: entry.officeEmoji,
         };
         found = true;
         return false;
@@ -217,7 +218,7 @@ const getScheduledMessageId = async (date, channelId, usergroupId = null) => {
 const addScheduledMessage = async (messageId, date, channelId, usergroupId = null) =>
   db.addScheduledMessage(messageId, date, channelId, usergroupId);
 
-const addOffice = async (officeName) => db.addOffice(officeName);
+const addOffice = async (officeName, officeEmoji) => db.addOffice(officeName, officeEmoji);
 
 const removeOffice = async (officeId) => db.removeOffice(officeId);
 
@@ -239,7 +240,8 @@ const getDefaultOfficeForUser = async (user) => {
   return offices[0];
 };
 
-const updateOffice = async (office, newName) => db.updateOffice(office, newName);
+const updateOffice = async (office, newName, newEmoji) =>
+  db.updateOffice(office, newName, newEmoji);
 
 module.exports = {
   changeRegistration,

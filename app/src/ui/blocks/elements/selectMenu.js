@@ -1,15 +1,15 @@
-const selectMenu = (label, offices, initialOffice, callback) => {
+const selectMenu = (label, offices, initialOffice, callback, formatter) => {
   const options = offices.map((office) => {
     const value = JSON.stringify(office, ["id", "officeName"]);
     return {
       text: {
         type: "plain_text",
-        text: office.officeName,
+        text: formatter(office),
       },
       value: value,
     };
   });
-  const initialOption = options.find(({ text }) => text.text === initialOffice.officeName);
+  const initialOption = options.find(({ text }) => text.text === formatter(initialOffice));
 
   const selectMenuElement = {
     type: "section",

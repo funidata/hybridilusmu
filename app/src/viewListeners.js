@@ -10,9 +10,8 @@ exports.enableViewListeners = ({ app, userCache }) => {
     const user = body.user.id;
     const officeName = view.state.values.office_name_input.office_name_input.value;
     const officeEmoji = view.state.values.office_emoji_input.office_emoji_input.value;
-    const result = await service.addOffice(officeName);
+    const result = await service.addOffice(officeName, officeEmoji);
     if (result) {
-      console.log(`Created a new office: ${officeName}`);
       home.update(client, user, userCache);
     } else {
       const msg = `There was an error creating office: ${officeName}`;
@@ -26,9 +25,8 @@ exports.enableViewListeners = ({ app, userCache }) => {
     const officeId = view.private_metadata;
     const newOfficeName = view.state.values.office_name_input.office_name_input.value;
     const newOfficeEmoji = view.state.values.office_emoji_input.office_emoji_input.value;
-    const result = await service.updateOffice(officeId, newOfficeName);
+    const result = await service.updateOffice(officeId, newOfficeName, newOfficeEmoji);
     if (result) {
-      console.log(`${user} updated an office name to: ${newOfficeName}`);
       home.update(client, user, userCache);
       home.openOfficeControlView(client, user, body.trigger_id);
     } else {
