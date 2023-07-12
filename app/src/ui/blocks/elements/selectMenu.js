@@ -1,6 +1,6 @@
 const selectMenu = (label, offices, initialOffice, callback, formatter) => {
   const options = offices.map((office) => {
-    const value = JSON.stringify(office, ["id", "officeName"]);
+    const value = JSON.stringify(office, ["id", "officeName", "officeEmoji"]);
     return {
       text: {
         type: "plain_text",
