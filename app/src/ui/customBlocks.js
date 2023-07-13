@@ -98,17 +98,11 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
       defaultAtOffice: isAtTheOffice(registration, selectedOffice),
       defaultIsRemote: isRemote(registration, selectedOffice),
     };
-    const officeStyle = buttonValue.defaultAtOffice
-      ? "primary"
-      : isAtAnotherOffice(registration, selectedOffice.id)
-      ? "danger"
-      : null;
-    const remoteStyle = buttonValue.defaultIsRemote
-      ? "primary"
-      : isRemoteAtAnotherOffice(registration, selectedOffice.id)
-      ? "danger"
-      : null;
-    const emoji = registration?.officeEmoji;
+    const { officeButtonColor, remoteButtonColor, emojis } = stylizeRegisterButtons(
+      null,
+      registration,
+      selectedOffice,
+    );
     const confirmLabel = "Varmastikko?";
     const confirmText = `Sinulla on jo oletusasetus toimistolle ${registration?.officeName}. Haluatko korvata sen?`;
 
@@ -120,8 +114,8 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
           "Toimistolla",
           "default_office_click",
           JSON.stringify(buttonValue),
-          officeStyle,
-          emoji,
+          officeButtonColor,
+          emojis.officeEmoji,
           registration && registration.officeId !== buttonValue.officeId
             ? confirmation(confirmLabel, confirmText)
             : null,
@@ -130,8 +124,8 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
           "Etänä",
           "default_remote_click",
           JSON.stringify(buttonValue),
-          remoteStyle,
-          emoji,
+          remoteButtonColor,
+          emojis.officeEmoji,
           registration && registration.officeId !== buttonValue.officeId
             ? confirmation(confirmLabel, confirmText)
             : null,
@@ -159,26 +153,29 @@ const stylizeRegisterButtons = (registration, defaultRegistration, selectedOffic
 
   if (registration) {
     emojis.registrationEmoji = "normal";
-    emojis.officeEmoji = registration.officeEmoji;
     if (isAtTheOffice(registration, selectedOffice)) {
       officeButtonColor = "primary";
     } else if (isAtAnotherOffice(registration, selectedOffice)) {
+      emojis.officeEmoji = registration.officeEmoji;
       officeButtonColor = "danger";
     } else if (isRemote(registration, selectedOffice)) {
       remoteButtonColor = "primary";
     } else if (isRemoteAtAnotherOffice(registration, selectedOffice)) {
+      emojis.officeEmoji = registration.officeEmoji;
+
       remoteButtonColor = "danger";
     }
   } else if (defaultRegistration) {
     emojis.registrationEmoji = "default";
-    emojis.officeEmoji = defaultRegistration.officeEmoji;
     if (isAtTheOffice(defaultRegistration, selectedOffice)) {
       officeButtonColor = "primary";
     } else if (isAtAnotherOffice(defaultRegistration, selectedOffice)) {
+      emojis.officeEmoji = defaultRegistration.officeEmoji;
       officeButtonColor = "danger";
     } else if (isRemote(defaultRegistration, selectedOffice)) {
       remoteButtonColor = "primary";
     } else if (isRemoteAtAnotherOffice(defaultRegistration, selectedOffice)) {
+      emojis.officeEmoji = defaultRegistration.officeEmoji;
       remoteButtonColor = "danger";
     }
   }

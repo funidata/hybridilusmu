@@ -11,7 +11,7 @@ const defaultSettingButton = (text, callback, value, style, emoji, confirm) => {
   };
   if (style === "primary" || style === "danger") {
     buttonElement.style = style;
-    if (emoji) buttonElement.text.text = `${text} ${emoji}`;
+    if (emoji) buttonElement.text.text = `${emoji} ${text}`;
   }
   if (confirm) {
     buttonElement.confirm = confirm;

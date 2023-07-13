@@ -12,9 +12,13 @@ const button = (text, callback, value, style, emoji = null, confirm = null) => {
   if (style === "primary" || style === "danger") {
     buttonElement.style = style;
     if (emoji?.registrationEmoji === "normal")
-      buttonElement.text.text = `${text} :writing_hand: ${emoji.officeEmoji}`;
+      buttonElement.text.text = `${
+        emoji.officeEmoji ? emoji.officeEmoji : ""
+      } ${text} :writing_hand: `;
     if (emoji?.registrationEmoji === "default")
-      buttonElement.text.text = `${text} :robot_face: ${emoji.officeEmoji}`;
+      buttonElement.text.text = `${
+        emoji.officeEmoji ? emoji.officeEmoji : ""
+      } ${text} :robot_face: `;
   }
   if (confirm) {
     buttonElement.confirm = confirm;

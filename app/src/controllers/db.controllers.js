@@ -651,7 +651,6 @@ exports.getOffice = async (officeId) => {
 };
 
 exports.addDefaultOfficeForUser = async (user, officeId) => {
-  console.log(`added default office ${officeId} for user ${user}`);
   try {
     const result = await Person.update({ DefaultOffice: officeId }, { where: { slackId: user } });
     if (result[0] === 0) {
@@ -667,17 +666,12 @@ exports.addDefaultOfficeForUser = async (user, officeId) => {
 exports.getDefaultOfficeForUser = async (user) => {
   try {
     const result = await Person.findOne({
-      //raw: true,
       attributes: [],
       where: {
         slackId: user,
       },
       include: {
         model: Office,
-        //attributes: ["id", "officeName"],
-        /*through: {
-          attributes: [],
-        },*/
       },
     });
     return result.Office.dataValues;
