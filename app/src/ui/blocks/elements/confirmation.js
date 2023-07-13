@@ -1,8 +1,8 @@
-const confirmation = (title, text, confirmButtonText = "Kyllä", style) => {
+const confirmation = (text, confirmButtonText = "Kyllä", style) => {
   const confirmationElement = {
     title: {
       type: "plain_text",
-      text: title,
+      text: "Varmastikko?",
     },
     text: {
       type: "plain_text",

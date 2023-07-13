@@ -22,20 +22,12 @@ const SHOW_DAYS_UNTIL = 10;
 
 const format = { ...DateTime.DATETIME_MED, month: "long" };
 
-const isAtTheOffice = (registration, office) => {
-  return registration ? registration.status && registration.officeId === office.id : false;
+const sameOffice = (registration, office) => {
+  return registration && registration.officeId === office.id;
 };
-const isRemote = (registration, office) => {
-  return registration ? !registration.status && registration.officeId === office.id : false;
+const isAtOffice = (registration) => {
+  return registration && registration.status;
 };
-const isAtAnotherOffice = (registration, selectedOffice) => {
-  return registration && registration.status && registration.officeId !== selectedOffice.id;
-};
-// What does it mean to be remote at another office? Better not to overthink it...
-const isRemoteAtAnotherOffice = (registration, selectedOffice) => {
-  return registration && !registration.status && registration.officeId !== selectedOffice.id;
-};
-
 const formatOffice = (office, upperCase) => {
   const { officeName, officeEmoji } = office;
   return `${upperCase ? officeName.toUpperCase() : officeName} ${officeEmoji ? officeEmoji : ""}`;
@@ -95,16 +87,14 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
     const buttonValue = {
       weekday,
       officeId: selectedOffice.id,
-      defaultAtOffice: isAtTheOffice(registration, selectedOffice),
-      defaultIsRemote: isRemote(registration, selectedOffice),
+      defaultAtOffice: isAtOffice(registration) && sameOffice(registration, selectedOffice),
+      defaultIsRemote: !isAtOffice(registration) && sameOffice(registration, selectedOffice),
     };
-    const { officeButtonColor, remoteButtonColor, emojis } = stylizeRegisterButtons(
+    const { officeButtonColor, remoteButtonColor, emojis, confirm } = stylizeRegisterButtons(
       null,
       registration,
       selectedOffice,
     );
-    const confirmLabel = "Varmastikko?";
-    const confirmText = `Sinulla on jo oletusasetus toimistolle ${registration?.officeName}. Haluatko korvata sen?`;
 
     if (weekday === "Keskiviikko") settingsBlock.push(mrkdwn(`*${weekday}isin*`));
     else settingsBlock.push(mrkdwn(`*${weekday}sin*`));
@@ -116,9 +106,7 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
           JSON.stringify(buttonValue),
           officeButtonColor,
           emojis.officeEmoji,
-          registration && registration.officeId !== buttonValue.officeId
-            ? confirmation(confirmLabel, confirmText)
-            : null,
+          confirm,
         ),
         defaultSettingButton(
           "Etänä",
@@ -126,9 +114,7 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
           JSON.stringify(buttonValue),
           remoteButtonColor,
           emojis.officeEmoji,
-          registration && registration.officeId !== buttonValue.officeId
-            ? confirmation(confirmLabel, confirmText)
-            : null,
+          confirm,
         ),
       ]),
     );
@@ -137,10 +123,10 @@ const getDefaultSettingsBlock = async (userId, selectedOffice) => {
 };
 
 /**
- * Handles the logic for providing the correct colors and emojis for the
+ * Handles the logic for providing the correct colors, emojis and confirmations for the
  * registration buttons. Green if registration is for the selected office, red if
- * a registration is for another office. There is also different emojis for normal
- * registrations and default registrations.
+ * a registration is for another office. There is also different emojis and confirmations
+ * for normal registrations and default registrations.
  * @param {{}} registration A normal registration object for a given day.
  * @param {{}} defaultRegistration A default registration object for a given day.
  * @param {{}} selectedOffice Office object of the current office.
@@ -150,37 +136,32 @@ const stylizeRegisterButtons = (registration, defaultRegistration, selectedOffic
   let officeButtonColor = null;
   let remoteButtonColor = null;
   let emojis = { registrationEmoji: null, officeEmoji: null };
+  let confirm = null;
+
+  const setButtonColors = (registration, sameOffice, defaultReg) => {
+    const confirmText = `Sinulla on jo ${
+      defaultReg ? "oletusilmoittautuminen" : "ilmoittautuminen"
+    } toimistolle ${registration.officeName}. Haluatko korvata sen?`;
+    if (sameOffice) {
+      officeButtonColor = isAtOffice(registration) ? "primary" : null;
+      remoteButtonColor = isAtOffice(registration) ? null : "primary";
+    } else {
+      confirm = confirmation(confirmText);
+      emojis.officeEmoji = registration.officeEmoji;
+      officeButtonColor = isAtOffice(registration) ? "danger" : null;
+      remoteButtonColor = isAtOffice(registration) ? null : "danger";
+    }
+  };
 
   if (registration) {
     emojis.registrationEmoji = "normal";
-    if (isAtTheOffice(registration, selectedOffice)) {
-      officeButtonColor = "primary";
-    } else if (isAtAnotherOffice(registration, selectedOffice)) {
-      emojis.officeEmoji = registration.officeEmoji;
-      officeButtonColor = "danger";
-    } else if (isRemote(registration, selectedOffice)) {
-      remoteButtonColor = "primary";
-    } else if (isRemoteAtAnotherOffice(registration, selectedOffice)) {
-      emojis.officeEmoji = registration.officeEmoji;
-
-      remoteButtonColor = "danger";
-    }
+    setButtonColors(registration, sameOffice(registration, selectedOffice));
   } else if (defaultRegistration) {
     emojis.registrationEmoji = "default";
-    if (isAtTheOffice(defaultRegistration, selectedOffice)) {
-      officeButtonColor = "primary";
-    } else if (isAtAnotherOffice(defaultRegistration, selectedOffice)) {
-      emojis.officeEmoji = defaultRegistration.officeEmoji;
-      officeButtonColor = "danger";
-    } else if (isRemote(defaultRegistration, selectedOffice)) {
-      remoteButtonColor = "primary";
-    } else if (isRemoteAtAnotherOffice(defaultRegistration, selectedOffice)) {
-      emojis.officeEmoji = defaultRegistration.officeEmoji;
-      remoteButtonColor = "danger";
-    }
+    setButtonColors(defaultRegistration, sameOffice(defaultRegistration, selectedOffice), true);
   }
 
-  return { officeButtonColor, remoteButtonColor, emojis };
+  return { officeButtonColor, remoteButtonColor, emojis, confirm };
 };
 
 /**
@@ -214,13 +195,11 @@ const getRegistrationListForDate = async (
   const buttonValue = {
     date,
     officeId: selectedOffice.id,
-    atOffice: isAtTheOffice(registration, selectedOffice),
-    isRemote: isRemote(registration, selectedOffice),
-    atOfficeDefault: isAtTheOffice(defaultRegistration, selectedOffice) && !registration,
-    isRemoteDefault: isRemote(defaultRegistration, selectedOffice) && !registration,
+    atOffice: isAtOffice(registration) && sameOffice(registration, selectedOffice),
+    isRemote: !isAtOffice(registration) && sameOffice(registration, selectedOffice),
   };
 
-  const { officeButtonColor, remoteButtonColor, emojis } = stylizeRegisterButtons(
+  const { officeButtonColor, remoteButtonColor, emojis, confirm } = stylizeRegisterButtons(
     registration,
     defaultRegistration,
     selectedOffice,
@@ -230,8 +209,22 @@ const getRegistrationListForDate = async (
     mrkdwn(userList),
     plainText("Oma ilmoittautumiseni:\n"),
     actions([
-      button("Toimistolla", "office_click", JSON.stringify(buttonValue), officeButtonColor, emojis),
-      button("Etänä", "remote_click", JSON.stringify(buttonValue), remoteButtonColor, emojis),
+      button(
+        "Toimistolla",
+        "office_click",
+        JSON.stringify(buttonValue),
+        officeButtonColor,
+        emojis,
+        confirm,
+      ),
+      button(
+        "Etänä",
+        "remote_click",
+        JSON.stringify(buttonValue),
+        remoteButtonColor,
+        emojis,
+        confirm,
+      ),
     ]),
     divider(),
   );
