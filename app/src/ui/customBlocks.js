@@ -313,12 +313,7 @@ const getOfficeControlBlock = async () => {
           `${office.id}`,
           "danger",
           null,
-          confirmation(
-            "Varmastikko?",
-            `Olet poistamassa toimistoa: ${office.officeName}`,
-            "Poista",
-            "danger",
-          ),
+          confirmation(`Olet poistamassa toimistoa: ${office.officeName}`, "Poista", "danger"),
         ),
       ]),
       divider(),

@@ -3,8 +3,9 @@ const db = require("./controllers/db.controllers");
 const dfunc = require("./dateFunctions");
 
 /**
- * Adds, removes or updates a registration for the given user, for the given day.
+ * Adds, removes or updates a registration for the given user, office and day.
  * @param {string} userId - Slack user ID.
+ * @param {string} officeId - Office ID string.
  * @param {string} date - Date string in the ISO date format.
  * @param {boolean} addRegistration - true, if we want to add a registration and
  * false, if we want to remove one.
@@ -21,8 +22,9 @@ const changeRegistration = async (userId, officeId, date, addRegistration, atOff
 };
 
 /**
- * Adds, removes or updates a default registration for the given user, for the given weekday.
+ * Adds, removes or updates a default registration for the given user, office and weekday.
  * @param {string} userId - Slack user ID.
+ * @param {string} officeId - Office ID string.
  * @param {string} weekday - Weekday as in "Maanantai".
  * @param {boolean} addRegistration - true, if we want to add a registration and
  * false, if we want to remove one.
@@ -92,11 +94,12 @@ const addJob = async (channelId, time) => db.addJob(channelId, time);
 const getAllJobs = async () => db.getAllJobs();
 
 /**
- * Returns a list of Slack user IDs of people who are at the office for every weekday
+ * Returns a list of Slack user IDs of people who are at the given office for every weekday
  * between firstDate and lastDate (inclusive).
  * Returns a dictionary of sets.
  * @param {string} firstDate - Date string in the ISO date format.
  * @param {string} lastDate - Date string in the ISO date format.
+ * @param {string} office - Office object.
  * @returns {Dictionary}
  */
 const getRegistrationsBetween = async (firstDate, lastDate, office) => {
@@ -133,12 +136,11 @@ const getRegistrationsBetween = async (firstDate, lastDate, office) => {
 };
 
 /**
- * Returns a dictionary where key is weekday as in "Maanantai" and value tells
- * the default settings status for the given user.
- * True means office, false remote and null that there is no setting for that weekday.
+ * Returns a dictionary where key is weekday as in "Maanantai" and the value is a
+ * registration object containing the status, officeID, officeName and officeEmoji.
+ * Null means there is no setting for that weekday and statutes True means at office,
+ * false means remote.
  * @param {string} userId - Slack user ID.
- * @param {string} firstDate - Date string in the ISO date format.
- * @param {string} lastDate - Date string in the ISO date format.
  * @returns {Dictionary}
  */
 const getDefaultSettingsForUser = async (userId) => {
@@ -168,8 +170,8 @@ const getDefaultSettingsForUser = async (userId) => {
 
 /**
  * Returns a dictionary, where keys are ISO Date strings of days starting from @fistDate and ending at @lastDate (inclusive).
- * The value for each day tells the normal registration status for the given user for that day.
- * True means office, false remote and null that there is no normal registration for that day.
+ * The values are registration objects containing (status, officeId, officeName, officeEmoji). Null means that there is no registration
+ * for that day and status True means at office, False means remote.
  * @param {string} userId - Slack user ID.
  * @param {string} firstDate - Date string in the ISO date format.
  * @param {string} lastDate - Date string in the ISO date format.
@@ -223,17 +225,44 @@ const getScheduledMessageId = async (date, channelId, usergroupId = null) => {
 const addScheduledMessage = async (messageId, date, channelId, usergroupId = null) =>
   db.addScheduledMessage(messageId, date, channelId, usergroupId);
 
+/**
+ * Adds a new office.
+ * @param {string} officeName Name of the office.
+ * @param {string} officeEmoji Emoji for the office in format ":emoji:".
+ * @returns true if successful, undefined otherwise.
+ */
 const addOffice = async (officeName, officeEmoji) => db.addOffice(officeName, officeEmoji);
 
+/**
+ * Removes an office with the given ID.
+ * @param {string} officeId Office id string.
+ */
 const removeOffice = async (officeId) => db.removeOffice(officeId);
 
+/**
+ * Fetches all the offices.
+ * @returns An array containing all the Office objects found in the database.
+ */
 const getAllOffices = async () => db.getAllOffices();
 
+/**
+ * Fetches an office with the given id.
+ * @param {string} officeId Office id string.
+ */
 const getOffice = async (officeId) => db.getOffice(officeId);
 
+/**
+ * Adds a default office to the user's Person object.
+ * @param {string} user Slack user ID.
+ * @param {string} officeId Office ID string.
+ */
 const addDefaultOfficeForUser = async (user, officeId) =>
   db.addDefaultOfficeForUser(user, officeId);
 
+/**
+ * Fetches the user's default office.
+ * @param {string} user Slack user ID.
+ */
 const getDefaultOfficeForUser = async (user) => {
   const result = await db.getDefaultOfficeForUser(user);
   if (result) {
@@ -245,6 +274,12 @@ const getDefaultOfficeForUser = async (user) => {
   return offices[0];
 };
 
+/**
+ * Updates the name and/or emoji of the given office.
+ * @param {string} office Office ID string.
+ * @param {string} newName New name for the office.
+ * @param {string} newEmoji New emoji string for the office.
+ */
 const updateOffice = async (office, newName, newEmoji) =>
   db.updateOffice(office, newName, newEmoji);
 

@@ -5,6 +5,9 @@ const home = require("./ui/home");
  * These will handle inputs from modals
  */
 exports.enableViewListeners = ({ app, userCache }) => {
+  /**
+   * Creates a new office with the data from the 'office creation' input modal.
+   */
   app.view("submit_office", async ({ ack, body, view, client }) => {
     await ack();
     const user = body.user.id;
@@ -19,6 +22,9 @@ exports.enableViewListeners = ({ app, userCache }) => {
     }
   });
 
+  /**
+   * Modifies an existing office with data from the 'office modify' input modal.
+   */
   app.view("modify_office", async ({ ack, body, view, client }) => {
     await ack();
     const user = body.user.id;

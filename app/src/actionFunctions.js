@@ -3,6 +3,10 @@ const service = require("./databaseService");
 const { updateScheduledMessages } = require("./lateRegistration");
 
 exports.enableActionFunctions = ({ app, userCache }) => {
+  /**
+   * Acknowledges the user's overflow menu selection and opens the
+   * specified modal view.
+   */
   app.action("overflow_menu", async ({ body, ack, client }) => {
     await ack();
     const selectedOption = body.actions[0].selected_option.value;
@@ -13,6 +17,10 @@ exports.enableActionFunctions = ({ app, userCache }) => {
     }
   });
 
+  /**
+   * Deletes the specified office and then updates the home and office
+   * control views.
+   */
   app.action("office_delete_click", async ({ body, ack, client }) => {
     await ack();
     const officeId = body.actions[0].value;
@@ -21,12 +29,20 @@ exports.enableActionFunctions = ({ app, userCache }) => {
     home.updateOfficeControlView(client, body.user.id);
   });
 
+  /**
+   * Opens the office modify modal for the specified office.
+   */
   app.action("office_modify_click", async ({ body, ack, client }) => {
     await ack();
     const officeId = body.actions[0].value;
     home.openOfficeModifyView(client, body.user.id, officeId);
   });
 
+  /**
+   * Acknowledges the user's office selection, saving that office as their
+   * default office and then updating the home and default settings views
+   * with the selected office.
+   */
   app.action("office_select", async ({ body, ack, client }) => {
     await ack();
     const user = body.user.id;

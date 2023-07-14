@@ -61,8 +61,9 @@ const getDefaultRegistrationsForUserAndWeekday = async (personId, weekday, trans
   });
 
 /**
- * Adds a normal registration for the given user.
+ * Adds a normal registration for the given user, office and date.
  * @param {String} userId - Slack user ID.
+ * @param {string} officeId - Office ID string.
  * @param {String} date - Date in the ISO date format.
  * @param {Boolean} atOffice - True, if we want to add an office registration. False otherwise.
  */
@@ -111,8 +112,9 @@ exports.addRegistrationForUser = async (userId, officeId, date, atOffice) => {
 };
 
 /**
- * Adds a default registration for the given user.
+ * Adds a default registration for the given user, office and weekday.
  * @param {String} userId - Slack user ID.
+ * @param {string} officeId - Office ID string.
  * @param {String} weekday - Weekday as in "Maanantai".
  * @param {Boolean} atOffice - True, if we want to add an office registration. False otherwise.
  */
@@ -241,9 +243,11 @@ exports.getDefaultSettingsForUser = async (userId) => {
 
 /**
  * Fetches all office registrations between the given dates.
- * Returns an array, where one element is an object containing a Slack user ID, registration date and registration status.
+ * Returns an array, where one element is an object containing a Slack user ID, registration date,
+ * registration status and office ID.
  * @param {String} startDate - Starting date in the ISO date format.
  * @param {String} endDate - Ending date in the ISO date format.
+ * @param {string} [officeId] - Optional office ID string.
  * @returns {Array}
  */
 exports.getAllRegistrationsForDateInterval = async (startDate, endDate, office) => {
@@ -278,7 +282,9 @@ exports.getAllRegistrationsForDateInterval = async (startDate, endDate, office) 
 
 /**
  * Fetches all office registrations between the given dates for given user.
- * Returns an array, where one element is an object containing registration date and registration status.
+ * Returns an array, where one element is an object containing registration date,
+ * registration status, office ID, office name and office emoji.
+ * @param {string} userId - Slack user ID.
  * @param {String} startDate - Starting date in the ISO date format.
  * @param {String} endDate - Ending date in the ISO date format.
  * @returns {Array}
@@ -321,7 +327,8 @@ exports.getRegistrationsForUserForDateInterval = async (userId, startDate, endDa
 };
 
 /**
- * Fetches all default office registrations.
+ * Fetches all default office registrations for the given office.
+ * @param {object} office Office object.
  * Returns an array, where one element is an object containing a Slack user ID and weekday.
  * @returns {Array}
  */
@@ -604,7 +611,12 @@ exports.getScheduledMessageId = async (date, channelId, usergroupId) => {
     return undefined;
   }
 };
-
+/**
+ * Adds a new office.
+ * @param {string} officeName Name of the office.
+ * @param {string} officeEmoji Emoji for the office in format ":emoji:".
+ * @returns true if successful, undefined otherwise.
+ */
 exports.addOffice = async (officeName, officeEmoji) => {
   try {
     return await Office.upsert({
@@ -616,7 +628,10 @@ exports.addOffice = async (officeName, officeEmoji) => {
     return undefined;
   }
 };
-
+/**
+ * Removes an office with the given ID.
+ * @param {string} officeId Office id string.
+ */
 exports.removeOffice = async (officeId) => {
   try {
     await Office.destroy({
@@ -630,6 +645,10 @@ exports.removeOffice = async (officeId) => {
   }
 };
 
+/**
+ * Fetches all the offices.
+ * @returns An array containing all the Office objects found in the database.
+ */
 exports.getAllOffices = async () => {
   try {
     const result = await Office.findAll({ raw: true, order: [["id", "ASC"]] });
@@ -640,6 +659,10 @@ exports.getAllOffices = async () => {
   }
 };
 
+/**
+ * Fetches an office with the given id.
+ * @param {string} officeId Office id string.
+ */
 exports.getOffice = async (officeId) => {
   try {
     const result = await Office.findOne({ raw: true, where: { id: officeId } });
@@ -650,6 +673,11 @@ exports.getOffice = async (officeId) => {
   }
 };
 
+/**
+ * Adds a default office to the user's Person object.
+ * @param {string} user Slack user ID.
+ * @param {string} officeId Office ID string.
+ */
 exports.addDefaultOfficeForUser = async (user, officeId) => {
   try {
     const result = await Person.update({ DefaultOffice: officeId }, { where: { slackId: user } });
@@ -663,6 +691,10 @@ exports.addDefaultOfficeForUser = async (user, officeId) => {
   return true;
 };
 
+/**
+ * Fetches the user's default office.
+ * @param {string} user Slack user ID.
+ */
 exports.getDefaultOfficeForUser = async (user) => {
   try {
     const result = await Person.findOne({
@@ -681,6 +713,12 @@ exports.getDefaultOfficeForUser = async (user) => {
   }
 };
 
+/**
+ * Updates the name and/or emoji of the given office.
+ * @param {string} office Office ID string.
+ * @param {string} newName New name for the office.
+ * @param {string} newEmoji New emoji string for the office.
+ */
 exports.updateOffice = async (office, newName, newEmoji) => {
   try {
     const result = await Office.update(
