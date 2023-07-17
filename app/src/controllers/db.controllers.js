@@ -386,7 +386,7 @@ exports.getAllRegistrationsForDate = async (date) => {
 /**
  * Fetches all default office registrations for the given weekday.
  * @param {String} date - Date in the ISO date format.
- * @returns {Array}
+ * @returns {Promise<Array>}
  */
 exports.getAllDefaultOfficeRegistrationsForWeekday = async (weekday) => {
   try {
@@ -669,6 +669,23 @@ exports.getOffice = async (officeId) => {
     return result;
   } catch (err) {
     console.log("Error while finding an office", err);
+    return undefined;
+  }
+};
+
+/**
+ * Fetches an office with the given name.
+ * @param {string} officeName Name of the office we're finding.
+ */
+exports.getOfficeByName = async (officeName) => {
+  try {
+    const result = await Office.findOne({
+      raw: true,
+      where: { officeName: { [Op.iLike]: officeName } },
+    });
+    return result;
+  } catch (err) {
+    console.log("Error while finding an office with the given name", err);
     return undefined;
   }
 };

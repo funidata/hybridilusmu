@@ -252,6 +252,12 @@ const getAllOffices = async () => db.getAllOffices();
 const getOffice = async (officeId) => db.getOffice(officeId);
 
 /**
+ * Fetches an office with the given name.
+ * @param {string} officeName Name of the office we're finding.
+ */
+const getOfficeByName = async (officeName) => db.getOfficeByName(officeName);
+
+/**
  * Adds a default office to the user's Person object.
  * @param {string} user Slack user ID.
  * @param {string} officeId Office ID string.
@@ -302,6 +308,7 @@ module.exports = {
   getDefaultOfficeForUser,
   getAllOffices,
   getOffice,
+  getOfficeByName,
   addDefaultOfficeForUser,
   updateOffice,
 };

@@ -36,7 +36,7 @@ const argify = (text) => {
   );
 };
 
-exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
+exports.enableSlashCommands = ({ app, usergroups }) => {
   /**
    * Checks if user gave 'help' as a parameter to a command.
    * If yes, posts instructions on how to use that command.
@@ -56,7 +56,7 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
    */
   const enoughParameters = (limit, parameterCount, channelId, userId, response) => {
     if (parameterCount >= limit) return true;
-    helper.postEphemeralMessage(app, channelId, userId, response());
+    helper.postEphemeralMessage(app, channelId, userId, response);
     return false;
   };
 
@@ -138,7 +138,9 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
       if (help(input, channelId, userId, library.explainIlmoita)) return;
       let response = library.demandDateAndStatus();
       const parameters = argify(input);
-      if (!enoughParameters(2, parameters.length, channelId, userId, library.demandDateAndStatus)) {
+      if (
+        !enoughParameters(2, parameters.length, channelId, userId, library.demandDateAndStatus())
+      ) {
         return;
       }
       let dateString = parameters[0];
@@ -186,7 +188,7 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
       if (help(input, channelId, userId, library.explainPoista)) return;
       let response = library.demandDate();
       const parameters = argify(input);
-      if (!enoughParameters(1, parameters.length, channelId, userId, library.demandDate)) {
+      if (!enoughParameters(1, parameters.length, channelId, userId, library.demandDate())) {
         return;
       }
       let dateString = parameters[0];
@@ -217,9 +219,7 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
   app.command(`/${COMMAND_PREFIX}tilaa`, async ({ command, ack }) => {
     try {
       await ack();
-      const input = command.text;
-      const channelId = command.channel_id;
-      const userId = command.user_id;
+      const { text: input, channel_id: channelId, user_id: userId } = command;
 
       // print help before channel membership check
       if (help(input, channelId, userId, library.explainTilaa)) return;
@@ -235,29 +235,41 @@ exports.enableSlashCommands = ({ app, usergroups, userCache }) => {
         );
         return;
       }
-      let response = library.demandTime();
       const parameters = argify(input);
-      if (!enoughParameters(1, parameters.length, channelId, userId, library.demandTime)) {
+      const offices = await service.getAllOffices();
+      // If only one office present, no need to specify the office.
+      const minParamN = offices.length > 1 ? 2 : 1;
+      let response = minParamN === 2 ? library.demandTimeAndOffice() : library.demandTime();
+      if (!enoughParameters(minParamN, parameters.length, channelId, userId, response)) {
         return;
       }
-      const timeString = parameters[0];
+      const [timeString, officeName] = parameters;
+
+      const office = officeName ? await service.getOfficeByName(officeName) : offices[0];
+      if (!office) {
+        response = library.noOfficeFound(officeName);
+        helper.postEphemeralMessage(app, channelId, userId, response);
+        return;
+      }
       const time = dfunc.parseTime(timeString);
-      if (time.isValid) {
-        schedule.scheduleMessage({
-          channelId,
-          time,
-          app,
-          usergroups,
-          userCache,
-        });
-        response = library.automatedMessageRescheduled(
-          time.setLocale("fi").toLocaleString(DateTime.TIME_24_SIMPLE),
-        );
-        helper.postMessage(app, channelId, response);
-      } else {
+      if (!time || !time.isValid) {
         response = library.demandTime();
         helper.postEphemeralMessage(app, channelId, userId, response);
+        return;
       }
+
+      schedule.scheduleMessage({
+        channelId,
+        time,
+        office,
+        app,
+        usergroups,
+      });
+      response = library.automatedMessageRescheduled(
+        time.setLocale("fi").toLocaleString(DateTime.TIME_24_SIMPLE),
+        office,
+      );
+      helper.postMessage(app, channelId, response);
     } catch (error) {
       console.log(error);
     }
