@@ -47,16 +47,21 @@ const changeDefaultRegistration = async (
 };
 
 /**
- * Returns a list of Slack user IDs of people who are at the office on the given day.
+ * Returns a list of Slack user IDs of people who are at the given office on
+ * the given day. If no office argument is given, return user's from all offices.
  * @param {string} date - Date string in the ISO date format.
+ * @param {string} [officeId] Optional office id to filter the query.
  */
-const getRegistrationsFor = async (date) => {
+const getRegistrationsFor = async (date, officeId) => {
   const result = new Set(
-    await db.getAllDefaultOfficeRegistrationsForWeekday(dfunc.getWeekday(DateTime.fromISO(date))),
+    await db.getAllDefaultOfficeRegistrationsForWeekday(
+      dfunc.getWeekday(DateTime.fromISO(date)),
+      officeId,
+    ),
   );
   const registrations = await db.getAllRegistrationsForDate(date);
   registrations.forEach((obj) => {
-    if (obj.status === true) result.add(obj.slackId);
+    if (obj.status === true && officeId ? obj.officeId === officeId : true) result.add(obj.slackId);
     else result.delete(obj.slackId);
   });
   return Array.from(result);
@@ -89,7 +94,7 @@ const updateJobs = async (channels) => {
  * @param {string} channelId - Slack channel ID.
  * @param {string} time - Optional. Time string in the ISO date format.
  */
-const addJob = async (channelId, time, office) => db.addJob(channelId, time, office);
+const addJob = async (channelId, time, officeId) => db.addJob(channelId, time, officeId);
 
 const getAllJobs = async () => db.getAllJobs();
 

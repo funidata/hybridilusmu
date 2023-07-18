@@ -258,7 +258,8 @@ const demandDate = () => "Anna parametrina päivä.";
 const demandDateAndRemindAboutUGName = () =>
   "Anna parametrina päivä. Jos annoit tiimin nimen, tarkista että kirjoitit sen oikein.";
 
-const demandTimeAndOffice = () => "Anna parametrina kellonaika ja toimiston nimi.";
+const demandTimeAndOffice = () =>
+  "Anna parametrina ainakin kellonaika ja vapaaehtoisesti myös toimiston nimi.";
 
 /**
  * Reply to /tilaa command, if something goes wrong.

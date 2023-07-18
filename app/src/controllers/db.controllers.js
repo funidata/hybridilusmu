@@ -363,7 +363,7 @@ exports.getAllDefaultOfficeSettings = async (office) => {
 exports.getAllRegistrationsForDate = async (date) => {
   try {
     const registrations = await Signup.findAll({
-      attributes: ["atOffice"],
+      attributes: ["atOffice", "OfficeId"],
       where: {
         officeDate: date,
       },
@@ -376,6 +376,7 @@ exports.getAllRegistrationsForDate = async (date) => {
     return registrations.map((s) => ({
       slackId: s.dataValues.person.dataValues.slackId,
       status: s.dataValues.atOffice,
+      officeId: s.dataValues.OfficeId,
     }));
   } catch (error) {
     console.log("Error while finding registrations:", error);
@@ -386,9 +387,10 @@ exports.getAllRegistrationsForDate = async (date) => {
 /**
  * Fetches all default office registrations for the given weekday.
  * @param {String} date - Date in the ISO date format.
+ * @param {string} [officeID] Optional office id to filter the query.
  * @returns {Promise<Array>}
  */
-exports.getAllDefaultOfficeRegistrationsForWeekday = async (weekday) => {
+exports.getAllDefaultOfficeRegistrationsForWeekday = async (weekday, officeId) => {
   try {
     const registrations = await Person.findAll({
       attributes: ["slackId"],
@@ -398,6 +400,9 @@ exports.getAllDefaultOfficeRegistrationsForWeekday = async (weekday) => {
         where: {
           weekday,
           atOffice: true,
+          ...(officeId && {
+            OfficeId: officeId,
+          }),
         },
       },
     });
@@ -529,13 +534,19 @@ exports.addAllJobs = async (jobs) => {
     return undefined;
   }
 };
-
-exports.addJob = async (channelId, time, office) => {
+/**
+ *
+ * @param {string} channelId Slack channel ID.
+ * @param {string} time Time string in the ISO date format.
+ * @param {string} [office] Optional office ID.
+ * @returns
+ */
+exports.addJob = async (channelId, time, officeId) => {
   try {
     return await Job.upsert({
       channel_id: channelId,
       time,
-      OfficeId: office.id,
+      OfficeId: officeId || null,
     });
   } catch (err) {
     console.log("Error while creating a job ", err);
@@ -558,6 +569,7 @@ exports.getAllJobs = async () => {
     return result.map((r) => ({
       channelId: r.dataValues.channel_id,
       time: r.dataValues.time,
+      officeId: r.dataValues.OfficeId,
     }));
   } catch (err) {
     console.log("Error while finding jobs ", err);

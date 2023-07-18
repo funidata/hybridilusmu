@@ -236,17 +236,14 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
         return;
       }
       const parameters = argify(input);
-      const offices = await service.getAllOffices();
-      // If only one office present, no need to specify the office.
-      const minParamN = offices.length > 1 ? 2 : 1;
-      let response = minParamN === 2 ? library.demandTimeAndOffice() : library.demandTime();
+      const minParamN = 1;
+      let response = library.demandTimeAndOffice();
       if (!enoughParameters(minParamN, parameters.length, channelId, userId, response)) {
         return;
       }
       const [timeString, officeName] = parameters;
-
-      const office = officeName ? await service.getOfficeByName(officeName) : offices[0];
-      if (!office) {
+      const office = officeName ? await service.getOfficeByName(officeName) : null;
+      if (officeName && !office) {
         response = library.noOfficeFound(officeName);
         helper.postEphemeralMessage(app, channelId, userId, response);
         return;
@@ -261,7 +258,7 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
       schedule.scheduleMessage({
         channelId,
         time,
-        office,
+        officeId: office ? office.id : null,
         app,
         usergroups,
       });
