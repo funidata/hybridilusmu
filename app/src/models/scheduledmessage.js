@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class ScheduledMessage extends Model {
     /**
@@ -12,18 +10,22 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.Job, {
-        foreignKey: 'channelId',
-      })
+        foreignKey: "channelId",
+        onDelete: "CASCADE",
+      });
     }
   }
-  ScheduledMessage.init({
-    messageId: DataTypes.STRING,
-    date: DataTypes.DATEONLY,
-    channelId: DataTypes.STRING,
-    usergroupId: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'ScheduledMessage',
-  });
+  ScheduledMessage.init(
+    {
+      messageId: DataTypes.STRING,
+      date: DataTypes.DATEONLY,
+      channelId: DataTypes.STRING,
+      usergroupId: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "ScheduledMessage",
+    },
+  );
   return ScheduledMessage;
 };

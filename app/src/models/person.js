@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Defaultsignup, { as: "defaultsignup" });
       this.belongsTo(models.Office, {
         foreignKey: "DefaultOffice",
+        onDelete: "SET NULL",
       });
     }
   }

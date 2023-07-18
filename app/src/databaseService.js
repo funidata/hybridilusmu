@@ -89,7 +89,7 @@ const updateJobs = async (channels) => {
  * @param {string} channelId - Slack channel ID.
  * @param {string} time - Optional. Time string in the ISO date format.
  */
-const addJob = async (channelId, time) => db.addJob(channelId, time);
+const addJob = async (channelId, time, office) => db.addJob(channelId, time, office);
 
 const getAllJobs = async () => db.getAllJobs();
 
@@ -275,6 +275,7 @@ const getDefaultOfficeForUser = async (user) => {
     return result;
   }
   // If no default office found for user, default to first office
+  console.log("No default office found for user, defaulting to first found office...");
   const offices = await getAllOffices();
   await addDefaultOfficeForUser(user, offices[0].id);
   return offices[0];

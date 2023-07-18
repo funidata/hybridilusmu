@@ -530,11 +530,12 @@ exports.addAllJobs = async (jobs) => {
   }
 };
 
-exports.addJob = async (channelId, time) => {
+exports.addJob = async (channelId, time, office) => {
   try {
     return await Job.upsert({
       channel_id: channelId,
       time,
+      OfficeId: office.id,
     });
   } catch (err) {
     console.log("Error while creating a job ", err);
@@ -725,7 +726,6 @@ exports.getDefaultOfficeForUser = async (user) => {
     });
     return result.Office.dataValues;
   } catch (err) {
-    console.log("Error while finding the default office for user", err);
     return undefined;
   }
 };

@@ -172,8 +172,8 @@ const defaultRegistrationRemoved = (date) =>
  * @param {Object} office
  */
 const automatedMessageRescheduled = (time, office) =>
-  `Ajastettu viesti tilattu kanavalle kello ${time} ${
-    office ? `sisältäen toimiston '${office.officeName}' ilmoittautumiset.` : "."
+  `Ajastettu viesti tilattu kanavalle kello ${time}${
+    office ? ` sisältäen toimiston '${office.officeName}' ilmoittautumiset.` : "."
   }`;
 
 /**

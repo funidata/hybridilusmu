@@ -11,13 +11,16 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.hasMany(models.ScheduledMessage, {
         foreignKey: "channelId",
+        onDelete: "CASCADE",
       });
+      this.belongsTo(models.Office, { foreignKey: "OfficeId", onDelete: "CASCADE" });
     }
   }
   Job.init(
     {
       channel_id: DataTypes.STRING,
       time: DataTypes.TIME,
+      OfficeId: DataTypes.INTEGER,
     },
     {
       sequelize,

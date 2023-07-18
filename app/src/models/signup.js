@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       this.belongsTo(models.Office, {
         foreignKey: "OfficeId",
+        onDelete: "CASCADE",
       });
     }
   }

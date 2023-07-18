@@ -11,12 +11,19 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.hasMany(models.Signup, {
         foreignKey: "OfficeId",
+        onDelete: "CASCADE",
       });
       this.hasMany(models.Defaultsignup, {
         foreignKey: "OfficeId",
+        onDelete: "CASCADE",
       });
       this.hasMany(models.Person, {
         foreignKey: "DefaultOffice",
+        onDelete: "SET NULL",
+      });
+      this.hasMany(models.Job, {
+        foreignKey: "OfficeId",
+        onDelete: "CASCADE",
       });
     }
   }
