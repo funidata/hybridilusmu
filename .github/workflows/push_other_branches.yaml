@@ -4,6 +4,7 @@ on:
   push:
     branches-ignore:
       - main
+  merge_group:
 
 jobs:
   build:
