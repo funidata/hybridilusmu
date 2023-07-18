@@ -20,4 +20,4 @@ Toteutettu Helsingin yliopiston ohjelmistotuotantoprojektikurssin työnä syksyl
 - [Slack-sovelluksen perusteet](docs/slack-sovelluksen_perusteet.md)
 - [Testaaminen](docs/testaaminen.md)
 
-..
+...
