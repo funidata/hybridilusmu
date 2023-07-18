@@ -19,3 +19,5 @@ Toteutettu Helsingin yliopiston ohjelmistotuotantoprojektikurssin työnä syksyl
 - [CI/CD -pipeline](docs/cicd_pipeline.md)
 - [Slack-sovelluksen perusteet](docs/slack-sovelluksen_perusteet.md)
 - [Testaaminen](docs/testaaminen.md)
+
+.
