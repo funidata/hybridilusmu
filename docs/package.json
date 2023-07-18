@@ -1,0 +1,17 @@
+{
+  "name": "hybridilusmu-docs",
+  "version": "0.0.2",
+  "engines": {
+    "npm": ">=9.5.1",
+    "node": ">=18.16.0"
+  },
+  "description": "Documentation for Hybridilusmu",
+  "scripts": {
+    "dev": "vuepress dev src",
+    "build": "vuepress build src"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^2.0.0-beta.66"
+  }
+}
