@@ -25,6 +25,7 @@ const na = (date) => `${weekdays[date.weekday - 1]}na`;
  * Turns a weekday into the finnish lta-form.
  * @param {Luxon Date}
  */
+// eslint-disable-next-line no-unused-vars
 const lta = (date) => {
   if (date.weekday === 3) return "keskiviikolta";
   return `${weekdays[date.weekday - 1]}lta`;
@@ -34,6 +35,7 @@ const lta = (date) => {
  * Turns a weekday into the finnish sin-form.
  * @param {Luxon Date}
  */
+// eslint-disable-next-line no-unused-vars
 const sin = (date) => {
   if (date.weekday === 3) return "keskiviikkoisin";
   return `${weekdays[date.weekday - 1]}sin`;
@@ -91,9 +93,11 @@ const correctVerbForm = (date, peopleCnt) => {
 };
 
 /**
- * Response to /listaa command.
+ * Generates a plain text string message containing the date
+ * and list of registrations.
  * @param {Luxon Date} date - Luxon Date object.
  * @param {List} registrations - List of user ID strings, usernames to be added to the response.
+ * @param {*} [userFormatter] - Optional userFormatter, defaults to "Name (@Mention)"
  * @return {string} A message ready to post
  */
 const registrationList = (date, registrations, userFormatter = generateNameAndMention) => {
@@ -108,10 +112,12 @@ const registrationList = (date, registrations, userFormatter = generateNameAndMe
 };
 
 /**
- * Response to /listaa command with usergroup defined.
+ * Generates a plain thext string message containing the date
+ * and a list of registrations within the given usergroup.
  * @param {Luxon Date} date - Luxon Date object.
  * @param {List} registrations - List of strings, usernames to be added to the response.
  * @param {string} usergroupMention - Usergroup mention string to be added to the response.
+ * @param {*} [userFormatter] - Optional userFormatter, defaults to "Name (@Mention)"
  * @return {string} A message ready to post
  */
 const registrationListWithUsergroup = (
@@ -131,42 +137,6 @@ const registrationListWithUsergroup = (
 };
 
 /**
- * Response to /ilmoita command.
- * @param {Luxon Date}
- * @param {string}
- */
-const normalRegistrationAdded = (date, status) => {
-  const head = `Ilmoittautuminen lisätty - ${atDate(date).toLowerCase()}`;
-  const tail = status === "toimisto" ? " toimistolla." : " etänä.";
-  return head + tail;
-};
-
-/**
- * Response to /ilmoita command with def parameter.
- * @param {Luxon Date}
- * @param {string}
- */
-const defaultRegistrationAdded = (date, status) => {
-  const head = `Oletusilmoittautuminen lisätty - ${sin(date).toLowerCase()}`;
-  const tail = status === "toimisto" ? " toimistolla." : " etänä.";
-  return head + tail;
-};
-
-/**
- * Response to /poista command.
- * @param {Luxon Date}
- */
-const normalRegistrationRemoved = (date) =>
-  `Ilmoittautuminen poistettu ${lta(date).toLowerCase()} ${dayPointMonth(date)}`;
-
-/**
- * Response to /poista command with def parameter.
- * @param {Luxon Date}
- */
-const defaultRegistrationRemoved = (date) =>
-  `Oletusilmoittautuminen poistettu ${lta(date).toLowerCase()}.`;
-
-/**
  * Response to /tilaa command.
  * @param {string} time
  * @param {Object} office
@@ -175,42 +145,6 @@ const automatedMessageRescheduled = (time, office) =>
   `Ajastettu viesti tilattu kanavalle kello ${time}${
     office ? ` sisältäen toimiston '${office.officeName}' ilmoittautumiset.` : "."
   }`;
-
-/**
- * Explains allowed formats for day parameter in slash commands.
- */
-const explainPäivä = () =>
-  "    • Maanantai\n" +
-  "    • Ma\n" +
-  "    • 15.11. tai 15.11\n" +
-  "    • Tänään\n" +
-  "    • Huomenna\n" +
-  "Isoilla ja pienillä kirjaimilla ei ole merkitystä.";
-
-/**
- * Reply to /listaa command with help parameter.
- */
-const explainListaa =
-  () => `*/listaa*: Anna komennolle parametrina päivä jossain seuraavista muodoista:
-${explainPäivä()}
-Mainitsemalla tiimin, voit rajata listauksen vain kyseisen tiimin jäseniin.`;
-
-/**
- * Reply to /ilmoita command with help parameter.
- */
-const explainIlmoita =
-  () => `*/ilmoita*: Anna komennolle parametrina päivä ja status. Päivä annetaan jossain seuraavista muodoista:
-${explainPäivä()}
-Status on joko *toimisto* tai *etä*.
-Antamalla parametrin *def* ennen muita parametreja, voit tehdä oletusilmoittautumisen.`;
-
-/**
- * Reply to /poista command with help parameter.
- */
-const explainPoista =
-  () => `*/poista*: Anna komennolle parametrina päivä jossain seuraavista muodoista:
-${explainPäivä()}
-Antamalla parametrin *def* ennen muita parametreja, voit poistaa oletusilmoittautumisen.`;
 
 /**
  * Reply to /tilaa command with help parameter.
@@ -279,8 +213,6 @@ const subscribeFailedNotInChannel = (channelName) =>
 
 module.exports = {
   automatedMessageRescheduled,
-  defaultRegistrationAdded,
-  defaultRegistrationRemoved,
   demandDate,
   demandDateAndStatus,
   demandDateAndRemindAboutUGName,
@@ -289,12 +221,7 @@ module.exports = {
   noOfficeFound,
   denyDefaultRegistrationForWeekend,
   denyNormalRegistrationForWeekend,
-  explainIlmoita,
-  explainListaa,
-  explainPoista,
   explainTilaa,
-  normalRegistrationAdded,
-  normalRegistrationRemoved,
   registrationList,
   registrationListWithUsergroup,
   usergroupNotFound,
