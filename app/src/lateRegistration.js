@@ -62,7 +62,6 @@ const updateScheduledMessages = async (app, date) => {
   if (date !== DateTime.now().toISODate()) {
     return;
   }
-  console.log("begin checking if scheduled messages need updating");
   const jobs = await service.getAllJobs();
   // Check every job/channel for scheduled messages for _today_
   for (const job of jobs) {

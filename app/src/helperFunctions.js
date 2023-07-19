@@ -72,7 +72,6 @@ async function editMessage(app, channelId, timestamp, message) {
       ts: timestamp,
       text: message,
     });
-    console.log(`edited message ${timestamp} in channel ${channelId} successfully`);
     return result;
   } catch (err) {
     console.log("error while editing message ", err);

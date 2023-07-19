@@ -40,10 +40,7 @@ const formatOffice = (office, upperCase) => {
 const getUpdateBlock = async (selectedOffice, isAdmin) => {
   const updateBlock = [];
   const overflowOptions = ["Toimistojen hallinta", "Lisää toimisto"];
-  const actionElements = [
-    button("Oletusasetukset", "settings_click", "updated"),
-    button("Päivitä", "update_click", "updated"),
-  ];
+  const actionElements = [button("Asetukset", "settings_click"), button("Päivitä", "update_click")];
   if (isAdmin) {
     actionElements.push(overflow(overflowOptions));
   }

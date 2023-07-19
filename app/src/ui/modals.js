@@ -53,7 +53,7 @@ const defaultSettingsModalView = {
   type: "modal",
   title: {
     type: "plain_text",
-    text: "Oletusasetukset",
+    text: "Asetukset",
   },
   close: {
     type: "plain_text",

@@ -36,7 +36,7 @@ const generatePlaintextString = (userId) => {
   const u = usercache[userId];
   if (!u) {
     // fall back to a mention string if user is not found
-    return `<@${userId}>`;
+    return `<${userId}>`;
   }
   return `${u.user.profile.real_name || u.user.profile.display_name}`;
 };
@@ -59,7 +59,6 @@ module.exports = {
         return null;
       }
       if (usercache[userId] && usercache[userId].date + OBJECT_AGE > Date.now()) {
-        console.log(`cache hit for user ${userId}`);
         return usercache[userId].user;
       }
       try {
@@ -70,7 +69,6 @@ module.exports = {
           return null;
         }
         // success
-        console.log(`caching user ${userId}`);
         usercache[userId] = {
           user: user.user,
           date: Date.now(),
@@ -91,7 +89,7 @@ module.exports = {
           date: date,
         };
       }
-      console.log("initialized user cache with every channel member");
+      console.log("Initialized user cache with every workspace member");
     };
 
     initUserCache();
