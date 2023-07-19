@@ -11,5 +11,11 @@ export default defineUserConfig({
     logo: "/logo/hybridilusmulogo1whitebgsmall.jpg",
     logoDark: "/logo/hybridilusmulogo1darkbgsmall.jpg",
     docsDir: "docs",
+    sidebar: [
+      "/introduction.md",
+      "/developing.md",
+      "/tests.md",
+      "/releases.md",
+    ],
   }),
 });
