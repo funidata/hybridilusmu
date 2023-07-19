@@ -36,7 +36,7 @@ const generatePlaintextString = (userId) => {
   const u = usercache[userId];
   if (!u) {
     // fall back to a mention string if user is not found
-    return `<${userId}>`;
+    return `<@${userId}>`;
   }
   return `${u.user.profile.real_name || u.user.profile.display_name}`;
 };
