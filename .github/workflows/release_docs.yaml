@@ -1,0 +1,34 @@
+name: Deploy documentation
+
+on:
+  workflow_call:
+
+jobs:
+  build-docs:
+    name: Build docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        working-directory: docs
+        run: npm ci
+      - name: Build vuepress project
+        working-directory: docs
+        run: npm run build
+      - name: Upload gh-pages artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: docs/build
+
+  deploy-docs:
+    name: Deploy docs
+    runs-on: ubuntu-latest
+    needs:
+      - build-docs
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy artifact to GH Pages
+        uses: actions/deploy-pages@v2

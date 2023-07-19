@@ -51,3 +51,9 @@ jobs:
           docker tag hybridilusmu ghcr.io/funidata/hybridilusmu:latest
       - name: Push image to GHCR
         run: docker push --all-tags ghcr.io/funidata/hybridilusmu
+
+  publish-docs:
+    name: Publish documentation
+    uses: ./.github/workflows/release_docs.yaml
+    needs:
+      - publish
