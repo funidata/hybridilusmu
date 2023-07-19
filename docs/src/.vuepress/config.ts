@@ -1,4 +1,5 @@
 import { defaultTheme, defineUserConfig } from "vuepress";
+import { copyCodePlugin } from "vuepress-plugin-copy-code2";
 
 export default defineUserConfig({
   base: "/hybridilusmu/",
@@ -18,4 +19,5 @@ export default defineUserConfig({
       "/releases.md",
     ],
   }),
+  plugins: [copyCodePlugin()],
 });
