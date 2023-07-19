@@ -1,8 +1,7 @@
 name: Deploy documentation
 
 on:
-  # FIXME: For testing.
-  push:
+  workflow_call:
 
 jobs:
   build-docs:
