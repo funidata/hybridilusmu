@@ -1,6 +1,6 @@
 {
   "name": "hybridilusmu",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "engines": {
     "npm": ">=9.5.1",
     "node": ">=18.16.0"
