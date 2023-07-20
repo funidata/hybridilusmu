@@ -57,3 +57,6 @@ jobs:
     uses: ./.github/workflows/release_docs.yaml
     needs:
       - publish
+    permissions:
+      pages: write
+      id-token: write
