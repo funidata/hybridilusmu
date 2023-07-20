@@ -1,4 +1,4 @@
-# Developing Hybridilusmu
+# Developing
 
 This document guides you through the development process of Hybridilusmu.
 
