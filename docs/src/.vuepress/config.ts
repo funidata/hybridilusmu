@@ -15,6 +15,7 @@ export default defineUserConfig({
     sidebar: [
       "/introduction.md",
       "/developing.md",
+      "/hosting.md",
       "/tests.md",
       "/releases.md",
     ],
