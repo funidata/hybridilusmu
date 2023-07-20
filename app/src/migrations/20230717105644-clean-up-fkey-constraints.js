@@ -2,8 +2,20 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
+    const removeConstraints = async (foreignKeys, target) => {
+      for (const foreignKey of foreignKeys) {
+        const { tableName, constraintName } = foreignKey;
+        if (constraintName.includes(target)) {
+          await queryInterface.removeConstraint(tableName, constraintName);
+        }
+      }
+    };
+
     // Clean up ScheduledMessage constraints to Jobs.
-    await queryInterface.removeConstraint("ScheduledMessages", "ScheduledMessages_channelId_fkey");
+    const scheduledMessageForeignKeys = await queryInterface.getForeignKeyReferencesForTable(
+      "ScheduledMessages",
+    );
+    await removeConstraints(scheduledMessageForeignKeys, "channelId");
     await queryInterface.changeColumn("ScheduledMessages", "channelId", {
       type: Sequelize.INTEGER,
       references: {
@@ -14,10 +26,8 @@ module.exports = {
     });
 
     // Clean up DefaultOffice constraints.
-    await queryInterface.removeConstraint("People", "People_DefaultOffice_fkey");
-    await queryInterface.removeConstraint("People", "People_DefaultOffice_fkey1");
-    await queryInterface.removeConstraint("People", "People_DefaultOffice_fkey2");
-    await queryInterface.removeConstraint("People", "People_DefaultOffice_fkey3");
+    const defaultOfficeForeignKeys = await queryInterface.getForeignKeyReferencesForTable("People");
+    await removeConstraints(defaultOfficeForeignKeys, "DefaultOffice");
     await queryInterface.changeColumn("People", "DefaultOffice", {
       type: Sequelize.INTEGER,
       references: {
@@ -27,10 +37,8 @@ module.exports = {
       onDelete: "SET NULL",
     });
     // Clean up Signups constraints.
-    await queryInterface.removeConstraint("Signups", "Signups_OfficeId_fkey");
-    await queryInterface.removeConstraint("Signups", "Signups_OfficeId_fkey1");
-    await queryInterface.removeConstraint("Signups", "Signups_OfficeId_fkey2");
-    await queryInterface.removeConstraint("Signups", "Signups_OfficeId_fkey3");
+    const signupsForeignkeys = await queryInterface.getForeignKeyReferencesForTable("Signups");
+    await removeConstraints(signupsForeignkeys, "OfficeId");
     await queryInterface.changeColumn("Signups", "OfficeId", {
       type: Sequelize.INTEGER,
       references: {
@@ -41,9 +49,10 @@ module.exports = {
     });
 
     // Clean up Defaultsignups constraints.
-    await queryInterface.removeConstraint("Defaultsignups", "Defaultsignups_OfficeId_fkey");
-    await queryInterface.removeConstraint("Defaultsignups", "Defaultsignups_OfficeId_fkey1");
-    await queryInterface.removeConstraint("Defaultsignups", "Defaultsignups_OfficeId_fkey2");
+    const defaultsignupsForeignKeys = await queryInterface.getForeignKeyReferencesForTable(
+      "Defaultsignups",
+    );
+    await removeConstraints(defaultsignupsForeignKeys, "OfficeId");
     await queryInterface.changeColumn("Defaultsignups", "OfficeId", {
       type: Sequelize.INTEGER,
       references: {
@@ -66,8 +75,6 @@ module.exports = {
       });
     };
     await addOldDefaultsignupsConstraint();
-    await addOldDefaultsignupsConstraint();
-    await addOldDefaultsignupsConstraint();
 
     await queryInterface.removeConstraint("Signups", "Signups_OfficeId_fkey");
     const addOldSignupsConstraint = async () => {
@@ -80,9 +87,6 @@ module.exports = {
       });
     };
     await addOldSignupsConstraint();
-    await addOldSignupsConstraint();
-    await addOldSignupsConstraint();
-    await addOldSignupsConstraint();
 
     const addOldDefaultOfficeConstraint = async () => {
       await queryInterface.changeColumn("People", "DefaultOffice", {
@@ -94,9 +98,6 @@ module.exports = {
       });
     };
     await queryInterface.removeConstraint("People", "People_DefaultOffice_fkey");
-    await addOldDefaultOfficeConstraint();
-    await addOldDefaultOfficeConstraint();
-    await addOldDefaultOfficeConstraint();
     await addOldDefaultOfficeConstraint();
 
     await queryInterface.removeConstraint("ScheduledMessages", "ScheduledMessages_channelId_fkey");
