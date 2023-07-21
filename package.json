@@ -1,6 +1,6 @@
 {
   "name": "hybridilusmu-dev-env",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "engines": {
     "npm": ">=9.5.1",
     "node": ">=18.16.0"
