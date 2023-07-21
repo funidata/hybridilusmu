@@ -369,4 +369,5 @@ module.exports = {
   getOfficeModifyBlock,
   getOfficeControlBlock,
   getNoOfficesBlock,
+  stylizeRegisterButtons,
 };
