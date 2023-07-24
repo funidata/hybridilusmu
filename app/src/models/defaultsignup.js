@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Defaultsignup extends Model {
     /**
@@ -11,17 +9,24 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.Person, {
-        foreignKey: 'PersonId',
-        as: 'person'
+        foreignKey: "PersonId",
+        as: "person",
+      });
+      this.belongsTo(models.Office, {
+        foreignKey: "OfficeId",
+        onDelete: "CASCADE",
       });
     }
   }
-  Defaultsignup.init({
-    weekday: DataTypes.STRING,
-    atOffice: DataTypes.BOOLEAN
-  }, {
-    sequelize,
-    modelName: 'Defaultsignup',
-  });
+  Defaultsignup.init(
+    {
+      weekday: DataTypes.STRING,
+      atOffice: DataTypes.BOOLEAN,
+    },
+    {
+      sequelize,
+      modelName: "Defaultsignup",
+    },
+  );
   return Defaultsignup;
 };

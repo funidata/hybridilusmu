@@ -9,6 +9,7 @@ const { enableEventListeners } = require("./eventListeners");
 const { enableUserCache } = require("./userCache");
 const { enableMiddleware } = require("./middleware");
 const { enableSlashCommands } = require("./slashCommands");
+const { enableViewListeners } = require("./viewListeners");
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -28,6 +29,7 @@ state.userCache = userCache;
 enableMiddleware(state);
 enableActionFunctions(state);
 enableEventListeners(state);
+enableViewListeners(state);
 enableSlashCommands(state);
 
 /**

@@ -13,15 +13,6 @@ features:
     display_name: hybridilusmu
     always_online: true
   slash_commands:
-    - command: /listaa
-      description: Listaa paikallaolijat
-      usage_hint: "<päivä> [<tiimi>]"
-    - command: /ilmoita
-      description: Lisää ilmoittautumisen
-      usage_hint: "[def] <päivä> <status>"
-    - command: /poista
-      description: Poistaa ilmoittautumisen
-      usage_hint: "[def] <päivä>"
     - command: /tilaa
       description: Ajastaa kanavan viestin
       usage_hint: "<kellonaika>"

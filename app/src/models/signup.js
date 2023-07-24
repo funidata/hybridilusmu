@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Signup extends Model {
     /**
@@ -11,18 +9,25 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.Person, {
-        foreignKey: 'PersonId',
-        as: 'person'
+        foreignKey: "PersonId",
+        as: "person",
+      });
+      this.belongsTo(models.Office, {
+        foreignKey: "OfficeId",
+        onDelete: "CASCADE",
       });
     }
   }
-  Signup.init({
-    officeDate: DataTypes.DATEONLY,
-    atOffice: DataTypes.BOOLEAN
-  }, {
-    sequelize,
-    modelName: 'Signup',
-    indexes: [{ fields: ['officeDate'] }]
-  });
+  Signup.init(
+    {
+      officeDate: DataTypes.DATEONLY,
+      atOffice: DataTypes.BOOLEAN,
+    },
+    {
+      sequelize,
+      modelName: "Signup",
+      indexes: [{ fields: ["officeDate"] }],
+    },
+  );
   return Signup;
 };

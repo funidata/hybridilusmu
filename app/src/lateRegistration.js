@@ -1,9 +1,9 @@
-const { DateTime } = require('luxon')
-const service = require('./databaseService')
-const library = require('./responses')
-const usergroups = require('./usergroups')
-const { editMessage } = require('./helperFunctions')
-const { generatePlaintextString } = require('./userCache')
+const { DateTime } = require("luxon");
+const service = require("./databaseService");
+const library = require("./responses");
+const usergroups = require("./usergroups");
+const { editMessage } = require("./helperFunctions");
+const { generatePlaintextString } = require("./userCache");
 
 /**
  * Forms a new message containing the updated registrations and
@@ -16,9 +16,13 @@ const { generatePlaintextString } = require('./userCache')
  * @returns The edited message object.
  */
 const editRegistrations = async (app, registrations, channelId, messageId) => {
-  const newMessage = library.registrationList(DateTime.now(), registrations, generatePlaintextString)
-  return await editMessage(app, channelId, messageId, newMessage)
-}
+  const newMessage = library.registrationList(
+    DateTime.now(),
+    registrations,
+    generatePlaintextString,
+  );
+  return await editMessage(app, channelId, messageId, newMessage);
+};
 
 /**
  * Forms a new message containing the updated registrations including
@@ -31,15 +35,21 @@ const editRegistrations = async (app, registrations, channelId, messageId) => {
  * @param {string} usergroupId Slack usergroup id.
  * @returns The edited message object.
  */
-const editRegistrationsWithUsergroup = async (app, registrations, channelId, messageId, usergroupId) => {
+const editRegistrationsWithUsergroup = async (
+  app,
+  registrations,
+  channelId,
+  messageId,
+  usergroupId,
+) => {
   const newMessage = library.registrationListWithUsergroup(
     DateTime.now(),
     registrations,
     usergroups.generatePlaintextString(usergroupId),
-    generatePlaintextString
-    )
-  return await editMessage(app, channelId, messageId, newMessage)
-}
+    generatePlaintextString,
+  );
+  return await editMessage(app, channelId, messageId, newMessage);
+};
 
 /**
  * Checks if there are any scheduled messages that have been sent on
@@ -50,22 +60,21 @@ const editRegistrationsWithUsergroup = async (app, registrations, channelId, mes
  */
 const updateScheduledMessages = async (app, date) => {
   if (date !== DateTime.now().toISODate()) {
-    return
+    return;
   }
-  console.log('begin checking if scheduled messages need updating')
-  const jobs = await service.getAllJobs()
-  const registrations = await service.getRegistrationsFor(date)
+  const jobs = await service.getAllJobs();
   // Check every job/channel for scheduled messages for _today_
   for (const job of jobs) {
-    const channelId = job.channelId
-    const usergroupIds = usergroups.getUsergroupsForChannel(channelId)
+    const { channelId, officeId } = job;
+    const registrations = await service.getRegistrationsFor(date, officeId);
+    const usergroupIds = usergroups.getUsergroupsForChannel(channelId);
     if (usergroupIds.length === 0) {
-      updateChannelsWithoutUsergroups(app, date, registrations, channelId)
+      updateChannelsWithoutUsergroups(app, date, registrations, channelId);
     } else {
-      updateChannelsWithUsergroups(app, date, registrations, channelId, usergroupIds)
+      updateChannelsWithUsergroups(app, date, registrations, channelId, usergroupIds);
     }
   }
-}
+};
 /**
  * Checks if the scheduled message has been sent for the given date
  * on this channel and updates it with updated registrations.
@@ -75,11 +84,11 @@ const updateScheduledMessages = async (app, date) => {
  * @param {List} registrations An array of Slack user ids
  */
 const updateChannelsWithoutUsergroups = async (app, date, registrations, channelId) => {
-  const messageId = await service.getScheduledMessageId(date, channelId)
+  const messageId = await service.getScheduledMessageId(date, channelId);
   if (messageId) {
-    editRegistrations(app, registrations, channelId, messageId)
+    editRegistrations(app, registrations, channelId, messageId);
   }
-}
+};
 
 /**
  * Checks if the scheduled messages have been sent on this channel for
@@ -93,18 +102,16 @@ const updateChannelsWithoutUsergroups = async (app, date, registrations, channel
  */
 const updateChannelsWithUsergroups = async (app, date, registrations, channelId, usergroupIds) => {
   for (const usergroupId of usergroupIds) {
-    const messageId = await service.getScheduledMessageId(date, channelId, usergroupId)
+    const messageId = await service.getScheduledMessageId(date, channelId, usergroupId);
     if (messageId) {
-      const filteredRegistrations = registrations.filter(
-        (userId) => usergroups.isUserInUsergroup(userId, usergroupId)
-      )
-      editRegistrationsWithUsergroup(
-        app, filteredRegistrations, channelId, messageId, usergroupId
-      )
+      const filteredRegistrations = registrations.filter((userId) =>
+        usergroups.isUserInUsergroup(userId, usergroupId),
+      );
+      editRegistrationsWithUsergroup(app, filteredRegistrations, channelId, messageId, usergroupId);
     }
   }
-}
+};
 
 module.exports = {
-  updateScheduledMessages
-}
+  updateScheduledMessages,
+};
