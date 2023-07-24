@@ -4,7 +4,6 @@ module.exports = {
   async up(queryInterface) {
     await queryInterface.bulkInsert("Offices", [
       {
-        id: 1,
         officeName: "Default Office",
         createdAt: new Date(),
         updatedAt: new Date(),

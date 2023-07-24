@@ -632,7 +632,7 @@ exports.getScheduledMessageId = async (date, channelId, usergroupId) => {
  */
 exports.addOffice = async (officeName, officeEmoji) => {
   try {
-    return await Office.upsert({
+    return await Office.create({
       officeName: officeName,
       officeEmoji: officeEmoji,
     });
