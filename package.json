@@ -21,5 +21,8 @@
     "postversion": "git push --tags",
     "lint": "cd app && npm run lint"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@nestjs/cli": "^10.1.10"
+  }
 }
