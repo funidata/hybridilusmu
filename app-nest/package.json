@@ -1,10 +1,18 @@
 {
-  "name": "app-nest",
+  "name": "hybridilusmu",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "Joonas Häkkinen <joonas.hakkinen@funidata.fi>",
+  "contributors": [
+    "Joonas Häkkinen <joonas.hakkinen@funidata.fi>",
+    "VoxBorealis <uusitalo.y@gmail.com>"
+  ],
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "engines": {
+    "npm": ">=9.5.1",
+    "node": ">=18.16.0"
+  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
