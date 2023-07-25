@@ -10,7 +10,15 @@ services:
       - ./app/test:/usr/src/app/test
     depends_on:
       - db
-    command: npm start
+
+  lusmu-nest:
+    container_name: lusmu-nest
+    build: app-nest/
+    volumes:
+      - ./app-nest/src:/usr/src/app/src
+      - ./app-nest/test:/usr/src/app/test
+    depends_on:
+      - db
 
   db:
     container_name: lusmu-db
