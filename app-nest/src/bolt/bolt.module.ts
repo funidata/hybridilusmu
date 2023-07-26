@@ -14,11 +14,10 @@ export class BoltModule
     super();
   }
   async onModuleInit() {
-    // TODO: Connect to Slack.
     await this.boltService.connect();
   }
 
-  onModuleDestroy() {
-    // TODO: Close Slack connection.
+  async onModuleDestroy() {
+    await this.boltService.disconnect();
   }
 }

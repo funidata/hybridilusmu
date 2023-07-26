@@ -8,7 +8,7 @@ import { StringIndexed } from "@slack/bolt/dist/types/helpers";
 
 @Injectable({})
 export class BoltService {
-  bolt: App<StringIndexed>;
+  private bolt: App<StringIndexed>;
 
   // FIXME: Use Nest.js logger in place of Bolt's console logger.
 
@@ -21,5 +21,9 @@ export class BoltService {
 
   async connect() {
     await this.bolt.start();
+  }
+
+  async disconnect() {
+    await this.bolt.stop();
   }
 }
