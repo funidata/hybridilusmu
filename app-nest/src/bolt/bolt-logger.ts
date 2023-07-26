@@ -8,6 +8,9 @@ const levelToInt = {
   [LogLevel.ERROR]: 3,
 };
 
+/**
+ * Adapt Nest.js Logger to implement Bolt's Logger interface.
+ */
 export class BoltLogger implements Logger {
   private level = LogLevel.INFO;
   private name = "Bolt";
@@ -30,39 +33,26 @@ export class BoltLogger implements Logger {
     return;
   }
 
-  debug(...msgs: string[]): void {
-    this.levelSensitiveLogger(msgs, LogLevel.DEBUG, (msg: string) =>
-      this.logger.debug(msg),
-    );
+  debug(msg: string): void {
+    this.levelSensitiveLogger(LogLevel.DEBUG, () => this.logger.debug(msg));
   }
 
-  info(...msgs: string[]): void {
-    this.levelSensitiveLogger(msgs, LogLevel.INFO, (msg: string) =>
-      this.logger.log(msg),
-    );
+  info(msg: string): void {
+    this.levelSensitiveLogger(LogLevel.INFO, () => this.logger.log(msg));
   }
 
-  warn(...msgs: string[]): void {
-    this.levelSensitiveLogger(msgs, LogLevel.WARN, (msg: string) =>
-      this.logger.warn(msg),
-    );
+  warn(msg: string): void {
+    this.levelSensitiveLogger(LogLevel.WARN, () => this.logger.warn(msg));
   }
 
-  error(...msgs: string[]): void {
-    this.levelSensitiveLogger(msgs, LogLevel.ERROR, (msg: string) =>
-      this.logger.error(msg),
-    );
+  error(msg: string): void {
+    this.levelSensitiveLogger(LogLevel.ERROR, () => this.logger.error(msg));
   }
 
-  private levelSensitiveLogger(
-    msgs: string[],
-    level: LogLevel,
-    logFn: (s: string) => void,
-  ) {
+  private levelSensitiveLogger(level: LogLevel, logFn: () => void) {
     if (levelToInt[this.level] > levelToInt[level]) {
       return;
     }
-
-    msgs.forEach((msg) => logFn(msg));
+    logFn();
   }
 }
