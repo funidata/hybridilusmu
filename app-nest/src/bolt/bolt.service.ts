@@ -3,20 +3,27 @@ import {
   BOLT_MODULE_OPTIONS_TOKEN,
   BoltModuleOptions,
 } from "./bolt.module-definition";
-import { App } from "@slack/bolt";
+import { App, LogLevel } from "@slack/bolt";
 import { StringIndexed } from "@slack/bolt/dist/types/helpers";
+import { BoltLogger } from "./bolt-logger";
 
 @Injectable({})
 export class BoltService {
   private bolt: App<StringIndexed>;
 
-  // FIXME: Use Nest.js logger in place of Bolt's console logger.
-
   constructor(
     @Inject(BOLT_MODULE_OPTIONS_TOKEN) private options: BoltModuleOptions,
   ) {
+    const logger = new BoltLogger();
     const { token, appToken, signingSecret } = options;
-    this.bolt = new App({ appToken, token, signingSecret, socketMode: true });
+    this.bolt = new App({
+      appToken,
+      token,
+      signingSecret,
+      socketMode: true,
+      logger,
+      logLevel: LogLevel.INFO,
+    });
   }
 
   async connect() {
