@@ -1,5 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { App, LogLevel } from "@slack/bolt";
+import {
+  App,
+  LogLevel,
+  Middleware,
+  SlackEventMiddlewareArgs,
+} from "@slack/bolt";
 import { StringIndexed } from "@slack/bolt/dist/types/helpers";
 import { BoltLogger } from "./bolt-logger";
 import {
@@ -7,7 +12,7 @@ import {
   BoltModuleOptions,
 } from "./bolt.module-definition";
 
-@Injectable({})
+@Injectable()
 export class BoltService {
   private bolt: App<StringIndexed>;
 
@@ -32,5 +37,12 @@ export class BoltService {
 
   async disconnect() {
     await this.bolt.stop();
+  }
+
+  registerEventHandler(
+    eventName: string,
+    listener: Middleware<SlackEventMiddlewareArgs<string>, StringIndexed>,
+  ) {
+    this.bolt.event(eventName, listener);
   }
 }

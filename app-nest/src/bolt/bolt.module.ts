@@ -1,7 +1,8 @@
-import { Module, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { Global, Module, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { ConfigurableBoltModule } from "./bolt.module-definition";
 import { BoltService } from "./bolt.service";
 
+@Global()
 @Module({
   providers: [BoltService],
   exports: [BoltService],

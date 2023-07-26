@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { BoltModule } from "./bolt/bolt.module";
 import configuration from "./config/configuration";
 import { inDevelopmentEnvironment } from "./config/utils";
+import { GuiModule } from "./gui/gui.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { inDevelopmentEnvironment } from "./config/utils";
       synchronize: inDevelopmentEnvironment,
       autoLoadEntities: true,
     }),
+    GuiModule,
   ],
 })
 export class AppModule {}
