@@ -1,4 +1,6 @@
+import { DiscoveryService } from "@golevelup/nestjs-discovery";
 import { Inject, Injectable } from "@nestjs/common";
+import { ModuleRef } from "@nestjs/core";
 import {
   App,
   LogLevel,
@@ -11,6 +13,7 @@ import {
   BOLT_MODULE_OPTIONS_TOKEN,
   BoltModuleOptions,
 } from "./bolt.module-definition";
+import { BOLT_EVENT_KEY } from "./decorators/bolt-event.decorator";
 
 @Injectable()
 export class BoltService {
@@ -18,6 +21,8 @@ export class BoltService {
 
   constructor(
     @Inject(BOLT_MODULE_OPTIONS_TOKEN) private options: BoltModuleOptions,
+    private discoveryService: DiscoveryService,
+    private moduleRef: ModuleRef,
   ) {
     const logger = new BoltLogger();
     const { token, appToken, signingSecret } = options;
@@ -33,6 +38,16 @@ export class BoltService {
 
   async connect() {
     await this.bolt.start();
+
+    const c = await this.discoveryService.controllerMethodsWithMetaAtKey(
+      BOLT_EVENT_KEY,
+    );
+    const { meta } = c[0];
+    const cref = this.moduleRef.get(
+      c[0].discoveredMethod.parentClass.injectType,
+      { strict: false },
+    );
+    this.registerEventHandler(meta.toString(), cref.getView());
   }
 
   async disconnect() {

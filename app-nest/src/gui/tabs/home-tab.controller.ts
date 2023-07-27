@@ -1,7 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { Controller } from "@nestjs/common";
+import BoltEvent from "../../bolt/decorators/bolt-event.decorator";
 
-@Injectable()
-export class HomeTabService {
+@Controller()
+export class HomeTabController {
+  @BoltEvent("app_home_opened")
   getView() {
     return async ({ event, client, logger }) => {
       try {
@@ -14,7 +16,7 @@ export class HomeTabService {
                 type: "section",
                 text: {
                   type: "mrkdwn",
-                  text: "*Welcome homeee, <@" + event.user + "> :house:*",
+                  text: "*Welcome controller, <@" + event.user + "> :house:*",
                 },
               },
               {
