@@ -1,3 +1,6 @@
 services:
   lusmu:
-    image: hybridilusmu-ci
+    image: hybridilusmu
+
+  lusmu-nest:
+    image: hybridilusmu-nest

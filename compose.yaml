@@ -14,6 +14,12 @@ services:
   lusmu-nest:
     container_name: lusmu-nest
     build: app-nest/
+    environment:
+      NODE_ENV: development
+      DATABASE_HOST: db
+      DATABASE_NAME: nest
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
     volumes:
       - ./app-nest/src:/usr/src/app/src
       - ./app-nest/test:/usr/src/app/test

@@ -11,13 +11,13 @@ describe("App", () => {
     await app.init();
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await app.close();
   });
 
   it("Find all users", async () => {
     const userService = app.get(UserService);
     const users = await userService.findAll();
-    expect(users).toHaveLength(1);
+    expect(users).toHaveLength(0);
   });
 });
