@@ -28,3 +28,4 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - lusmu-db:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
