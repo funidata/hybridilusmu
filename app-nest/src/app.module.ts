@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { BoltModule } from "./bolt/bolt.module";
 import configuration from "./config/configuration";
 import { inDevelopmentEnvironment } from "./config/utils";
+import { EntitiesModule } from "./entities/entities.module";
 import { GuiModule } from "./gui/gui.module";
 
 @Module({
@@ -23,6 +24,7 @@ import { GuiModule } from "./gui/gui.module";
       autoLoadEntities: true,
     }),
     GuiModule,
+    EntitiesModule,
   ],
 })
 export class AppModule {}

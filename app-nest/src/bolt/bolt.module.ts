@@ -20,6 +20,7 @@ export class BoltModule
   ) {
     super();
   }
+
   async onModuleInit() {
     await this.boltService.connect();
     await this.boltRegisterService.registerEvents();
