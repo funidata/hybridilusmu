@@ -5,9 +5,11 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { BoltModule } from "../src/bolt/bolt.module";
 import { BoltService } from "../src/bolt/bolt.service";
+import configuration from "../src/config/configuration";
 import { EntitiesModule } from "../src/entities/entities.module";
 import { UserService } from "../src/entities/user/user.service";
 import { GuiModule } from "../src/gui/gui.module";
+import testConfiguration from "./testConfiguration";
 
 @Module({
   imports: [DiscoveryModule],
@@ -25,10 +27,11 @@ describe("AppController (e2e)", () => {
       imports: [
         TypeOrmModule.forRoot({
           type: "postgres",
-          host: "localhost",
-          username: "postgres",
-          password: "postgres",
-          database: "test",
+          host: testConfiguration.database.host,
+          port: configuration.database.port,
+          username: testConfiguration.database.username,
+          password: testConfiguration.database.password,
+          database: testConfiguration.database.name,
           synchronize: true,
           autoLoadEntities: true,
         }),
