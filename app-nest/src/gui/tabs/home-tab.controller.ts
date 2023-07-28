@@ -1,11 +1,16 @@
 import { Controller } from "@nestjs/common";
 import BoltEvent from "../../bolt/decorators/bolt-event.decorator";
+import { UserService } from "../../entities/user/user.service";
 
 @Controller()
 export class HomeTabController {
+  constructor(private userService: UserService) {}
+
   @BoltEvent("app_home_opened")
   getView() {
     return async ({ event, client, logger }) => {
+      const users = await this.userService.findAll();
+      const { slackId } = users[0];
       try {
         const result = await client.views.publish({
           user_id: event.user,
@@ -16,7 +21,11 @@ export class HomeTabController {
                 type: "section",
                 text: {
                   type: "mrkdwn",
-                  text: "*Welcome controller, <@" + event.user + "> :house:*",
+                  text:
+                    "*Welcome controller, <@" +
+                    event.user +
+                    "> :house:* " +
+                    slackId,
                 },
               },
               {
