@@ -5,6 +5,7 @@ import configuration from "./config/configuration";
 import { inDevelopmentEnvironment } from "./config/utils";
 import { EntitiesModule } from "./entities/entities.module";
 import { GuiModule } from "./gui/gui.module";
+import { SyncModule } from "./sync/sync.module";
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { GuiModule } from "./gui/gui.module";
     }),
     GuiModule,
     EntitiesModule,
+    SyncModule,
   ],
 })
 export class AppModule {}
