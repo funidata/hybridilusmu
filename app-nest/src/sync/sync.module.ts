@@ -1,6 +1,11 @@
 import { Module } from "@nestjs/common";
+import { UserModule } from "../entities/user/user.module";
+import { UserService } from "../entities/user/user.service";
 import { SyncService } from "./sync.service";
 import { UserSyncService } from "./user-sync.service";
 
-@Module({ providers: [SyncService, UserSyncService] })
+@Module({
+  imports: [UserModule],
+  providers: [SyncService, UserSyncService, UserService],
+})
 export class SyncModule {}

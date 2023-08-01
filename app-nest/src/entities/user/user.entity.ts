@@ -1,12 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { Column, Entity, PrimaryColumn, Repository } from "typeorm";
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn()
+  slackId: string;
 
   @Column()
-  slackId: string;
+  displayName: string;
+
+  @Column()
+  realName: string;
 }
 
 export type UserRepository = Repository<User>;
