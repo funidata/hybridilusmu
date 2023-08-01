@@ -7,11 +7,12 @@
   },
   "scripts": {
     "start": "docker compose -f compose.yaml -f compose-dev.yaml up -d --build lusmu",
+    "start:nest": "docker compose -f compose.yaml -f compose-dev.yaml up --build lusmu-nest",
     "stop": "docker compose down",
     "logs": "docker compose logs -f",
-    "init": "cd app && npm ci",
+    "init": "cd app && npm ci && cd ../app-nest && npm ci",
     "test": "docker exec -t lusmu-dev npm test",
-    "test:integration": "docker exec -t lusmu-dev npm run test:integration",
+    "test:integration": "docker exec -t lusmu-nest npm run test:integration",
     "test:all": "npm test && npm test:integration",
     "e2e:run": "set -o allexport && source .env.development && set +o allexport && cd e2e && npm test",
     "e2e:open": "set -o allexport && source .env.development && set +o allexport && cd e2e && npm start",
@@ -21,5 +22,8 @@
     "postversion": "git push --tags",
     "lint": "cd app && npm run lint"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@nestjs/cli": "^10.1.10"
+  }
 }
