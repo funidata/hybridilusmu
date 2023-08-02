@@ -1,9 +1,16 @@
 import { DiscoveryService } from "@golevelup/nestjs-discovery";
 import { Injectable } from "@nestjs/common";
 import { ModuleRef } from "@nestjs/core";
-import { App, Middleware, SlackEventMiddlewareArgs } from "@slack/bolt";
+import {
+  App,
+  Middleware,
+  SlackAction,
+  SlackActionMiddlewareArgs,
+  SlackEventMiddlewareArgs,
+} from "@slack/bolt";
 import { StringIndexed } from "@slack/bolt/dist/types/helpers";
 import { BoltService } from "./bolt.service";
+import { BOLT_ACTION_KEY } from "./decorators/bolt-action.decorator";
 import { BOLT_EVENT_KEY } from "./decorators/bolt-event.decorator";
 
 @Injectable()
@@ -19,7 +26,7 @@ export class BoltRegisterService {
   }
 
   async registerEvents() {
-    // TODO: This needs a type parameter.
+    // TODO: This needs a type parameter. Or does it..?
     const controllers =
       await this.discoveryService.controllerMethodsWithMetaAtKey(
         BOLT_EVENT_KEY,
@@ -27,11 +34,11 @@ export class BoltRegisterService {
 
     controllers.forEach((controller) => {
       const { meta } = controller;
-      const cref = this.moduleRef.get(
-        controller.discoveredMethod.parentClass.injectType,
-        { strict: false },
+
+      this.registerEventHandler(
+        meta.toString(),
+        controller.discoveredMethod.handler(),
       );
-      this.registerEventHandler(meta.toString(), cref.getView());
     });
   }
 
@@ -40,5 +47,31 @@ export class BoltRegisterService {
     listener: Middleware<SlackEventMiddlewareArgs<string>, StringIndexed>,
   ) {
     this.bolt.event(eventName, listener);
+  }
+
+  async registerActions() {
+    // TODO: This needs a type parameter. Or does it..?
+    const controllers =
+      await this.discoveryService.controllerMethodsWithMetaAtKey(
+        BOLT_ACTION_KEY,
+      );
+    console.log(controllers);
+
+    controllers.forEach((controller) => {
+      const { meta } = controller;
+      console.log(controller);
+
+      this.registerActionHandler(
+        meta.toString(),
+        controller.discoveredMethod.handler(),
+      );
+    });
+  }
+
+  private registerActionHandler(
+    eventName: string,
+    listener: Middleware<SlackActionMiddlewareArgs<SlackAction>, StringIndexed>,
+  ) {
+    this.bolt.action(eventName, listener);
   }
 }

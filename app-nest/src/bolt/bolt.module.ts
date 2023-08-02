@@ -25,6 +25,7 @@ export class BoltModule
   async onModuleInit() {
     await this.boltService.connect();
     await this.boltRegisterService.registerEvents();
+    await this.boltRegisterService.registerActions();
   }
 
   async onModuleDestroy() {
