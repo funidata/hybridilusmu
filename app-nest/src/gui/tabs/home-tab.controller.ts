@@ -1,6 +1,7 @@
 import { Controller } from "@nestjs/common";
 import BoltEvent from "../../bolt/decorators/bolt-event.decorator";
 import { UserService } from "../../entities/user/user.service";
+import devTools from "../dev/dev-tools";
 
 @Controller()
 export class HomeTabController {
@@ -11,12 +12,14 @@ export class HomeTabController {
     return async ({ event, client, logger }) => {
       const users = await this.userService.findAll();
       const { slackId } = users[0];
+
       try {
         const result = await client.views.publish({
           user_id: event.user,
           view: {
             type: "home",
             blocks: [
+              ...devTools,
               {
                 type: "section",
                 text: {
