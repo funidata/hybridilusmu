@@ -62,9 +62,13 @@ const getRegistrationsFor = async (date, officeId) => {
   const registrations = await db.getAllRegistrationsForDate(date);
   registrations.forEach((obj) => {
     if (obj.status === true && (officeId ? obj.officeId === officeId : true)) {
-      result.add(obj.slackId);
+      result.add({ slackId: obj.slackId, officeId: obj.officeId });
     } else {
-      result.delete(obj.slackId);
+      result.forEach((entry) => {
+        if (entry.slackId === obj.slackId) {
+          result.delete(entry);
+        }
+      });
     }
   });
   return Array.from(result);

@@ -1,9 +1,10 @@
 const { DateTime } = require("luxon");
 
 const service = require("../databaseService");
+const library = require("../responses");
 const dfunc = require("../dateFunctions");
-const { formatUserIdList, formatDates } = require("../helperFunctions");
-const { generateNameAndMention } = require("../userCache");
+const { formatUserIdList, formatDates, formatOffice } = require("../helperFunctions");
+const { generateNameAndMention, generatePlaintextString } = require("../userCache");
 
 const { textInput } = require("./blocks/elements/textInput");
 const { plainText, mrkdwn } = require("./blocks/section");
@@ -27,10 +28,6 @@ const sameOffice = (registration, office) => {
 };
 const isAtOffice = (registration) => {
   return registration && registration.status;
-};
-const formatOffice = (office, upperCase) => {
-  const { officeName, officeEmoji } = office;
-  return `${upperCase ? officeName.toUpperCase() : officeName} ${officeEmoji ? officeEmoji : ""}`;
 };
 
 /**
@@ -361,6 +358,23 @@ const getNoOfficesBlock = async (admin) => {
   return noOfficesBlock;
 };
 
+const getRegistrationsForTheDayBlock = (date, registrations, office) => {
+  const registrationsforTheDayBlock = [];
+  const registrationList = library.registrationList(
+    date,
+    registrations.map((registration) => registration.slackId),
+    generatePlaintextString,
+  );
+  registrationsforTheDayBlock.push(
+    header(formatOffice(office)),
+    mrkdwn(registrationList),
+    divider(),
+    actions([button("Ilmoittaudu", "register_from_message")]),
+  );
+
+  return registrationsforTheDayBlock;
+};
+
 module.exports = {
   getUpdateBlock,
   getDefaultSettingsBlock,
@@ -370,4 +384,5 @@ module.exports = {
   getOfficeControlBlock,
   getNoOfficesBlock,
   stylizeRegisterButtons,
+  getRegistrationsForTheDayBlock,
 };

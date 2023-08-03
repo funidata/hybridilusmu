@@ -125,4 +125,9 @@ exports.enableActionFunctions = ({ app, userCache }) => {
     home.updateDefaultSettingsView(client, body.user.id);
     await ack();
   });
+
+  app.action("register_from_message", async ({ body, ack, client }) => {
+    await ack();
+    console.log("register from message click");
+  });
 };

@@ -5,6 +5,7 @@ const helper = require("./helperFunctions");
 const service = require("./databaseService");
 const library = require("./responses");
 const schedule = require("./scheduler/scheduler");
+const { getRegistrationsForTheDayBlock } = require("./ui/customBlocks");
 
 /**
  * An optional prefix for our slash-commands. When set to e.g. 'h',
@@ -58,6 +59,21 @@ exports.enableSlashCommands = ({ app, usergroups }) => {
     helper.postEphemeralMessage(app, channelId, userId, response);
     return false;
   };
+
+  app.command(`/${COMMAND_PREFIX}test`, async ({ command, ack }) => {
+    try {
+      await ack();
+      const { channel_id: channelId } = command;
+      //helper.postEphemeralMessage(app, channelId, userId, input);
+      const date = DateTime.now();
+      const office = await service.getOffice(1);
+      const registrations = await service.getRegistrationsFor(date.toISODate());
+      const blocks = await getRegistrationsForTheDayBlock(date, registrations, office);
+      helper.postBlockMessage(app, channelId, "asd", blocks);
+    } catch (error) {
+      console.log(error);
+    }
+  });
 
   /**
    * Listens to a slash-command and changes the time at which the automated message is posted to the current channel.

@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 const dfunc = require("./dateFunctions");
-const { formatUserIdList } = require("./helperFunctions");
+const { formatUserIdList, formatOffice } = require("./helperFunctions");
 const { generateNameAndMention } = require("./userCache");
 
 const weekdays = [
@@ -92,6 +92,13 @@ const correctVerbForm = (date, peopleCnt) => {
   return verb;
 };
 
+const scheduledMessageNotificationMsg = (office, nPeople) => {
+  const message = `Tänään toimistolla ${formatOffice(office)} on ${nPeople} ${
+    nPeople === 1 ? "henkilö" : "henkilöä"
+  }.`;
+  return message;
+};
+
 /**
  * Generates a plain text string message containing the date
  * and list of registrations.
@@ -103,7 +110,7 @@ const correctVerbForm = (date, peopleCnt) => {
 const registrationList = (date, registrations, userFormatter = generateNameAndMention) => {
   if (registrations.length === 0) return nobodyAtOffice(date);
   const verb = correctVerbForm(date, registrations.length);
-  let response = `${atDate(date)} toimistolla ${verb}:\n`;
+  let response = `${atDate(date)} toimistolla ${verb}: _(${registrations.length})_\n\n`;
   registrations = formatUserIdList(registrations, userFormatter);
   for (const user of registrations) {
     response += `${user}\n`;
@@ -226,4 +233,5 @@ module.exports = {
   registrationListWithUsergroup,
   usergroupNotFound,
   subscribeFailedNotInChannel,
+  scheduledMessageNotificationMsg,
 };

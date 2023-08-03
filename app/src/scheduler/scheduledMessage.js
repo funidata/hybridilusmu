@@ -4,6 +4,7 @@ const library = require("../responses");
 const helper = require("../helperFunctions");
 const service = require("../databaseService");
 const { generatePlaintextString } = require("../userCache");
+const { getRegistrationsForTheDayBlock } = require("../ui/customBlocks");
 
 /**
  * Sends the list of registered users to the given channel.
@@ -19,6 +20,18 @@ const postRegistrations = async (app, registrations, channelId, date) => {
     generatePlaintextString,
   );
   const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts;
+  if (messageId) {
+    service.addScheduledMessage(messageId, date, channelId);
+  }
+};
+
+const postRegistrationsAsBlock = async (app, registrations, channelId, date, officeId) => {
+  const office = await service.getOffice(officeId);
+  const registrationsBlock = getRegistrationsForTheDayBlock(date, registrations, office);
+  const fallbackMessage = library.scheduledMessageNotificationMsg(office, registrations.length);
+  const messageId = (
+    await helper.postBlockMessage(app, channelId, fallbackMessage, registrationsBlock)
+  ).ts;
   if (messageId) {
     service.addScheduledMessage(messageId, date, channelId);
   }
@@ -65,14 +78,14 @@ const postRegistrationsWithUsergroup = async (
  */
 const sendScheduledMessage = async (app, channelId, officeId, usergroups) => {
   console.log("delivering scheduled posts");
-  const date = DateTime.now().toISODate();
-  const registrations = await service.getRegistrationsFor(date, officeId);
+  const date = DateTime.now();
+  const registrations = await service.getRegistrationsFor(date.toISODate(), officeId);
 
   const usergroupIds = usergroups.getUsergroupsForChannel(channelId);
   // No Slack user groups are added to this channel.
   // Send normal message containing everyone that is registered.
   if (usergroupIds.length === 0) {
-    return postRegistrations(app, registrations, channelId, date);
+    return postRegistrationsAsBlock(app, registrations, channelId, date, officeId);
   } else {
     // Send a separate list of registered users from each
     // Slack user group in this channel
