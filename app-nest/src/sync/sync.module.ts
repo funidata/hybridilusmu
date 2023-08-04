@@ -7,5 +7,6 @@ import { UserSyncService } from "./user-sync.service";
 @Module({
   imports: [UserModule],
   providers: [SyncService, UserSyncService, UserService],
+  exports: [SyncService, UserSyncService],
 })
 export class SyncModule {}

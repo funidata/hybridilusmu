@@ -13,7 +13,6 @@ export class UserSyncService {
   ) {}
 
   async syncUsers() {
-    // FIXME: This needs to be limited in dev env to protect against rate-limit errors. Add UI button to fire this manually.
     this.logger.log("Starting user data synchronization.");
     const data = await this.boltUserService.getUsers();
 

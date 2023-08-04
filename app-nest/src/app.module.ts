@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { BoltModule } from "./bolt/bolt.module";
 import configuration from "./config/configuration";
 import { inDevelopmentEnvironment } from "./config/utils";
+import { DevToolsModule } from "./dev-tools/dev-tools.module";
 import { EntitiesModule } from "./entities/entities.module";
 import { GuiModule } from "./gui/gui.module";
 import { SyncModule } from "./sync/sync.module";
@@ -27,6 +28,7 @@ import { SyncModule } from "./sync/sync.module";
     GuiModule,
     EntitiesModule,
     SyncModule,
+    DevToolsModule,
   ],
 })
 export class AppModule {}
