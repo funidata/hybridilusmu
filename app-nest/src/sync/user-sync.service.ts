@@ -3,6 +3,8 @@ import { UsersListResponse } from "@slack/web-api";
 import { BoltUserService } from "../bolt/bolt-user.service";
 import { UserService } from "../entities/user/user.service";
 
+type SlackMember = UsersListResponse["members"][0];
+
 @Injectable()
 export class UserSyncService {
   private logger = new Logger(UserSyncService.name);
@@ -12,11 +14,26 @@ export class UserSyncService {
     private userService: UserService,
   ) {}
 
-  async syncUsers() {
-    this.logger.log("Starting user data synchronization.");
-    const data = await this.boltUserService.getUsers();
+  /**
+   * Synchronize users from Slack to local database.
+   *
+   * By default, all users are synchronized. Optionally, a single user may be
+   * updated by passing their data as `updateOverride` argument.
+   */
+  async syncUsers(updateOverride?: SlackMember) {
+    if (updateOverride) {
+      this.logger.log(
+        `Starting user data synchronization for user ${updateOverride.id}.`,
+      );
+    } else {
+      this.logger.log("Starting user data synchronization for all users.");
+    }
 
-    const users = data.members.filter(this.appUserFilter).map((user) => ({
+    const slackUsers = updateOverride
+      ? [updateOverride]
+      : (await this.boltUserService.getUsers()).members;
+
+    const users = slackUsers.filter(this.appUserFilter).map((user) => ({
       slackId: user.id,
       displayName: user.profile.display_name || "",
       realName: user.profile.real_name || "",
@@ -29,7 +46,7 @@ export class UserSyncService {
   /**
    * Filter out bots, restricted and deleted users, leaving only real app users.
    */
-  private appUserFilter(user: UsersListResponse["members"][0]) {
+  private appUserFilter(user: SlackMember) {
     return (
       user.id !== "USLACKBOT" &&
       !user.is_bot &&
