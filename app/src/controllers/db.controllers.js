@@ -406,10 +406,7 @@ exports.getAllDefaultOfficeRegistrationsForWeekday = async (weekday, officeId) =
         },
       },
     });
-    return registrations.map((s) => ({
-      slackId: s.dataValues.slackId,
-      officeId: s.dataValues.defaultsignup[0].dataValues.OfficeId,
-    }));
+    return registrations.map((s) => s.dataValues.slackId);
   } catch (error) {
     console.log("Error while finding default registrations:", error);
     return null;

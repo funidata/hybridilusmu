@@ -358,19 +358,40 @@ const getNoOfficesBlock = async (admin) => {
   return noOfficesBlock;
 };
 
+/**
+ * Creates a Slack block message containing the office name as header
+ * and the names of the registered users for the day.
+ * @param {{}} date Luxon date object.
+ * @param {[]} registrations List of Slack user IDs.
+ * @param {{}} office Office object.
+ * @returns {{}} Scheduled message formated in Slack Block Kit.
+ */
 const getRegistrationsForTheDayBlock = (date, registrations, office) => {
   const registrationsforTheDayBlock = [];
-  const registrationList = library.registrationList(
+  const registrationList = library.registrationList(date, registrations, generatePlaintextString);
+  registrationsforTheDayBlock.push(header(formatOffice(office)), mrkdwn(registrationList));
+
+  return registrationsforTheDayBlock;
+};
+
+/**
+ * Creates a Slack block message containing the office name as header
+ * and the names of the registered users for the day and usergroup.
+ * @param {{}} date Luxon date object.
+ * @param {[]} registrations List of Slack user IDs.
+ * @param {{}} office Office object.
+ * @param {String} usergroupMention Name of the usergroup.
+ * @returns {{}} Scheduled message formated in Slack Block Kit.
+ */
+const getRegistrationsForTheDayBlockWithUG = (date, registrations, office, usergroupMention) => {
+  const registrationsforTheDayBlock = [];
+  const registrationList = library.registrationListWithUsergroup(
     date,
-    registrations.map((registration) => registration.slackId),
+    registrations,
+    usergroupMention,
     generatePlaintextString,
   );
-  registrationsforTheDayBlock.push(
-    header(formatOffice(office)),
-    mrkdwn(registrationList),
-    divider(),
-    actions([button("Ilmoittaudu", "register_from_message")]),
-  );
+  registrationsforTheDayBlock.push(header(formatOffice(office)), mrkdwn(registrationList));
 
   return registrationsforTheDayBlock;
 };
@@ -385,4 +406,5 @@ module.exports = {
   getNoOfficesBlock,
   stylizeRegisterButtons,
   getRegistrationsForTheDayBlock,
+  getRegistrationsForTheDayBlockWithUG,
 };

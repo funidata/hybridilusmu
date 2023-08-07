@@ -92,10 +92,17 @@ const correctVerbForm = (date, peopleCnt) => {
   return verb;
 };
 
-const scheduledMessageNotificationMsg = (office, nPeople) => {
-  const message = `Tänään toimistolla ${formatOffice(office)} on ${nPeople} ${
-    nPeople === 1 ? "henkilö" : "henkilöä"
-  }.`;
+/**
+ * Formats a notification message to be sent with the scheduled message block.
+ * @param {Object} office Office object.
+ * @param {Number} nPeople Number of people at the office.
+ * @param {String} [usergroupMention] Optional name of the usergroup.
+ * @returns {String} A message containing the status of the number of people at the office.
+ */
+const scheduledMessageNotificationMsg = (office, nPeople, usergroupMention) => {
+  const message = `Tänään toimistolla ${formatOffice(office)} ${
+    usergroupMention ? `tiimistä ${usergroupMention}` : ""
+  } on ${nPeople} ${nPeople === 1 ? "henkilö" : "henkilöä"}.`;
   return message;
 };
 
@@ -135,7 +142,9 @@ const registrationListWithUsergroup = (
 ) => {
   if (registrations.length === 0) return nobodyAtOfficeFromTeam(date, usergroupMention);
   const verb = correctVerbForm(date, registrations.length);
-  let response = `${atDate(date)} tiimistä ${usergroupMention} ${verb} toimistolla:\n`;
+  let response = `${atDate(date)} tiimistä ${usergroupMention} ${verb} toimistolla: _(${
+    registrations.length
+  })_\n\n`;
   registrations = formatUserIdList(registrations, userFormatter);
   for (const user of registrations) {
     response += `${user}\n`;
@@ -149,8 +158,10 @@ const registrationListWithUsergroup = (
  * @param {Object} office
  */
 const automatedMessageRescheduled = (time, office) =>
-  `Ajastettu viesti tilattu kanavalle kello ${time}${
-    office ? ` sisältäen toimiston '${office.officeName}' ilmoittautumiset.` : "."
+  `Ajastettu viesti tilattu kanavalle kello ${time} ${
+    office
+      ? `sisältäen toimiston '${office.officeName}' ilmoittautumiset.`
+      : "sisältäen kaikkien toimistojen ilmoittautumiset."
   }`;
 
 /**
