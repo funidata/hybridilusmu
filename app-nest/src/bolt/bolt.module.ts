@@ -1,18 +1,25 @@
 import { DiscoveryModule } from "@golevelup/nestjs-discovery";
-import { Global, Module, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import {
+  Global,
+  Module,
+  OnApplicationBootstrap,
+  OnModuleDestroy,
+  OnModuleInit,
+} from "@nestjs/common";
 import { BoltRegisterService } from "./bolt-register.service";
+import { BoltUserService } from "./bolt-user.service";
 import { ConfigurableBoltModule } from "./bolt.module-definition";
 import { BoltService } from "./bolt.service";
 
 @Global()
 @Module({
   imports: [DiscoveryModule],
-  providers: [BoltService, BoltRegisterService],
-  exports: [BoltService],
+  providers: [BoltService, BoltRegisterService, BoltUserService],
+  exports: [BoltService, BoltUserService],
 })
 export class BoltModule
   extends ConfigurableBoltModule
-  implements OnModuleInit, OnModuleDestroy
+  implements OnModuleInit, OnApplicationBootstrap, OnModuleDestroy
 {
   constructor(
     private boltService: BoltService,
@@ -23,7 +30,10 @@ export class BoltModule
 
   async onModuleInit() {
     await this.boltService.connect();
-    await this.boltRegisterService.registerEvents();
+  }
+
+  async onApplicationBootstrap() {
+    await this.boltRegisterService.registerAllHandlers();
   }
 
   async onModuleDestroy() {
