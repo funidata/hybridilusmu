@@ -3,7 +3,7 @@ import BoltEvent from "../../bolt/decorators/bolt-event.decorator";
 import BoltEvents from "../../bolt/enums/bolt-events.enum";
 import { AppHomeOpenedArgs } from "../../bolt/types/bolt-event-types";
 import { UserService } from "../../entities/user/user.service";
-import devTools from "../dev/dev-tools";
+import getHomeTabBlocks from "./home-tab.view";
 
 @Controller()
 export class HomeTabController {
@@ -19,27 +19,7 @@ export class HomeTabController {
         user_id: event.user,
         view: {
           type: "home",
-          blocks: [
-            ...devTools,
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text:
-                  "*Welcome controller, <@" +
-                  event.user +
-                  "> :house:* " +
-                  slackId,
-              },
-            },
-            {
-              type: "section",
-              text: {
-                type: "mrkdwn",
-                text: "Learn how home tabs can be more useful and interactive <https://api.slack.com/surfaces/tabs/using|*in the documentation*>.",
-              },
-            },
-          ],
+          blocks: getHomeTabBlocks(),
         },
       });
 
