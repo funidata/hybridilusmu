@@ -1,4 +1,5 @@
 import { Dayjs } from "dayjs";
+import BoltActions from "../../../bolt/enums/bolt-actions.enum";
 
 type DayListItemProps = {
   date: Dayjs;
@@ -22,6 +23,8 @@ const getDayListItemBlocks = ({ date }: DayListItemProps) => [
           text: "Toimistolla",
         },
         style: "primary",
+        action_id: BoltActions.REGISTER_PRESENCE,
+        value: date.toISOString(),
       },
       {
         type: "button",

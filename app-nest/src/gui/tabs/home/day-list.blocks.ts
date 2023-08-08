@@ -1,6 +1,6 @@
 import dayjs, { Dayjs } from "dayjs";
 import { flatten } from "lodash";
-import getDayListItemBlocks from "./day-list.item.blocks";
+import getDayListItemBlocks from "./day-list-item.blocks";
 
 /**
  * Get range of days from today (inclusive) for the next `len` working days (defined as Mon-Fri).

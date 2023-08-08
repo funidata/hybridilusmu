@@ -1,3 +1,5 @@
+import BoltActions from "../../bolt/enums/bolt-actions.enum";
+
 const devTools = [
   {
     type: "header",
@@ -15,7 +17,7 @@ const devTools = [
           type: "plain_text",
           text: ":recycle:  Sync Users",
         },
-        action_id: "sync_users",
+        action_id: BoltActions.SYNC_USERS,
       },
     ],
   },
