@@ -1,6 +1,7 @@
 import { Controller } from "@nestjs/common";
 import BoltEvent from "../../bolt/decorators/bolt-event.decorator";
 import BoltEvents from "../../bolt/enums/bolt-events.enum";
+import { AppHomeOpenedArgs } from "../../bolt/types/bolt-event-types";
 import { UserService } from "../../entities/user/user.service";
 import devTools from "../dev/dev-tools";
 
@@ -9,7 +10,7 @@ export class HomeTabController {
   constructor(private userService: UserService) {}
 
   @BoltEvent(BoltEvents.APP_HOME_OPENED)
-  async getView({ event, client, logger }) {
+  async getView({ event, client, logger }: AppHomeOpenedArgs) {
     const users = await this.userService.findAll();
     const { slackId } = users[0];
 
