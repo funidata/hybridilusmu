@@ -8,44 +8,42 @@ export class HomeTabController {
   constructor(private userService: UserService) {}
 
   @BoltEvent("app_home_opened")
-  getView() {
-    return async ({ event, client, logger }) => {
-      const users = await this.userService.findAll();
-      const { slackId } = users[0];
+  async getView({ event, client, logger }) {
+    const users = await this.userService.findAll();
+    const { slackId } = users[0];
 
-      try {
-        const result = await client.views.publish({
-          user_id: event.user,
-          view: {
-            type: "home",
-            blocks: [
-              ...devTools,
-              {
-                type: "section",
-                text: {
-                  type: "mrkdwn",
-                  text:
-                    "*Welcome controller, <@" +
-                    event.user +
-                    "> :house:* " +
-                    slackId,
-                },
+    try {
+      const result = await client.views.publish({
+        user_id: event.user,
+        view: {
+          type: "home",
+          blocks: [
+            ...devTools,
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text:
+                  "*Welcome controller, <@" +
+                  event.user +
+                  "> :house:* " +
+                  slackId,
               },
-              {
-                type: "section",
-                text: {
-                  type: "mrkdwn",
-                  text: "Learn how home tabs can be more useful and interactive <https://api.slack.com/surfaces/tabs/using|*in the documentation*>.",
-                },
+            },
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: "Learn how home tabs can be more useful and interactive <https://api.slack.com/surfaces/tabs/using|*in the documentation*>.",
               },
-            ],
-          },
-        });
+            },
+          ],
+        },
+      });
 
-        logger.debug(result);
-      } catch (error) {
-        logger.error(error);
-      }
-    };
+      logger.debug(result);
+    } catch (error) {
+      logger.error(error);
+    }
   }
 }

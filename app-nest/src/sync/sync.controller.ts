@@ -7,7 +7,7 @@ export class SyncController {
   constructor(private userSyncService: UserSyncService) {}
 
   @BoltEvent("user_profile_changed")
-  userProfileChanged() {
-    return ({ event }) => this.userSyncService.syncUsers(event.user);
+  async userProfileChanged({ event }) {
+    await this.userSyncService.syncUsers(event.user);
   }
 }
