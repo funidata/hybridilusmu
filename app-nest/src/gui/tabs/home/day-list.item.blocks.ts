@@ -1,12 +1,15 @@
-import devTools from "../dev/dev-tools";
+import { Dayjs } from "dayjs";
 
-const getHomeTabBlocks = () => [
-  ...devTools,
+type DayListItemProps = {
+  date: Dayjs;
+};
+
+const getDayListItemBlocks = ({ date }: DayListItemProps) => [
   {
     type: "header",
     text: {
       type: "plain_text",
-      text: "Ilmoittautumiset",
+      text: date.format("dd D.M."),
     },
   },
   {
@@ -75,4 +78,4 @@ const getHomeTabBlocks = () => [
   },
 ];
 
-export default getHomeTabBlocks;
+export default getDayListItemBlocks;

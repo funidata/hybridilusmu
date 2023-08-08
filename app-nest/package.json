@@ -35,10 +35,11 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/typeorm": "^10.0.0",
     "@slack/bolt": "^3.13.2",
+    "dayjs": "^1.11.9",
+    "lodash": "^4.17.21",
     "pg": "^8.11.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "slack-block-builder": "^2.7.2",
     "typeorm": "^0.3.17"
   },
   "devDependencies": {
@@ -48,6 +49,7 @@
     "@nestjs/testing": "^10.0.0",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
+    "@types/lodash": "^4.14.196",
     "@types/node": "^20.3.1",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.59.11",
