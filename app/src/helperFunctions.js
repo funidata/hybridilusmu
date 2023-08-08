@@ -47,6 +47,14 @@ async function postEphemeralMessage(app, channelId, userId, message) {
   });
 }
 
+const postBlockMessage = async (app, channelId, text, blocks) => {
+  return app.client.chat.postMessage({
+    channel: channelId,
+    text: text,
+    blocks: blocks,
+  });
+};
+
 /**
  * Posts a message to the given channel.
  */
@@ -133,13 +141,26 @@ const formatDates = (date) => {
   return mrkdwnDate;
 };
 
+/**
+ * Creates a string for the office in format: "OFFICE :office_emoji:"
+ * @param {Object} office Office object.
+ * @param {Boolean} upperCase Boolean value of whether we want the office name to be capitalized.
+ * @returns {String}
+ */
+const formatOffice = (office, upperCase) => {
+  const { officeName, officeEmoji } = office;
+  return `${upperCase ? officeName.toUpperCase() : officeName} ${officeEmoji ? officeEmoji : ""}`;
+};
+
 module.exports = {
   getMemberChannelIds,
   isBotChannelMember,
   postEphemeralMessage,
+  postBlockMessage,
   postMessage,
   editMessage,
   readUsergroupsFromCleanSlate,
   formatUserIdList,
   formatDates,
+  formatOffice,
 };

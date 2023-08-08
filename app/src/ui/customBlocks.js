@@ -1,9 +1,10 @@
 const { DateTime } = require("luxon");
 
 const service = require("../databaseService");
+const library = require("../responses");
 const dfunc = require("../dateFunctions");
-const { formatUserIdList, formatDates } = require("../helperFunctions");
-const { generateNameAndMention } = require("../userCache");
+const { formatUserIdList, formatDates, formatOffice } = require("../helperFunctions");
+const { generateNameAndMention, generatePlaintextString } = require("../userCache");
 
 const { textInput } = require("./blocks/elements/textInput");
 const { plainText, mrkdwn } = require("./blocks/section");
@@ -27,10 +28,6 @@ const sameOffice = (registration, office) => {
 };
 const isAtOffice = (registration) => {
   return registration && registration.status;
-};
-const formatOffice = (office, upperCase) => {
-  const { officeName, officeEmoji } = office;
-  return `${upperCase ? officeName.toUpperCase() : officeName} ${officeEmoji ? officeEmoji : ""}`;
 };
 
 /**
@@ -361,6 +358,44 @@ const getNoOfficesBlock = async (admin) => {
   return noOfficesBlock;
 };
 
+/**
+ * Creates a Slack block message containing the office name as header
+ * and the names of the registered users for the day.
+ * @param {{}} date Luxon date object.
+ * @param {[]} registrations List of Slack user IDs.
+ * @param {{}} office Office object.
+ * @returns {{}} Scheduled message formated in Slack Block Kit.
+ */
+const getRegistrationsForTheDayBlock = (date, registrations, office) => {
+  const registrationsforTheDayBlock = [];
+  const registrationList = library.registrationList(date, registrations, generatePlaintextString);
+  registrationsforTheDayBlock.push(header(formatOffice(office)), mrkdwn(registrationList));
+
+  return registrationsforTheDayBlock;
+};
+
+/**
+ * Creates a Slack block message containing the office name as header
+ * and the names of the registered users for the day and usergroup.
+ * @param {{}} date Luxon date object.
+ * @param {[]} registrations List of Slack user IDs.
+ * @param {{}} office Office object.
+ * @param {String} usergroupMention Name of the usergroup.
+ * @returns {{}} Scheduled message formated in Slack Block Kit.
+ */
+const getRegistrationsForTheDayBlockWithUG = (date, registrations, office, usergroupMention) => {
+  const registrationsforTheDayBlock = [];
+  const registrationList = library.registrationListWithUsergroup(
+    date,
+    registrations,
+    usergroupMention,
+    generatePlaintextString,
+  );
+  registrationsforTheDayBlock.push(header(formatOffice(office)), mrkdwn(registrationList));
+
+  return registrationsforTheDayBlock;
+};
+
 module.exports = {
   getUpdateBlock,
   getDefaultSettingsBlock,
@@ -370,4 +405,6 @@ module.exports = {
   getOfficeControlBlock,
   getNoOfficesBlock,
   stylizeRegisterButtons,
+  getRegistrationsForTheDayBlock,
+  getRegistrationsForTheDayBlockWithUG,
 };

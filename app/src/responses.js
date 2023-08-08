@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 const dfunc = require("./dateFunctions");
-const { formatUserIdList } = require("./helperFunctions");
+const { formatUserIdList, formatOffice } = require("./helperFunctions");
 const { generateNameAndMention } = require("./userCache");
 
 const weekdays = [
@@ -93,6 +93,20 @@ const correctVerbForm = (date, peopleCnt) => {
 };
 
 /**
+ * Formats a notification message to be sent with the scheduled message block.
+ * @param {Object} office Office object.
+ * @param {Number} nPeople Number of people at the office.
+ * @param {String} [usergroupMention] Optional name of the usergroup.
+ * @returns {String} A message containing the status of the number of people at the office.
+ */
+const scheduledMessageNotificationMsg = (office, nPeople, usergroupMention) => {
+  const message = `Tänään toimistolla ${formatOffice(office)} ${
+    usergroupMention ? `tiimistä ${usergroupMention}` : ""
+  } on ${nPeople} ${nPeople === 1 ? "henkilö" : "henkilöä"}.`;
+  return message;
+};
+
+/**
  * Generates a plain text string message containing the date
  * and list of registrations.
  * @param {Luxon Date} date - Luxon Date object.
@@ -103,7 +117,7 @@ const correctVerbForm = (date, peopleCnt) => {
 const registrationList = (date, registrations, userFormatter = generateNameAndMention) => {
   if (registrations.length === 0) return nobodyAtOffice(date);
   const verb = correctVerbForm(date, registrations.length);
-  let response = `${atDate(date)} toimistolla ${verb}:\n`;
+  let response = `${atDate(date)} toimistolla ${verb}: _(${registrations.length})_\n\n`;
   registrations = formatUserIdList(registrations, userFormatter);
   for (const user of registrations) {
     response += `${user}\n`;
@@ -128,7 +142,9 @@ const registrationListWithUsergroup = (
 ) => {
   if (registrations.length === 0) return nobodyAtOfficeFromTeam(date, usergroupMention);
   const verb = correctVerbForm(date, registrations.length);
-  let response = `${atDate(date)} tiimistä ${usergroupMention} ${verb} toimistolla:\n`;
+  let response = `${atDate(date)} tiimistä ${usergroupMention} ${verb} toimistolla: _(${
+    registrations.length
+  })_\n\n`;
   registrations = formatUserIdList(registrations, userFormatter);
   for (const user of registrations) {
     response += `${user}\n`;
@@ -142,8 +158,10 @@ const registrationListWithUsergroup = (
  * @param {Object} office
  */
 const automatedMessageRescheduled = (time, office) =>
-  `Ajastettu viesti tilattu kanavalle kello ${time}${
-    office ? ` sisältäen toimiston '${office.officeName}' ilmoittautumiset.` : "."
+  `Ajastettu viesti tilattu kanavalle kello ${time} ${
+    office
+      ? `sisältäen toimiston '${office.officeName}' ilmoittautumiset.`
+      : "sisältäen kaikkien toimistojen ilmoittautumiset."
   }`;
 
 /**
@@ -226,4 +244,5 @@ module.exports = {
   registrationListWithUsergroup,
   usergroupNotFound,
   subscribeFailedNotInChannel,
+  scheduledMessageNotificationMsg,
 };

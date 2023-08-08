@@ -4,6 +4,10 @@ const library = require("../responses");
 const helper = require("../helperFunctions");
 const service = require("../databaseService");
 const { generatePlaintextString } = require("../userCache");
+const {
+  getRegistrationsForTheDayBlock,
+  getRegistrationsForTheDayBlockWithUG,
+} = require("../ui/customBlocks");
 
 /**
  * Sends the list of registered users to the given channel.
@@ -12,13 +16,13 @@ const { generatePlaintextString } = require("../userCache");
  * @param {string} channelId - Slack channel id.
  * @param {string} date - Date string in the ISO date format.
  */
-const postRegistrations = async (app, registrations, channelId, date) => {
-  const messageWithoutMentions = library.registrationList(
-    DateTime.now(),
-    registrations,
-    generatePlaintextString,
-  );
-  const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts;
+const postRegistrations = async (app, registrations, channelId, date, officeId) => {
+  const office = await service.getOffice(officeId);
+  const registrationsBlock = getRegistrationsForTheDayBlock(date, registrations, office);
+  const fallbackMessage = library.scheduledMessageNotificationMsg(office, registrations.length);
+  const messageId = (
+    await helper.postBlockMessage(app, channelId, fallbackMessage, registrationsBlock)
+  ).ts;
   if (messageId) {
     service.addScheduledMessage(messageId, date, channelId);
   }
@@ -40,14 +44,24 @@ const postRegistrationsWithUsergroup = async (
   usergroups,
   usergroupId,
   date,
+  officeId,
 ) => {
-  const messageWithoutMentions = library.registrationListWithUsergroup(
-    DateTime.now(),
+  const office = await service.getOffice(officeId);
+  const registrationsBlock = getRegistrationsForTheDayBlockWithUG(
+    date,
     registrations,
+    office,
     usergroups.generatePlaintextString(usergroupId),
     generatePlaintextString,
   );
-  const messageId = (await helper.postMessage(app, channelId, messageWithoutMentions)).ts;
+  const fallbackMessage = library.scheduledMessageNotificationMsg(
+    office,
+    registrations.length,
+    usergroups.generatePlaintextString(usergroupId),
+  );
+  const messageId = (
+    await helper.postBlockMessage(app, channelId, fallbackMessage, registrationsBlock)
+  ).ts;
   if (messageId) {
     service.addScheduledMessage(messageId, date, channelId, usergroupId);
   }
@@ -59,36 +73,44 @@ const postRegistrationsWithUsergroup = async (
  * and posts separate messages for each.
  * @param {*} app - Slack app instance.
  * @param {string} channelId - ID of the channel where messages will be posted
+ * @param {string} [officeId] - Optional ID of a office, will only include registrations
+ *                              from this office, otherwise includes all.
  * @param {*} usergroups - usergroups cache instance
- * @param {*} userCache - userCache instance
- * @returns
  */
 const sendScheduledMessage = async (app, channelId, officeId, usergroups) => {
   console.log("delivering scheduled posts");
-  const date = DateTime.now().toISODate();
-  const registrations = await service.getRegistrationsFor(date, officeId);
+  const date = DateTime.now();
+  const officeIds = [];
+  officeId
+    ? officeIds.push(officeId)
+    : officeIds.push(...(await service.getAllOffices()).map((office) => office.id));
+  // Send a separate message for each office if no office argument was given.
+  for (officeId of officeIds) {
+    const registrations = await service.getRegistrationsFor(date.toISODate(), officeId);
 
-  const usergroupIds = usergroups.getUsergroupsForChannel(channelId);
-  // No Slack user groups are added to this channel.
-  // Send normal message containing everyone that is registered.
-  if (usergroupIds.length === 0) {
-    return postRegistrations(app, registrations, channelId, date);
-  } else {
-    // Send a separate list of registered users from each
-    // Slack user group in this channel
-    usergroupIds.forEach(async (usergroupId) => {
-      const filteredRegistrations = registrations.filter((userId) =>
-        usergroups.isUserInUsergroup(userId, usergroupId),
-      );
-      return postRegistrationsWithUsergroup(
-        app,
-        filteredRegistrations,
-        channelId,
-        usergroups,
-        usergroupId,
-        date,
-      );
-    });
+    const usergroupIds = usergroups.getUsergroupsForChannel(channelId);
+    // No Slack user groups are added to this channel.
+    // Send normal message containing everyone that is registered.
+    if (usergroupIds.length === 0) {
+      postRegistrations(app, registrations, channelId, date, officeId);
+    } else {
+      // Send a separate list of registered users from each
+      // Slack user group in this channel
+      usergroupIds.forEach(async (usergroupId) => {
+        const filteredRegistrations = registrations.filter((userId) =>
+          usergroups.isUserInUsergroup(userId, usergroupId),
+        );
+        postRegistrationsWithUsergroup(
+          app,
+          filteredRegistrations,
+          channelId,
+          usergroups,
+          usergroupId,
+          date,
+          officeId,
+        );
+      });
+    }
   }
 };
 
