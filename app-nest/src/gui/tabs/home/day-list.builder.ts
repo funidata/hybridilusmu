@@ -1,6 +1,7 @@
+import { Injectable } from "@nestjs/common";
 import dayjs, { Dayjs } from "dayjs";
 import { flatten } from "lodash";
-import getDayListItemBlocks from "./day-list-item.blocks";
+import { DayListItemBuilder } from "./day-list-item.builder";
 
 /**
  * Get range of days from today (inclusive) for the next `len` working days (defined as Mon-Fri).
@@ -24,10 +25,15 @@ const dayRange = (len: number, days: Dayjs[] = [], i = 0): Dayjs[] => {
   return dayRange(len, days, i + 1);
 };
 
-const getDayListBlocks = () => {
-  const dates = dayRange(14);
-  const blockLists = dates.map((date) => getDayListItemBlocks({ date }));
-  return flatten(blockLists);
-};
+@Injectable()
+export class DayListBuilder {
+  constructor(private dayListItemBuilder: DayListItemBuilder) {}
 
-export default getDayListBlocks;
+  async build() {
+    const dates = dayRange(14);
+    const blockLists = dates.map((date) =>
+      this.dayListItemBuilder.build({ date }),
+    );
+    return flatten(blockLists);
+  }
+}

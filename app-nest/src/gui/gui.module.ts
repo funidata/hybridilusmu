@@ -1,11 +1,7 @@
 import { Module } from "@nestjs/common";
-import { UserModule } from "../entities/user/user.module";
-import { UserService } from "../entities/user/user.service";
-import { HomeTabController } from "./tabs/home/home-tab.controller";
+import { HomeTabModule } from "./tabs/home/home-tab.module";
 
 @Module({
-  imports: [UserModule],
-  providers: [UserService],
-  controllers: [HomeTabController],
+  imports: [HomeTabModule],
 })
 export class GuiModule {}
