@@ -1,4 +1,4 @@
-import { Controller } from "@nestjs/common";
+import { Controller, InternalServerErrorException } from "@nestjs/common";
 import dayjs from "dayjs";
 import BoltAction from "../../bolt/decorators/bolt-action.decorator";
 import BoltActions from "../../bolt/enums/bolt-actions.enum";
@@ -40,6 +40,22 @@ export class PresenceController {
       userId: body.user.id,
       date: dayjs(date).toDate(),
       office: value,
+    });
+  }
+
+  // TODO: Should this be moved?
+  @BoltAction(BoltActions.DAY_LIST_ITEM_OVERFLOW)
+  async dayListItemOverflow({ ack, body, payload }: BoltActionArgs) {
+    await ack();
+    const { type, date } = JSON.parse(payload["selected_option"].value);
+
+    if (type !== "remove_presence") {
+      throw new InternalServerErrorException("Not implemented.");
+    }
+
+    await this.presenceService.remove({
+      userId: body.user.id,
+      date: dayjs(date).toDate(),
     });
   }
 }

@@ -26,4 +26,8 @@ export class PresenceService {
       .orUpdate(updatableCols, primaryKeys)
       .execute();
   }
+
+  async remove(presence: Pick<Presence, "userId" | "date">) {
+    return this.presenceRepository.delete(presence);
+  }
 }
