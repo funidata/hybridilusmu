@@ -23,7 +23,7 @@ const getDayListItemBlocks = ({ date }: DayListItemProps) => [
           text: "Toimistolla",
         },
         style: "primary",
-        action_id: BoltActions.REGISTER_PRESENCE,
+        action_id: BoltActions.SET_OFFICE_PRESENCE,
         value: date.toISOString(),
       },
       {
@@ -32,6 +32,8 @@ const getDayListItemBlocks = ({ date }: DayListItemProps) => [
           type: "plain_text",
           text: "Etänä",
         },
+        action_id: BoltActions.SET_REMOTE_PRESENCE,
+        value: date.toISOString(),
       },
       {
         action_id: BoltActions.SELECT_OFFICE_FOR_DATE,

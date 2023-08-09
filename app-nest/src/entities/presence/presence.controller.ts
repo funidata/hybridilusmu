@@ -10,13 +10,24 @@ import { PresenceService } from "./presence.service";
 export class PresenceController {
   constructor(private presenceService: PresenceService) {}
 
-  @BoltAction(BoltActions.REGISTER_PRESENCE)
-  async registerPresence({ ack, body, payload }: BoltActionArgs) {
+  @BoltAction(BoltActions.SET_OFFICE_PRESENCE)
+  async setOfficePresence({ ack, body, payload }: BoltActionArgs) {
     await ack();
     const date = dayjs(payload["value"]).toDate();
     await this.presenceService.upsert({
       userId: body.user.id,
       type: PresenceType.AT_OFFICE,
+      date,
+    });
+  }
+
+  @BoltAction(BoltActions.SET_REMOTE_PRESENCE)
+  async setRemotePresence({ ack, body, payload }: BoltActionArgs) {
+    await ack();
+    const date = dayjs(payload["value"]).toDate();
+    await this.presenceService.upsert({
+      userId: body.user.id,
+      type: PresenceType.REMOTE,
       date,
     });
   }
