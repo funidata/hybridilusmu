@@ -7,15 +7,17 @@ import {
   Option,
   OverflowMenu,
   StaticSelect,
+  ViewBlockBuilder,
 } from "slack-block-builder";
 import BoltActions from "../../../bolt/enums/bolt-actions.enum";
+import { BlockBuilder } from "../../block-builder.interface";
 
 type DayListItemProps = {
   date: Dayjs;
 };
 
 @Injectable()
-export class DayListItemBuilder {
+export class DayListItemBuilder implements BlockBuilder<ViewBlockBuilder> {
   build({ date }: DayListItemProps) {
     const dateString = date.toISOString();
 

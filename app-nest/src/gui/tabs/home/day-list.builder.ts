@@ -1,6 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import dayjs, { Dayjs } from "dayjs";
 import { flatten } from "lodash";
+import { ViewBlockBuilder } from "slack-block-builder";
+import { BlockBuilder } from "../../block-builder.interface";
 import { DayListItemBuilder } from "./day-list-item.builder";
 
 /**
@@ -26,7 +28,7 @@ const dayRange = (len: number, days: Dayjs[] = [], i = 0): Dayjs[] => {
 };
 
 @Injectable()
-export class DayListBuilder {
+export class DayListBuilder implements BlockBuilder<ViewBlockBuilder> {
   constructor(private dayListItemBuilder: DayListItemBuilder) {}
 
   async build() {

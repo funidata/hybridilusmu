@@ -1,9 +1,17 @@
 import { Injectable } from "@nestjs/common";
-import { Actions, Button, Context, Divider, Header } from "slack-block-builder";
+import {
+  Actions,
+  Button,
+  Context,
+  Divider,
+  Header,
+  ViewBlockBuilder,
+} from "slack-block-builder";
 import BoltActions from "../../bolt/enums/bolt-actions.enum";
+import { BlockBuilder } from "../block-builder.interface";
 
 @Injectable()
-export class DevToolsBuilder {
+export class DevToolsBuilder implements BlockBuilder<ViewBlockBuilder> {
   build() {
     return [
       Header({ text: ":wrench:  Developer Tools" }),

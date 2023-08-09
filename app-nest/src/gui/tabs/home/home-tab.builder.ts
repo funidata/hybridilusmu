@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { Header } from "slack-block-builder";
+import { Header, ViewBlockBuilder } from "slack-block-builder";
+import { BlockBuilder } from "../../block-builder.interface";
 import { DevToolsBuilder } from "../../dev/dev-tools.builder";
 import { DayListBuilder } from "./day-list.builder";
 
-// TODO: Create interface for these kind of builder classes.
 @Injectable()
-export class HomeTabBuilder {
+export class HomeTabBuilder implements BlockBuilder<ViewBlockBuilder> {
   constructor(
     private dayListBlocks: DayListBuilder,
     private devToolsBuilder: DevToolsBuilder,
