@@ -1,15 +1,20 @@
-import { Column, Entity, PrimaryGeneratedColumn, Repository } from "typeorm";
+import { Column, Entity, PrimaryColumn, Repository } from "typeorm";
+
+export enum PresenceType {
+  AT_OFFICE = "at_office",
+  REMOTE = "remote",
+}
 
 @Entity()
 export class Presence {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
+  @PrimaryColumn()
   userId: string;
 
-  @Column({ type: "timestamptz" })
+  @PrimaryColumn({ type: "date" })
   date: Date;
+
+  @Column({ type: "enum", enum: PresenceType })
+  type: PresenceType;
 }
 
 export type PresenceRepository = Repository<Presence>;
