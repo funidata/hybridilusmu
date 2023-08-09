@@ -20,4 +20,15 @@ export class PresenceController {
       date,
     });
   }
+
+  @BoltAction(BoltActions.SELECT_OFFICE_FOR_DATE)
+  async selectOfficeForDate({ ack, body, payload }: BoltActionArgs) {
+    await ack();
+    const { value, date } = JSON.parse(payload["selected_option"].value);
+    await this.presenceService.upsert({
+      userId: body.user.id,
+      date: dayjs(date).toDate(),
+      office: value,
+    });
+  }
 }

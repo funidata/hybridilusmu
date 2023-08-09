@@ -13,8 +13,11 @@ export class Presence {
   @PrimaryColumn({ type: "date" })
   date: Date;
 
-  @Column({ type: "enum", enum: PresenceType })
-  type: PresenceType;
+  @Column({ type: "enum", enum: PresenceType, nullable: true })
+  type: PresenceType | null;
+
+  @Column({ nullable: true })
+  office: string | null;
 }
 
 export type PresenceRepository = Repository<Presence>;

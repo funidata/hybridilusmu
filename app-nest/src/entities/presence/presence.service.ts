@@ -10,13 +10,20 @@ export class PresenceService {
     private dataSource: DataSource,
   ) {}
 
-  async upsert(presence: Presence) {
+  async upsert(presence: Partial<Presence>) {
+    // Select only existing cols for the upsert operation to avoid overriding
+    // existing data with defaults/nulls.
+    const primaryKeys = ["userId", "date"];
+    const updatableCols = Object.keys(presence).filter(
+      (key) => !primaryKeys.includes(key),
+    );
+
     return this.dataSource
       .createQueryBuilder()
       .insert()
       .into(Presence)
       .values(presence)
-      .orUpdate(["type"], ["userId", "date"])
+      .orUpdate(updatableCols, primaryKeys)
       .execute();
   }
 }

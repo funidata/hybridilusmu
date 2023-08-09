@@ -34,7 +34,7 @@ const getDayListItemBlocks = ({ date }: DayListItemProps) => [
         },
       },
       {
-        action_id: "text1234",
+        action_id: BoltActions.SELECT_OFFICE_FOR_DATE,
         type: "static_select",
         placeholder: {
           type: "plain_text",
@@ -45,7 +45,7 @@ const getDayListItemBlocks = ({ date }: DayListItemProps) => [
             type: "plain_text",
             text: "Helsinki",
           },
-          value: "hki",
+          value: JSON.stringify({ value: "hki", date: date.toISOString() }),
         },
         options: [
           {
@@ -53,14 +53,14 @@ const getDayListItemBlocks = ({ date }: DayListItemProps) => [
               type: "plain_text",
               text: "Helsinki",
             },
-            value: "hki",
+            value: JSON.stringify({ value: "hki", date: date.toISOString() }),
           },
           {
             text: {
               type: "plain_text",
               text: "Tampere",
             },
-            value: "tre",
+            value: JSON.stringify({ value: "tre", date: date.toISOString() }),
           },
         ],
       },
