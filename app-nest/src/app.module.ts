@@ -5,7 +5,6 @@ import configuration from "./config/configuration";
 import { inDevelopmentEnvironment } from "./config/utils";
 import { DevToolsModule } from "./dev-tools/dev-tools.module";
 import { EntitiesModule } from "./entities/entities.module";
-import { PresenceModule } from "./entities/presence/presence.module";
 import { GuiModule } from "./gui/gui.module";
 import { SyncModule } from "./sync/sync.module";
 
@@ -30,7 +29,6 @@ import { SyncModule } from "./sync/sync.module";
     EntitiesModule,
     SyncModule,
     DevToolsModule,
-    PresenceModule,
   ],
 })
 export class AppModule {}
