@@ -10,15 +10,18 @@ import {
   ViewBlockBuilder,
 } from "slack-block-builder";
 import BoltActions from "../../../bolt/enums/bolt-actions.enum";
+import { Office } from "../../../entities/office/office.entity";
 import { BlockBuilder } from "../../block-builder.interface";
 
 type DayListItemProps = {
   date: Dayjs;
+  offices: Office[];
 };
 
 @Injectable()
 export class DayListItemBuilder implements BlockBuilder<ViewBlockBuilder> {
-  build({ date }: DayListItemProps) {
+  build(props: DayListItemProps) {
+    const { date } = props;
     const dateString = date.toISOString();
 
     return [
@@ -34,26 +37,7 @@ export class DayListItemBuilder implements BlockBuilder<ViewBlockBuilder> {
           actionId: BoltActions.SET_REMOTE_PRESENCE,
           value: dateString,
         }),
-        StaticSelect({
-          placeholder: "Valitse toimipiste",
-          actionId: BoltActions.SELECT_OFFICE_FOR_DATE,
-        })
-          .initialOption(
-            Option({
-              text: "Helsinki",
-              value: JSON.stringify({ value: "hki", date }),
-            }),
-          )
-          .options(
-            Option({
-              text: "Helsinki",
-              value: JSON.stringify({ value: "hki", date }),
-            }),
-            Option({
-              text: "Tampere",
-              value: JSON.stringify({ value: "tre", date }),
-            }),
-          ),
+        this.getOfficeBlocks(props),
         OverflowMenu({ actionId: BoltActions.DAY_LIST_ITEM_OVERFLOW }).options(
           Option({
             text: "Poista ilmoittautuminen",
@@ -65,5 +49,26 @@ export class DayListItemBuilder implements BlockBuilder<ViewBlockBuilder> {
         ),
       ),
     ];
+  }
+
+  private getOfficeBlocks({ date, offices }: DayListItemProps) {
+    // Don't show office select at all if no offices exist.
+    if (offices.length === 0) {
+      return null;
+    }
+
+    const Options = offices.map(({ id, name }) =>
+      Option({
+        text: name,
+        value: JSON.stringify({ value: id, date }),
+      }),
+    );
+
+    return StaticSelect({
+      placeholder: "Valitse toimipiste",
+      actionId: BoltActions.SELECT_OFFICE_FOR_DATE,
+    })
+      .initialOption(Options[0])
+      .options(Options);
   }
 }
