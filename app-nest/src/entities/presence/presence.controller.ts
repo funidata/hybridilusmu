@@ -36,10 +36,10 @@ export class PresenceController {
   async selectOfficeForDate({ ack, body, payload }: BoltActionArgs) {
     await ack();
     const { value, date } = JSON.parse(payload["selected_option"].value);
-    await this.presenceService.upsert({
+    await this.presenceService.setOffice({
       userId: body.user.id,
       date: dayjs(date).toDate(),
-      office: value,
+      officeId: value,
     });
   }
 

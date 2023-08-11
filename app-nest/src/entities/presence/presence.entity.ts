@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn, Repository } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryColumn, Repository } from "typeorm";
+import { Office } from "../office/office.entity";
 
 export enum PresenceType {
   AT_OFFICE = "at_office",
@@ -16,8 +17,8 @@ export class Presence {
   @Column({ type: "enum", enum: PresenceType, nullable: true })
   type: PresenceType | null;
 
-  @Column({ nullable: true })
-  office: string | null;
+  @ManyToOne(() => Office, { nullable: true })
+  office: Office;
 }
 
 export type PresenceRepository = Repository<Presence>;
