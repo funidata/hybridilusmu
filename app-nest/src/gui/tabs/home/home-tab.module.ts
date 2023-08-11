@@ -5,10 +5,16 @@ import { DayListItemBuilder } from "./day-list-item.builder";
 import { DayListBuilder } from "./day-list.builder";
 import { HomeTabBuilder } from "./home-tab.builder";
 import { HomeTabController } from "./home-tab.controller";
+import { VisibleOfficeSelectBuilder } from "./visible-office-select.builder";
 
 @Module({
   imports: [DevToolsModule, OfficeModule],
-  providers: [HomeTabBuilder, DayListBuilder, DayListItemBuilder],
+  providers: [
+    HomeTabBuilder,
+    DayListBuilder,
+    DayListItemBuilder,
+    VisibleOfficeSelectBuilder,
+  ],
   controllers: [HomeTabController],
 })
 export class HomeTabModule {}
