@@ -58,9 +58,10 @@ export class BoltRegisterService {
     const cref = this.moduleRef.get(discoveredMethod.parentClass.injectType, {
       strict: false,
     });
-    // N.B.: Take care where you call the discovered handler method. This is an easy
-    // place to bind it into a wrong context. Ask me how I know.
-    return cref[discoveredMethod.methodName]();
+
+    return cref[discoveredMethod.methodName].bind(
+      discoveredMethod.parentClass.instance,
+    );
   }
 
   /**
