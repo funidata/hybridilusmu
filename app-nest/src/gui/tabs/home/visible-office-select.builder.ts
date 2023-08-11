@@ -5,6 +5,7 @@ import {
   StaticSelect,
   ViewBlockBuilder,
 } from "slack-block-builder";
+import BoltActions from "../../../bolt/enums/bolt-actions.enum";
 import { OfficeService } from "../../../entities/office/office.service";
 import { BlockBuilder } from "../../block-builder.interface";
 
@@ -29,7 +30,7 @@ export class VisibleOfficeSelectBuilder
       }).accessory(
         StaticSelect({
           placeholder: "Valitse toimipiste",
-          actionId: "asd",
+          actionId: BoltActions.SET_VISIBLE_OFFICE,
         })
           // TODO: Use user's selected office as initial value.
           .initialOption(Options[0])
